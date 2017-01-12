@@ -33,28 +33,29 @@ module Hg
       end
 
       def include_chunks
-        bot_class.class_eval "include #{bot_class.to_s}::Blocks"
+        bot_class.class_eval "include #{bot_class.to_s}::Chunks"
       end
 
       def deliver(recipient)
         show_typing(recipient)
 
-        Rails.logger.ap(@deliverables)
+        Rails.logger.info 'DELIVERABLES'
+        Rails.logger.info @deliverables.inspect
 
         @deliverables.each do |deliverable|
           if deliverable.is_a? Class
             deliverable.deliver(recipient)
           else
-            Facebook::Messenger::Bot.deliver(deliverable.merge(recipient: recipient))
+            Facebook::Messenger::Bot.deliver(deliverable.merge(recipient: recipient), access_token: ENV['ACCESS_TOKEN'])
           end
         end
       end
 
       def show_typing(recipient)
-        Facebook::Messenger::Bot.deliver(
+        Facebook::Messenger::Bot.deliver({
           recipient: recipient,
           sender_action: 'typing_on'
-        )
+        }, access_token: ENV['ACCESS_TOKEN'])
       end
 
       def keywords(*chunk_keywords)

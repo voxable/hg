@@ -34,11 +34,11 @@ module Hg
       end
 
       def initialize_persistent_menu
-        Facebook::Messenger::Thread.set(
-          setting_type: 'call_to_actions',
-          thread_state: 'existing_thread',
+        Facebook::Messenger::Thread.set({
+          setting_type:    'call_to_actions',
+          thread_state:    'existing_thread',
           call_to_actions: @call_to_actions
-        )
+        }, access_token: ENV['ACCESS_TOKEN'])
       end
 
       def call_to_action(text, options = {})
@@ -70,7 +70,7 @@ module Hg
       end
 
       def initialize_get_started_button
-        Facebook::Messenger::Thread.set @get_started_content
+        Facebook::Messenger::Thread.set @get_started_content, access_token: ENV['ACCESS_TOKEN']
       end
 
       def greeting_text(text)
@@ -82,34 +82,34 @@ module Hg
       end
 
       def initialize_greeting_text
-        Facebook::Messenger::Thread.set(
+        Facebook::Messenger::Thread.set({
           setting_type: 'greeting',
           greeting: {
             text: @greeting_text
           }
-        )
+        }, access_token: ENV['ACCESS_TOKEN'])
       end
 
       def run_postback_payload(payload, recipient)
         begin
           payload.constantize.deliver(recipient)
         rescue NameError
-          Rails.logger.error "Postback payload constant not found: #{payload}"
+          # Rails.logger.error "Postback payload constant not found: #{payload}"
         end
       end
 
       def initialize_router
-        Facebook::Messenger::Bot.on :postback do |postback|
-          #Rails.logger.info 'POSTBACK'
-          #Rails.logger.info postback.payload
+        ::Facebook::Messenger::Bot.on :postback do |postback|
+          Rails.logger.info 'POSTBACK'
+          Rails.logger.info postback.payload
 
           run_postback_payload(postback.payload, postback.sender)
         end
 
-        Facebook::Messenger::Bot.on :message do |message|
-          #Rails.logger.info 'MESSAGE'
-          #Rails.logger.info message.text
-          #Rails.logger.info message.quick_reply
+        ::Facebook::Messenger::Bot.on :message do |message|
+          Rails.logger.info 'MESSAGE'
+          Rails.logger.info message.text
+          Rails.logger.info message.quick_reply
 
           # Attempt to run a quick reply payload
           if message.quick_reply
