@@ -89,6 +89,31 @@ module Hg
         @card[:item_url] = url
       end
 
+      # Build a button template message.
+      # See https://developers.facebook.com/docs/messenger-platform/send-api-reference/button-template
+      def buttons(&block)
+        @card = {}
+
+        yield
+
+        deliverable = {
+          message: {
+            attachment: {
+              type: 'template',
+              payload: {
+                template_type: 'button'
+              }
+            }
+          }
+        }
+
+        # Move buttons to proper location
+        deliverable[:message][:attachment][:payload][:buttons] = @card.delete(:buttons)
+        deliverable[:message][:attachment][:payload][:text] = @deliverables.pop[:message][:text]
+
+        @deliverables << deliverable
+      end
+
       def button(text, options = {})
         # TODO: text needs a better name
         if text.is_a? Class
