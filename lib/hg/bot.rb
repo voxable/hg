@@ -92,6 +92,7 @@ module Hg
 
       def run_postback_payload(payload, recipient)
         begin
+          # TODO: Shouldn't be constantizing user input. Need a way to sanitize this.
           payload.constantize.deliver(recipient)
         rescue NameError
           # Rails.logger.error "Postback payload constant not found: #{payload}"
