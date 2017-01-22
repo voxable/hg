@@ -5,6 +5,7 @@ module Hg
       base.prepend Initializer
       base.id = base.to_s
       base.deliverables = []
+      base.dynamic = false
       base.add_to_router
       base.add_to_chunks
       base.include_chunks
@@ -17,16 +18,20 @@ module Hg
       Rails.logger.info self.class.deliverables.inspect
 
       self.class.deliverables.each do |deliverable|
+        # If another chunk, deliver it
         if deliverable.is_a? Class
-          deliverable.new(recipient: @recipient).deliver
+          deliverable.new(recipient: @recipient, context: @context).deliver
+        # If dynamic, then it needs to be evaluated at delivery time. Create a
+        # `template` with empty `@deliverables`, then evaluate
+        # the dynamic block within it and deliver.
         elsif deliverable.is_a? Proc
-          old_deliverables = self.class.deliverables.dup
-          self.class.deliverables = []
+          template = self.class.dup
+          template.deliverables = []
 
-          deliverable.call
-          self.class.new(recipient: @recipient, context: @context).deliver
+          template.class_eval(&deliverable)
 
-          self.class.deliverables = old_deliverables
+          template.new(recipient: @recipient, context: @context).deliver
+        # Otherwise, it's just a raw message. Deliver it.
         else
           Facebook::Messenger::Bot.deliver(deliverable.merge(recipient: @recipient), access_token: ENV['ACCESS_TOKEN'])
         end
@@ -46,6 +51,7 @@ module Hg
       attr_accessor :label
       attr_accessor :recipient
       attr_accessor :context
+      attr_accessor :dynamic
 
       def bot_class
         self.to_s.split('::').first.constantize
@@ -68,6 +74,8 @@ module Hg
       end
 
       def dynamic(&block)
+        @dynamic = true
+
         @deliverables << block
       end
 
