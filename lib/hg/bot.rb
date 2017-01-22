@@ -1,12 +1,10 @@
 module Hg
   module Bot
-    class << self
-      def included(base)
-        base.extend ClassMethods
-        base.routes = {}
-        base.chunks = []
-        base.call_to_actions = []
-      end
+    def self.included(base)
+      base.extend ClassMethods
+      base.routes = {}
+      base.chunks = []
+      base.call_to_actions = []
     end
 
     module ClassMethods
@@ -90,13 +88,9 @@ module Hg
         }, access_token: ENV['ACCESS_TOKEN'])
       end
 
-      def run_postback_payload(payload, recipient)
-        begin
-          # TODO: Shouldn't be constantizing user input. Need a way to sanitize this.
-          payload.constantize.deliver(recipient)
-        rescue NameError
-          # Rails.logger.error "Postback payload constant not found: #{payload}"
-        end
+      def run_postback_payload(payload, recipient, context)
+        # TODO: Shouldn't be constantizing user input. Need a way to sanitize this.
+        payload.constantize.new(recipient: recipient, context: context).deliver
       end
 
       def initialize_router

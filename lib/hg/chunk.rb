@@ -1,13 +1,42 @@
 module Hg
   module Chunk
-    class << self
-      def included(base)
-        base.extend ClassMethods
-        base.id = base.to_s
-        base.deliverables = []
-        base.add_to_router
-        base.add_to_chunks
-        base.include_chunks
+    def self.included(base)
+      base.extend ClassMethods
+      base.prepend Initializer
+      base.id = base.to_s
+      base.deliverables = []
+      base.add_to_router
+      base.add_to_chunks
+      base.include_chunks
+    end
+
+    def deliver
+      self.class.show_typing(@recipient)
+
+      Rails.logger.info 'DELIVERABLES'
+      Rails.logger.info self.class.deliverables.inspect
+
+      self.class.deliverables.each do |deliverable|
+        if deliverable.is_a? Class
+          deliverable.new(recipient: @recipient).deliver
+        elsif deliverable.is_a? Proc
+          old_deliverables = self.class.deliverables.dup
+          self.class.deliverables = []
+
+          deliverable.call
+          self.class.new(recipient: @recipient, context: @context).deliver
+
+          self.class.deliverables = old_deliverables
+        else
+          Facebook::Messenger::Bot.deliver(deliverable.merge(recipient: @recipient), access_token: ENV['ACCESS_TOKEN'])
+        end
+      end
+    end
+
+    module Initializer
+      def initialize(recipient: nil, context: nil)
+        @recipient = recipient
+        @context = context
       end
     end
 
@@ -15,6 +44,8 @@ module Hg
       attr_accessor :id
       attr_accessor :deliverables
       attr_accessor :label
+      attr_accessor :recipient
+      attr_accessor :context
 
       def bot_class
         self.to_s.split('::').first.constantize
@@ -36,19 +67,8 @@ module Hg
         bot_class.class_eval "include #{bot_class.to_s}::Chunks"
       end
 
-      def deliver(recipient)
-        show_typing(recipient)
-
-        Rails.logger.info 'DELIVERABLES'
-        Rails.logger.info @deliverables.inspect
-
-        @deliverables.each do |deliverable|
-          if deliverable.is_a? Class
-            deliverable.deliver(recipient)
-          else
-            Facebook::Messenger::Bot.deliver(deliverable.merge(recipient: recipient), access_token: ENV['ACCESS_TOKEN'])
-          end
-        end
+      def dynamic(&block)
+        @deliverables << block
       end
 
       def show_typing(recipient)
@@ -116,6 +136,7 @@ module Hg
 
       def button(text, options = {})
         # TODO: text needs a better name
+        # If the first argument is a chunk, then make this button a link to that chunk
         if text.is_a? Class
           klass = text
           text = text.instance_variable_get(:@label)
@@ -131,14 +152,24 @@ module Hg
           }
         end
 
+        # If a `to` option is present, assume this is a postback link to another chunk.
         if options[:to]
           button_content[:type] = 'postback'
           button_content[:payload] = options[:to].to_s
+        # If a `url` option is present, assume this is a webview link button.
         elsif options[:url]
           button_content[:type] = 'web_url'
-          button_content[:url] = options[:url]
+
+          button_content[:url] = evaluate_option(options[:url])
+        # If a different type of button is specified (e.g. "Log in"), then pass
+        # through the `type` and `url`.
+        elsif options[:type]
+          button_content[:type] = options[:type]
+
+          button_content[:url] = evaluate_option(options[:url])
         end
 
+        # Pass through the `webview_height_ratio` option.
         button_content[:webview_height_ratio] = options[:webview_height_ratio]
 
         @card[:buttons] = [] unless @card[:buttons]
@@ -208,6 +239,20 @@ module Hg
 
       def chunk(chunk_class)
         @deliverables << chunk_class
+      end
+
+      private
+
+      # Take an option, and either call it (if a lambda) or return its value.
+      #
+      # @param [lambda, String] option Either a lambda to be evaluated, or a value
+      # @return [String] The option value
+      def evaluate_option(option)
+        if option.respond_to?(:call)
+          option.call(@context)
+        else
+          option
+        end
       end
     end
   end
