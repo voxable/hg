@@ -1,5 +1,7 @@
 # Hg
 
+**NB: This gem is still under heavy development, and is likely going to change wildly between releases. You probably shouldn't use it quite yet.**
+
 ## Getting Started
 
 ### Installation
@@ -20,9 +22,7 @@ Or install it yourself as:
     
 ### Configuration
 
-Create an initializer file within your Rails app at `config/initializers/bot.rb`:
-
-```ruby
+Create an initializer file within your Rails app at `config/initializers/bot.rb`
     
 
 ## Usage
