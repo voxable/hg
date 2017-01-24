@@ -142,6 +142,10 @@ module Hg
         @deliverables << deliverable
       end
 
+      def log_in(url)
+        button nil, url: url, type: 'account_link'
+      end
+
       def button(text, options = {})
         # TODO: text needs a better name
         # If the first argument is a chunk, then make this button a link to that chunk
@@ -164,15 +168,15 @@ module Hg
         if options[:to]
           button_content[:type] = 'postback'
           button_content[:payload] = options[:to].to_s
-        # If a `url` option is present, assume this is a webview link button.
-        elsif options[:url]
-          button_content[:type] = 'web_url'
-
-          button_content[:url] = evaluate_option(options[:url])
         # If a different type of button is specified (e.g. "Log in"), then pass
         # through the `type` and `url`.
         elsif options[:type]
           button_content[:type] = options[:type]
+
+          button_content[:url] = evaluate_option(options[:url])
+        # If a `url` option is present, assume this is a webview link button.
+        elsif options[:url]
+          button_content[:type] = 'web_url'
 
           button_content[:url] = evaluate_option(options[:url])
         end
