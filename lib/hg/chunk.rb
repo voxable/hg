@@ -28,7 +28,7 @@ module Hg
           template = self.class.dup
           template.deliverables = []
 
-          template.class_eval(&deliverable)
+          template.class_exec(@recipient, @context, &deliverable)
 
           template.new(recipient: @recipient, context: @context).deliver
         # Otherwise, it's just a raw message. Deliver it.
