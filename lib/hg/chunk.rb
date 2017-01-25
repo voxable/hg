@@ -16,6 +16,8 @@ module Hg
 
       Rails.logger.info 'DELIVERABLES'
       Rails.logger.info self.class.deliverables.inspect
+      Rails.logger.info 'RECIPIENT'
+      Rails.logger.info @recipient.inspect
 
       self.class.deliverables.each do |deliverable|
         # If another chunk, deliver it
@@ -40,7 +42,16 @@ module Hg
 
     module Initializer
       def initialize(recipient: nil, context: nil)
-        @recipient = recipient
+        # TODO: test
+        # Ensure recipient is transformed into a Hash
+        if recipient.is_a? Hash
+          @recipient = recipient
+        else
+          @recipient = {
+            'id': recipient
+          }
+        end
+
         @context = context
       end
     end
