@@ -120,8 +120,8 @@ module Hg
         @card[:subtitle] = text
       end
 
-      def image_url(path)
-        @card[:image_url] = bot_class.instance_variable_get(:@image_url_base_portion) + path
+      def image_url(path, options)
+        @card[:image_url] = ApplicationController.helpers.image_url(path, options)
       end
 
       def item_url(url)
