@@ -163,6 +163,10 @@ module Hg
         button nil, url: url, type: 'account_link'
       end
 
+      def log_out
+        button nil, type: 'account_unlink'
+      end
+
       def button(text, options = {})
         # TODO: text needs a better name
         # If the first argument is a chunk, then make this button a link to that chunk
