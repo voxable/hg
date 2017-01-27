@@ -12,8 +12,6 @@ module Hg
       attr_accessor :chunks
       attr_accessor :default_chunk
       attr_accessor :call_to_actions
-      attr_accessor :get_started_content
-      attr_accessor :greeting_text
       attr_accessor :image_url_base_portion
 
       def init
