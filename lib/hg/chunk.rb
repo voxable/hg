@@ -15,7 +15,13 @@ module Hg
       self.class.show_typing(@recipient)
 
       Rails.logger.info 'DELIVERABLES'
-      Rails.logger.info self.class.deliverables.inspect
+      self.class.deliverables.each do |deliverable|
+        if deliverable.is_a? Hash
+          Rails.logger.info JSON.pretty_generate(deliverable)
+        else
+          Rails.logger.info deliverable.inspect
+        end
+      end
       Rails.logger.info 'RECIPIENT'
       Rails.logger.info @recipient.inspect
 
