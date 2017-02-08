@@ -126,8 +126,12 @@ module Hg
         @card[:subtitle] = text
       end
 
-      def image_url(path, options)
-        @card[:image_url] = ApplicationController.helpers.image_url(path, options)
+      def image_url(url, options = {})
+        if options.has_key?(:host)
+          @card[:image_url] = ApplicationController.helpers.image_url(url, options)
+        else
+          @card[:image_url] = url
+        end
       end
 
       def item_url(url)
