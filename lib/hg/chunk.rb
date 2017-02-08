@@ -261,17 +261,12 @@ module Hg
         @deliverables << @gallery
       end
 
-      def image(path)
-        @deliverables << {
-          message: {
-            attachment: {
-              type: 'image',
-              payload: {
-                url: bot_class.instance_variable_get(:@image_url_base_portion) + path
-              }
-            }
-          }
-        }
+      def image(url)
+        attachment('image', url)
+      end
+
+      def video(url)
+        attachment('video', url)
       end
 
       def chunk(chunk_class)
@@ -290,6 +285,19 @@ module Hg
         else
           option
         end
+      end
+
+      def attachment(type, url)
+        @deliverables << {
+          message: {
+            attachment: {
+              type: type,
+              payload: {
+                url: url
+              }
+            }
+          }
+        }
       end
     end
   end
