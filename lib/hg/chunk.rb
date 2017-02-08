@@ -58,7 +58,7 @@ module Hg
           }
         end
 
-        @context = context
+        @context = OpenStruct.new(context)
       end
     end
 
