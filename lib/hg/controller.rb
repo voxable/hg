@@ -8,5 +8,10 @@ module Hg
     def initialize(params: {})
       @params = params
     end
+
+    # @return [Hashie::Mash] The parameters for the request.
+    def params
+      Hashie::Mash.new(@params)
+    end
   end
 end
