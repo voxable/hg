@@ -31,5 +31,31 @@ module Hg
 
     attr_accessor :request
     attr_accessor :user
+
+    # Send a message back to the user. It's possible to either pass a string,
+    # which will be delivered as a text message, or a chunk and its context:
+    #
+    #   respond Chunks::ConfirmBookingSuccess, {time: Time.now}
+    #
+    #   respond 'Sounds good!'
+    # TODO: Document these params
+    def respond(*args)
+      # If we're attempting to send back a simple text message...
+      if args.first.is_a?(String)
+        # ...deliver the method.
+
+        message_text = args.first
+
+        # TODO: Add this as a method to Bot.
+        Facebook::Messenger::Bot.deliver({
+          recipient: {
+            id: user.facebook_psid
+          },
+          message: {
+            text: message_text
+          }
+        }, access_token: ENV['ACCESS_TOKEN'])
+      end
+    end
   end
 end

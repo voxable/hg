@@ -48,9 +48,43 @@ describe Hg::Controller do
   end
 
   describe '#respond' do
-    context 'when the first argument is a string' do
-      it 'delivers the argument as a text message to the user' do
+    # See https://github.com/rspec/rspec-mocks/issues/1076 (it really is a bug)
+    # If we try to use a class_double here, it'll throw an error when we attempt
+    # to create an expectation on deliver (Missing required keyword arguments: access_token)
+    # TODO: file a bug on rspeck-mocks about the above
+    let(:messenger_api_client) { double('Facebook::Messenger::Bot') }
 
+    before(:each) do
+      Facebook::Messenger::Bot = messenger_api_client
+    end
+
+    context 'when the first argument is a string' do
+      let(:message_text) { 'hullo' }
+      let(:recipient_id) { '1234' }
+      let(:user) { double('User', facebook_psid: recipient_id) }
+
+      let(:message) {{
+        message: {
+          text: message_text,
+        }
+      }}
+
+      before(:each) do
+        allow(@controller_instance).to receive(:user).and_return(user)
+      end
+
+      it 'delivers the argument as a text message' do
+        expect(messenger_api_client).to receive(:deliver).with(
+          hash_including(message), anything)
+
+        @controller_instance.respond(message_text)
+      end
+
+      it 'delivers the text message to the user' do
+        expect(messenger_api_client).to receive(:deliver).with(
+          hash_including({recipient: {id: user.facebook_psid}}), anything)
+
+        @controller_instance.respond('Hello, world.')
       end
     end
 
