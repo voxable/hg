@@ -14,5 +14,15 @@ require 'hg/router'
 Hashie.logger = Rails.logger
 
 module Hg
-  # Your code goes here...
+  # The root class for the bot.
+  mattr_accessor :bot_class
+
+  module_function
+
+  # @return [Hashie::Mash] The routes map for the bot.
+  def routes
+    # Assume that a router has been defined.
+    # TODO: Test that a router class has been defined on init.
+    bot_class::Router.routes
+  end
 end
