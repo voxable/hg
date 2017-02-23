@@ -62,6 +62,13 @@ module Hg
   #
   #   PizzaBotRouter.handle(request) # => PizzaOrderController.call(:create)
   class Router
+    # Error thrown when an action isn't recognized by the router.
+    class ActionNotRegisteredError < StandardError
+      def initialize(action)
+        super("No route registered for action #{action}")
+      end
+    end
+
     class << self
       # Create a new class instance variable `routes` on any subclasses.
       def inherited(subclass)
@@ -92,8 +99,10 @@ module Hg
       #
       # @param request [Hash, Hashie::Mash] The inbound request.
       def handle(request)
-        route = routes[request[:action]]
+        route = routes.fetch(request[:action])
         route.controller.new(request: request).send(route.handler)
+      rescue KeyError
+        raise ActionNotRegisteredError.new(request[:action])
       end
     end
   end

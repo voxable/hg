@@ -76,5 +76,11 @@ describe Hg::Router do
 
       RouterWithSingleAction.handle({action: action_name})
     end
+
+    context "when the action isn't registered in the routes" do
+      it 'throws an error' do
+        expect { RouterWithSingleAction.handle({action: 'foo'}) }.to raise_error(Hg::Router::ActionNotRegisteredError)
+      end
+    end
   end
 end
