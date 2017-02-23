@@ -54,24 +54,27 @@ describe Hg::Controller do
     # TODO: file a bug on rspeck-mocks about the above
     let(:messenger_api_client) { double('Facebook::Messenger::Bot') }
 
-    before(:each) do
+    let(:recipient_id) { '1234' }
+    let(:user) { double('User', facebook_psid: recipient_id) }
+
+    before(:example) do
+      @old_messenger_bot_class = Facebook::Messenger::Bot
       Facebook::Messenger::Bot = messenger_api_client
+      allow(@controller_instance).to receive(:user).and_return(user)
+    end
+
+    after(:example) do
+      Facebook::Messenger::Bot = @old_messenger_bot_class
     end
 
     context 'when the first argument is a string' do
       let(:message_text) { 'hullo' }
-      let(:recipient_id) { '1234' }
-      let(:user) { double('User', facebook_psid: recipient_id) }
 
       let(:message) {{
         message: {
           text: message_text,
         }
       }}
-
-      before(:each) do
-        allow(@controller_instance).to receive(:user).and_return(user)
-      end
 
       it 'delivers the argument as a text message' do
         expect(messenger_api_client).to receive(:deliver).with(
@@ -82,14 +85,31 @@ describe Hg::Controller do
 
       it 'delivers the text message to the user' do
         expect(messenger_api_client).to receive(:deliver).with(
-          hash_including({recipient: {id: user.facebook_psid}}), anything)
+          hash_including({recipient: {id: user.facebook_psid}}), anything
+        )
 
         @controller_instance.respond('Hello, world.')
       end
     end
 
     context 'when the first argument is a chunk class' do
-      it 'delivers the chunk to the user'
+      class BotChunk;
+        def initialize(*args); end
+      end
+
+      let(:chunk_instance) { double('chunk_instance', deliver: nil) }
+
+      before(:each) do
+        allow(BotChunk).to receive(:new).and_return(chunk_instance)
+      end
+
+      it 'delivers the chunk to the user' do
+        expect(BotChunk).to receive(:new).with(
+          hash_including({recipient: user.facebook_psid})
+        ).and_return(chunk_instance)
+
+        @controller_instance.respond(BotChunk)
+      end
 
       it 'passes the second argument to the chunk as context'
     end

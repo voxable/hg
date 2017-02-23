@@ -55,6 +55,14 @@ module Hg
             text: message_text
           }
         }, access_token: ENV['ACCESS_TOKEN'])
+      # If we're attempting to deliver a chunk...
+      elsif args.first.is_a?(Class)
+        # ....deliver the chunk
+        chunk_class = args[0]
+        chunk_options = args[1] || {}
+        chunk_context = chunk_options[:context]
+
+        chunk_class.new(recipient: user.facebook_psid, context: chunk_context).deliver
       end
     end
   end
