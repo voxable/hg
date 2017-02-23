@@ -8,3 +8,11 @@
 /spec/reports/
 /tmp/
 /.idea/
+
+# Ignore Dummy App
+spec/support/dummy/db/*.sqlite3
+spec/support/dummy/db/*.sqlite3-journal
+spec/support/dummy/db/log/*.log
+spec/support/dummy/log/
+spec/support/dummy/tmp/
+spec/support/dummy/.sass-cache

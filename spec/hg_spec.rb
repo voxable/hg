@@ -1,4 +1,4 @@
-require 'spec_helper'
+require 'support/rails_helper'
 
 describe Hg do
   it 'has a version number' do

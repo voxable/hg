@@ -1,7 +1,11 @@
-require 'spec_helper'
+require 'support/rails_helper'
 
+=begin
 class Bot
   include Hg::Bot
+
+  module Chunks
+  end
 end
 
 describe Hg::Chunk do
@@ -11,7 +15,7 @@ describe Hg::Chunk do
         class ChunkWithText
           include Hg::Chunk
 
-          text = 'some text'
+          text 'some text'
         end
       end
     end
@@ -27,3 +31,4 @@ describe Hg::Chunk do
     end
   end
 end
+=end
