@@ -1,19 +1,19 @@
 require 'support/rails_helper'
 
 describe Hg::Router do
+  ACTION_NAME = 'showRecipe'
+  HANDLER = :show
+
+  let(:action_name) { ACTION_NAME }
+  let(:handler) { HANDLER }
+
+  class RecipesController; end
+
+  class RouterWithSingleAction < Hg::Router
+    action ACTION_NAME, RecipesController, :show
+  end
+
   describe '.action' do
-    ACTION_NAME = 'showRecipe'
-    HANDLER = :show
-
-    let(:action_name) { ACTION_NAME }
-    let(:handler) { HANDLER }
-
-    class RecipesController; end
-
-    class RouterWithSingleAction < Hg::Router
-      action ACTION_NAME, RecipesController, :show
-    end
-
     before(:example) do
       @routes = RouterWithSingleAction.instance_variable_get(:@routes)
     end
@@ -32,10 +32,12 @@ describe Hg::Router do
   end
 
   describe '.routes' do
-    it 'allows accessing routes as methods'
+    it 'returns the route map' do
+      expect(RouterWithSingleAction.routes).to_not be_nil
+    end
 
-    it 'allows accessing routes as strings'
-
-    it 'allows accessing routes as symbols'
+    it 'returns a Hashie::Mash' do
+      expect(RouterWithSingleAction.routes).to be_a(Hashie::Mash)
+    end
   end
 end

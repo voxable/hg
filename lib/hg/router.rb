@@ -51,6 +51,11 @@ module Hg
         subclass.instance_variable_set(:@routes, Hashie::Mash.new)
       end
 
+      # @return [Hashie::Mash] The routes map.
+      def routes
+        @routes
+      end
+
       # Add the action to the routes map.
       #
       # @param action_name [String, Symbol] The name of the action to be matched by the router.
