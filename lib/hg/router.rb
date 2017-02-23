@@ -43,6 +43,24 @@ module Hg
   #     controller: PizzaOrderController,
   #     handler: :create
   #   }
+  #
+  # ## Routing
+  #
+  # The router will map an inbound `request` to the appropriate handler method.
+  # `request` objects take the following form:
+  #
+  #  request = {
+  #     action: 'orderPizza',
+  #     parameters: {
+  #       size: 'large',
+  #       toppings: ['pepperoni', 'sausage']
+  #     }
+  #  }
+  #
+  # Passing a `request` to `handle` directly off the bot's router class will
+  # call the action's matching handler method on its controller class:
+  #
+  #   PizzaBotRouter.handle(request) # => PizzaOrderController.call(:create)
   class Router
     class << self
       # Create a new class instance variable `routes` on any subclasses.
@@ -67,6 +85,15 @@ module Hg
         @routes[action_name] = Hashie::Mash.new
         @routes[action_name].controller = controller
         @routes[action_name].handler = handler_method_name
+      end
+
+      # Handle an inbound request by finding its matching handler method and
+      # executing it.
+      #
+      # @param request [Hash, Hashie::Mash] The inbound request.
+      def handle(request)
+        route = routes[request[:action]]
+        route.controller.new(parameters: request[:parameters]).send(route.handler)
       end
     end
   end

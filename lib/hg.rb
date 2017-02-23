@@ -19,10 +19,15 @@ module Hg
 
   module_function
 
+  # @return [Class] The router class for the bot.
+  def router
+    bot_class::Router
+  end
+
   # @return [Hashie::Mash] The routes map for the bot.
   def routes
     # Assume that a router has been defined.
     # TODO: Test that a router class has been defined on init.
-    bot_class::Router.routes
+    router.routes
   end
 end

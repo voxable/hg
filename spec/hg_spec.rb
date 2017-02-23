@@ -20,6 +20,12 @@ describe Hg do
       end
     end
 
+    describe '.router' do
+      it "returns the bot's router class" do
+        expect(Hg.router).to eq(Bot::Router)
+      end
+    end
+
     describe '.routes' do
       it "returns the bot's routes" do
         expect(Hg.routes).to_not be_nil

@@ -7,10 +7,21 @@ describe Hg::Router do
   let(:action_name) { ACTION_NAME }
   let(:handler) { HANDLER }
 
-  class RecipesController; end
+  class RecipesController
+    # Don't rely on the implementation of `Hg:Controller`. Just accept any args.
+    def initialize(*args); end
+
+    def show; end
+  end
+
+  let(:controller_instance) { instance_double('RecipesController') }
 
   class RouterWithSingleAction < Hg::Router
-    action ACTION_NAME, RecipesController, :show
+    action ACTION_NAME, RecipesController, HANDLER
+  end
+
+  before(:example) do
+    allow(RecipesController).to receive(:new).with(any_args).and_return(controller_instance)
   end
 
   describe '.action' do
@@ -38,6 +49,14 @@ describe Hg::Router do
 
     it 'returns a Hashie::Mash' do
       expect(RouterWithSingleAction.routes).to be_a(Hashie::Mash)
+    end
+  end
+
+  describe '.handle' do
+    it "calls the handler method on the request's action's controller class" do
+      expect(controller_instance).to receive(HANDLER)
+
+      RouterWithSingleAction.handle({action: action_name})
     end
   end
 end
