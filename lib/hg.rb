@@ -6,6 +6,7 @@ require 'hg/version'
 require 'hg/action'
 require 'hg/bot'
 require 'hg/chunk'
+require 'hg/engine'
 
 module Hg
   # Your code goes here...
