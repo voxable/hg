@@ -4,10 +4,11 @@ require 'interactor/rails'
 require 'hashie/mash'
 
 require 'hg/version'
+require 'hg/engine'
 require 'hg/action'
 require 'hg/bot'
 require 'hg/chunk'
-require 'hg/engine'
+require 'hg/controller'
 require 'hg/router'
 
 # Ensure Hashie logs to Rails logger
