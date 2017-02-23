@@ -18,6 +18,9 @@ module Hg
   # The root class for the bot.
   mattr_accessor :bot_class
 
+  # The class representing bot users.
+  mattr_accessor :user_class
+
   module_function
 
   # @return [Class] The router class for the bot.

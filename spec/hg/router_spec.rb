@@ -9,12 +9,14 @@ describe Hg::Router do
 
   class RecipesController
     # Don't rely on the implementation of `Hg:Controller`. Just accept any args.
-    def initialize(*args); end
+    def initialize(*args)
+      puts 'hello'
+    end
 
     def show; end
   end
 
-  let(:controller_instance) { instance_double('RecipesController') }
+  let(:controller_instance) { instance_double('RecipesController', show: nil) }
 
   class RouterWithSingleAction < Hg::Router
     action ACTION_NAME, RecipesController, HANDLER
@@ -53,6 +55,22 @@ describe Hg::Router do
   end
 
   describe '.handle' do
+    context 'initializing controller' do
+      let(:request) {{
+        action: action_name,
+        parameters: {
+          ingredient: 'pepper'
+        }
+      }}
+
+      # TODO: Not entirely sure how to test this
+      it 'sets the request' #do
+        #expect(RecipesController).to receive(:initialize).with(hash_including({request: request}))
+
+        #RouterWithSingleAction.handle(request)
+      #end
+    end
+
     it "calls the handler method on the request's action's controller class" do
       expect(controller_instance).to receive(HANDLER)
 

@@ -10,12 +10,10 @@ describe Hg do
   end
 
   context 'configuration' do
-    before(:example) do
-      Hg.bot_class = Bot
-    end
-
     describe '.bot_class' do
       it "sets the bot's root class" do
+        Hg.bot_class = Bot
+
         expect(Hg.bot_class).to eq(Bot)
       end
     end
@@ -23,6 +21,14 @@ describe Hg do
     describe '.router' do
       it "returns the bot's router class" do
         expect(Hg.router).to eq(Bot::Router)
+      end
+    end
+
+    describe '.user_class' do
+      it "sets the bot's user class" do
+        Hg.user_class = BotUser
+
+        expect(Hg.user_class).to eq(BotUser)
       end
     end
 

@@ -93,7 +93,7 @@ module Hg
       # @param request [Hash, Hashie::Mash] The inbound request.
       def handle(request)
         route = routes[request[:action]]
-        route.controller.new(parameters: request[:parameters]).send(route.handler)
+        route.controller.new(request: request).send(route.handler)
       end
     end
   end
