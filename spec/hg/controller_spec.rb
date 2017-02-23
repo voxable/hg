@@ -111,7 +111,15 @@ describe Hg::Controller do
         @controller_instance.respond(BotChunk)
       end
 
-      it 'passes the second argument to the chunk as context'
+      it 'passes the second argument to the chunk as context' do
+        context = {foo: 'bar'}
+
+        expect(BotChunk).to receive(:new).with(
+          hash_including({context: context})
+        ).and_return(chunk_instance)
+
+        @controller_instance.respond(BotChunk, context: context)
+      end
     end
   end
 end
