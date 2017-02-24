@@ -65,5 +65,7 @@ module Hg
         chunk_class.new(recipient: user.facebook_psid, context: chunk_context).deliver
       end
     end
+    alias_method :reply, :respond
+
   end
 end
