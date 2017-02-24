@@ -91,6 +91,14 @@ module Hg
         payload.constantize.new(recipient: recipient, context: context).deliver
       end
 
+      def queue_postback(postback)
+
+      end
+
+      def queue_message(message)
+
+      end
+
       # Show a typing indicator to the user.
       #
       # @param recipient_id [String] The Facebook PSID of the user that will see the indicator
@@ -132,14 +140,23 @@ module Hg
           show_typing(postback.sender['id'])
 
           # TODO: Build a custom logger, make production logging optional
+          # Log the postback
           Rails.logger.info "POSTBACK: #{postback.payload}"
 
-
+          # Queue the postback for processing
+          queue_postback(postback)
         end
 
         ::Facebook::Messenger::Bot.on :message do |message|
+          # Show a typing indicator to the user
+          show_typing(message.sender['id'])
+
           # TODO: Build a custom logger, make production logging optional
-          Rails.logger.info "MESSAGE: #{message.text || message.quick_reply}"
+          # Log the message
+          Rails.logger.info "MESSAGE: #{message.payload}"
+
+          # Queue the message for processing
+          queue_message(message)
         end
       end
     end
