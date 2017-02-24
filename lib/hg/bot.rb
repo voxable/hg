@@ -91,7 +91,18 @@ module Hg
         payload.constantize.new(recipient: recipient, context: context).deliver
       end
 
+      # Show a typing indicator to the user.
+      #
+      # @param recipient_id [String] The Facebook PSID of the user that will see the indicator
+      def show_typing(recipient_psid)
+        Facebook::Messenger::Bot.deliver({
+           recipient: {id: recipient_psid},
+           sender_action: 'typing_on'
+         }, access_token: ENV['ACCESS_TOKEN'])
+      end
+
       def initialize_router
+=begin
         ::Facebook::Messenger::Bot.on :postback do |postback|
           Rails.logger.info 'POSTBACK'
           Rails.logger.info postback.payload
@@ -114,6 +125,21 @@ module Hg
           else
             @default_chunk.deliver(message.sender)
           end
+        end
+=end
+        ::Facebook::Messenger::Bot.on :postback do |postback|
+          # Show a typing indicator to the user
+          show_typing(postback.sender['id'])
+
+          # TODO: Build a custom logger, make production logging optional
+          Rails.logger.info "POSTBACK: #{postback.payload}"
+
+
+        end
+
+        ::Facebook::Messenger::Bot.on :message do |message|
+          # TODO: Build a custom logger, make production logging optional
+          Rails.logger.info "MESSAGE: #{message.text || message.quick_reply}"
         end
       end
     end
