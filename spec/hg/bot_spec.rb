@@ -106,7 +106,7 @@ describe Hg::Bot do
         it 'throws an error' do
           expect {
             FAQBot.router
-          }.to raise_error(Hg::NoRouterExistsError)
+          }.to raise_error(Hg::NoRouterClassExistsError)
         end
       end
 
@@ -142,11 +142,48 @@ describe Hg::Bot do
   end
 
   describe '.user_class' do
-    it "default's the bot's user class to User" #do
-      #Hg.user_class = BotUser
+    before(:example) do
+      stub_access_token
+    end
 
-      #expect(Hg.user_class).to eq(BotUser)
-    #end
+    context 'when no user class is explicitly set' do
+      context 'when no global class User exists' do
+        it 'throws an error' do
+          expect {
+            FAQBot.user_class
+          }.to raise_error(Hg::NoUserClassExistsError)
+        end
+      end
+
+      context 'when a global class User does exist' do
+        let(:user_class) { class_double('User').as_stubbed_const }
+
+        before(:example) do
+          # access the let value to instantiate the doubled class constant
+          user_class
+        end
+
+        it 'defaults to a global class called User' do
+          expect(FAQBot.user_class).to eq(user_class)
+        end
+      end
+    end
+
+    context 'when user class explicitly set' do
+      let(:user_class) { class_double('FAQBot::CustomUser') }
+
+      before(:each) do
+        FAQBot.user_class = user_class
+      end
+
+      after(:each) do
+        FAQBot.user_class = nil
+      end
+
+      it 'returns the custom user class' do
+        expect(FAQBot.user_class).to eq(user_class)
+      end
+    end
   end
 
   describe '.show_typing' do

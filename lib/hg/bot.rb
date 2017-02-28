@@ -1,8 +1,15 @@
 module Hg
   # Error thrown when no router class exists.
-  class NoRouterExistsError < StandardError
+  class NoRouterClassExistsError < StandardError
     def initialize
-      super('No Router class exists for this bot. Define a nested class Router, or set with bot_class.')
+      super('No Router class exists for this bot. Define a nested class Router, or set with router=')
+    end
+  end
+
+  # Error thrown when no user class exists.
+  class NoUserClassExistsError < StandardError
+    def initialize
+      super('No User class exists for this bot. Define a global class User, or set with user_class=')
     end
   end
 
@@ -29,7 +36,14 @@ module Hg
       end
 
       # The class representing users.
-      attr_accessor :user_class
+      attr_writer :user_class
+
+      # @return [Class] The class representing bot users.
+      def user_class
+        @user_class ||= 'User'.constantize
+      rescue NameError
+        raise NoUserClassExistsError.new
+      end
 
       attr_accessor :chunks
       attr_accessor :default_chunk
@@ -43,7 +57,7 @@ module Hg
       def router
         @router ||= const_get(:Router)
       rescue NameError
-        raise NoRouterExistsError.new
+        raise NoRouterClassExistsError.new
       end
 
       def default(chunk)
