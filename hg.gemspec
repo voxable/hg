@@ -37,12 +37,14 @@ Gem::Specification.new do |spec|
   spec.add_runtime_dependency 'interactor-rails', '~> 2.0.2'
   # Enhanced Hashes
   spec.add_runtime_dependency 'hashie', '~> 3.5.4'
+  # Background Jobs
+  spec.add_runtime_dependency 'sidekiq', '~> 4.2.9'
+  # API.ai NLU
+  spec.add_runtime_dependency 'api-ai-ruby', '~> 1.2.3'
 
   spec.add_development_dependency 'bundler', '~> 1.13'
   spec.add_development_dependency 'rake', '~> 12.0'
   spec.add_development_dependency 'rspec-rails', '~> 3.5.2'
   spec.add_development_dependency 'sqlite3', '~> 1.3.11'
 
-  # Background Jobs
-  spec.add_development_dependency 'sidekiq', '~> 4.2.9'
 end
