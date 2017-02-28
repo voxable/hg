@@ -87,15 +87,31 @@ describe Hg::Bot do
     end
   end
 
-  describe '#show_typing' do
-    it 'shows a typing indicator to the user'
+  describe '.access_token' do
+    it 'defaults to the ENV variable FB_ACCESS_TOKEN'
   end
 
-  describe '#queue_postback' do
+  describe '.user_class' do
+    it "default's the bot's user class to User" #do
+      #Hg.user_class = BotUser
+
+      #expect(Hg.user_class).to eq(BotUser)
+    #end
+  end
+
+  describe '.show_typing' do
+    it 'shows a typing indicator to the user' do
+      expect(Facebook::Messenger::Bot).to receive(:deliver).with(hash_including(sender_action: 'typing_on'))
+
+      FAQBot.show_typing('1234')
+    end
+  end
+
+  describe '.queue_postback' do
     it 'queues the postback'
   end
 
-  describe '#queue_message' do
+  describe '.queue_message' do
     it 'queues the message'
   end
 end

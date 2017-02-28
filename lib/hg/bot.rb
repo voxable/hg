@@ -8,11 +8,7 @@ module Hg
     end
 
     module ClassMethods
-      attr_accessor :routes
-      attr_accessor :chunks
-      attr_accessor :default_chunk
-      attr_accessor :call_to_actions
-      attr_accessor :image_url_base_portion
+
 
       def init
         initialize_router
@@ -20,6 +16,22 @@ module Hg
         initialize_get_started_button
         initialize_greeting_text
       end
+
+      # The Facebook Page access token
+      attr_writer :access_token
+
+      def access_token
+        @access_token || ENV['FB_ACCESS_TOKEN']
+      end
+
+      # The class representing users.
+      attr_accessor :user_class
+
+      attr_accessor :routes
+      attr_accessor :chunks
+      attr_accessor :default_chunk
+      attr_accessor :call_to_actions
+      attr_accessor :image_url_base_portion
 
       def default(chunk)
         @default_chunk = chunk
@@ -34,7 +46,7 @@ module Hg
           setting_type:    'call_to_actions',
           thread_state:    'existing_thread',
           call_to_actions: @call_to_actions
-        }, access_token: ENV['ACCESS_TOKEN'])
+        }, access_token: access_token)
       end
 
       def call_to_action(text, options = {})
@@ -66,7 +78,7 @@ module Hg
       end
 
       def initialize_get_started_button
-        Facebook::Messenger::Thread.set @get_started_content, access_token: ENV['ACCESS_TOKEN']
+        Facebook::Messenger::Thread.set @get_started_content, access_token: access_token
       end
 
       def greeting_text(text)
@@ -83,7 +95,7 @@ module Hg
           greeting: {
             text: @greeting_text
           }
-        }, access_token: ENV['ACCESS_TOKEN'])
+        }, access_token: access_token)
       end
 
       def run_postback_payload(payload, recipient, context)
@@ -106,7 +118,7 @@ module Hg
         Facebook::Messenger::Bot.deliver({
            recipient: {id: recipient_psid},
            sender_action: 'typing_on'
-         }, access_token: ENV['ACCESS_TOKEN'])
+         }, access_token: access_token)
       end
 
       def initialize_router
