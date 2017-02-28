@@ -12,7 +12,10 @@ module Hg
 
       # Fetch the User representing the message's sender
       bot_class = Kernel.const_get(bot_class_name)
-      bot_class.user_class.find_or_create_by_facebook_psid(user_id)
+      user = bot_class.user_class.find_or_create_by_facebook_psid(user_id)
+
+      # Send the message to API.ai for NLU
+      api_ai_client = ApiAiClient.new(user.api_ai_session_id).query(message.text)
     end
   end
 end

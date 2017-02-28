@@ -27,14 +27,17 @@ RSpec.describe Hg::MessageWorker, type: :worker do
   end
 
   context "when a message is present on the user's unprocessed message queue" do
+    let(:text) { 'hi there' }
     let(:message) {
       Hashie::Mash.new({
-        sender: { id: user_id }
+        sender: { id: user_id },
+        text: text
       })
     }
-    let(:api_ai_client) { instance_double('Hg::ApiAiClient') }
+    let(:api_ai_client) { instance_double('Hg::ApiAiClient', query: nil) }
     let(:user_class) { class_double('User').as_stubbed_const }
-    let(:user) { double('user') }
+    let(:user_api_ai_session_id) { 's0m3id' }
+    let(:user) { double('user', api_ai_session_id: user_api_ai_session_id) }
 
     before(:example) do
       allow(Hg::MessageStore).to receive(:fetch_message_for_user).and_return(message)
@@ -43,19 +46,31 @@ RSpec.describe Hg::MessageWorker, type: :worker do
       allow(user_class).to receive(:find_or_create_by_facebook_psid).and_return(user)
     end
 
-    it 'sends the message to API.ai for parsing' do
+    context 'sending the message to API.ai for parsing' do
+      it 'sets the session ID the API.ai session key for the user' do
+        expect(Hg::ApiAiClient).to receive(:new).with(user_api_ai_session_id)
 
+        subject.perform(*valid_args)
+      end
+
+      it 'sends the message to API.ai for parsing' do
+        expect(api_ai_client).to receive(:query).with(text)
+
+        subject.perform(*valid_args)
+      end
     end
 
     context 'when the message is understood by the API.ai agent' do
       it "passes a request to the bot's router"
 
       context 'constructing the request object' do
-        it 'fetches or creates the user representing the sender' do
-          expect(user_class).to receive(:find_or_create_by_facebook_psid).with(user_id).and_return(user)
+        it 'fetches or creates the user representing the sender' #do
+          #allow(user_class).to receive(:find_or_create_by_facebook_psid).with(user_id).and_return(user)
 
-          subject.perform(*valid_args)
-        end
+          #subject.perform(*valid_args)
+
+          #expect
+        #end
 
         it 'contains the matched intent'
 
