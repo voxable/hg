@@ -140,7 +140,7 @@ module Hg
         Hg::MessageStore.store_message_for_user(user_id, message, redis_namespace)
 
         # Queue message for processing.
-        Hg::MessageWorker.perform_async(user_id)
+        Hg::MessageWorker.perform_async(user_id, redis_namespace)
       end
 
       # Show a typing indicator to the user.

@@ -189,7 +189,7 @@ describe Hg::Bot do
     end
 
     it 'queues the message for processing' do
-      expect(Hg::MessageWorker).to receive(:perform_async).with(user_id)
+      expect(Hg::MessageWorker).to receive(:perform_async).with(user_id, anything)
 
       FAQBot.queue_message(message)
     end

@@ -27,7 +27,7 @@ class Hg::MessageStore
     # @param namespace [String] The redis namespace under which to store the message.
     #
     # @return [Hashie::Mash] The stored message.
-    def retrieve_message_for_user(user_id, namespace)
+    def fetch_message_for_user(user_id, namespace)
       key = message_key(user_id, namespace)
 
       message = Hg::Redis.execute do |conn|
