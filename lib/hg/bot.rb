@@ -120,6 +120,13 @@ module Hg
         payload.constantize.new(recipient: recipient, context: context).deliver
       end
 
+      # Generate a redis namespace, based on the class's name.
+      #
+      # @return [String] The redis namespace
+      def redis_namespace
+        self.to_s.tableize
+      end
+
       def queue_postback(postback)
 
       end

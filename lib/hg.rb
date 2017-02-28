@@ -9,6 +9,7 @@ require 'hg/action'
 require 'hg/bot'
 require 'hg/chunk'
 require 'hg/controller'
+require 'hg/message_store'
 require 'hg/router'
 
 # Ensure Hashie logs to Rails logger

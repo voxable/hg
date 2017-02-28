@@ -161,11 +161,19 @@ describe Hg::Bot do
     end
   end
 
+  describe '.redis_namespace' do
+    it 'generates a redis namespace based on the name of the bot class' do
+      expect(FAQBot.redis_namespace).to eq('faq_bots')
+    end
+  end
+
   describe '.queue_postback' do
     it 'queues the postback'
   end
 
   describe '.queue_message' do
-    it 'queues the message'
+    it "stores the message on the user's queue of unprocessed messages"
+
+    it 'queues the message for processing'
   end
 end

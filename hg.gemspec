@@ -42,4 +42,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'rake', '~> 12.0'
   spec.add_development_dependency 'rspec-rails', '~> 3.5.2'
   spec.add_development_dependency 'sqlite3', '~> 1.3.11'
+
+  # Background Jobs
+  spec.add_development_dependency 'sidekiq', '~> 4.2.9'
 end
