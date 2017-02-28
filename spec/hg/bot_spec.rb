@@ -172,8 +172,26 @@ describe Hg::Bot do
   end
 
   describe '.queue_message' do
-    it "stores the message on the user's queue of unprocessed messages"
+    let(:user_id) { '1234' }
+    let(:message) {
+      Hashie::Mash.new({sender: { id: user_id }})
+    }
 
-    it 'queues the message for processing'
+    before(:example) do
+      allow(Hg::MessageStore).to receive(:store_message_for_user)
+      allow(Hg::MessageWorker).to receive(:perform_async)
+    end
+
+    it "stores the message on the user's queue of unprocessed messages" do
+      expect(Hg::MessageStore).to receive(:store_message_for_user).with(user_id, message, anything)
+
+      FAQBot.queue_message(message)
+    end
+
+    it 'queues the message for processing' do
+      expect(Hg::MessageWorker).to receive(:perform_async).with(user_id)
+
+      FAQBot.queue_message(message)
+    end
   end
 end

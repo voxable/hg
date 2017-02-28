@@ -131,8 +131,16 @@ module Hg
 
       end
 
+      # Queue a message for processing.
+      #
+      # @param message [Hash] The message to be queued.
       def queue_message(message)
+        # Store message on this user's queue of unprocessed messages.
+        user_id = message.sender['id']
+        Hg::MessageStore.store_message_for_user(user_id, message, redis_namespace)
 
+        # Queue message for processing.
+        Hg::MessageWorker.perform_async(user_id)
       end
 
       # Show a typing indicator to the user.

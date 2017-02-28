@@ -2,6 +2,7 @@ require 'facebook/messenger'
 require 'fuzzy_match'
 require 'interactor/rails'
 require 'hashie/mash'
+require 'sidekiq'
 
 require 'hg/version'
 require 'hg/engine'
