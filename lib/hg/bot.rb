@@ -1,15 +1,19 @@
 module Hg
+  # Error thrown when no router class exists.
+  class NoRouterExistsError < StandardError
+    def initialize
+      super('No Router class exists for this bot. Define a nested class Router, or set with bot_class.')
+    end
+  end
+
   module Bot
     def self.included(base)
       base.extend ClassMethods
-      base.routes = {}
       base.chunks = []
       base.call_to_actions = []
     end
 
     module ClassMethods
-
-
       def init
         initialize_router
         initialize_persistent_menu
@@ -27,11 +31,24 @@ module Hg
       # The class representing users.
       attr_accessor :user_class
 
-      attr_accessor :routes
       attr_accessor :chunks
       attr_accessor :default_chunk
       attr_accessor :call_to_actions
       attr_accessor :image_url_base_portion
+
+      # The class representing the router.
+      attr_writer :router
+
+      # @return [Class] The bot's router class.
+      def router
+        return @router if @router
+
+        begin
+          const_get(:Router)
+        rescue NameError
+          raise NoRouterExistsError.new
+        end
+      end
 
       def default(chunk)
         @default_chunk = chunk

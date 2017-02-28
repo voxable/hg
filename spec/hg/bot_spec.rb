@@ -9,6 +9,11 @@ describe Hg::Bot do
     allow(Facebook::Messenger::Bot).to receive(:on)
   end
 
+  # Stub an access token on the bot
+  def stub_access_token
+    allow(FAQBot).to receive(:access_token).and_return('token')
+  end
+
   # Spoof an inbound Facebook message
   #
   # @param message [Hashie::Mash] The inbound (fake) message
@@ -91,6 +96,51 @@ describe Hg::Bot do
     it 'defaults to the ENV variable FB_ACCESS_TOKEN'
   end
 
+  describe '.router' do
+    before(:example) do
+      stub_access_token
+    end
+
+    context 'when no router class is explicitly set' do
+      context 'when no nested class Router exists' do
+        it 'throws an error' do
+          expect {
+            FAQBot.router
+          }.to raise_error(Hg::NoRouterExistsError)
+        end
+      end
+
+      context 'when a nested class Router does exist' do
+        let(:router) { class_double('FAQBot::Router').as_stubbed_const }
+
+        before(:example) do
+          # access the let value to instantiate the doubled class constant
+          router
+        end
+
+        it 'defaults to a nested class called Router' do
+          expect(FAQBot.router).to eq(router)
+        end
+      end
+    end
+
+    context 'when router class explicitly set' do
+      let(:router) { class_double('FAQBot::CustomRouter') }
+
+      before(:each) do
+        FAQBot.router = router
+      end
+
+      after(:each) do
+        FAQBot.router = nil
+      end
+
+      it 'returns the router class' do
+        expect(FAQBot.router).to eq(router)
+      end
+    end
+  end
+
   describe '.user_class' do
     it "default's the bot's user class to User" #do
       #Hg.user_class = BotUser
@@ -100,8 +150,12 @@ describe Hg::Bot do
   end
 
   describe '.show_typing' do
+    before(:each) do
+      stub_access_token
+    end
+
     it 'shows a typing indicator to the user' do
-      expect(Facebook::Messenger::Bot).to receive(:deliver).with(hash_including(sender_action: 'typing_on'))
+      expect(Facebook::Messenger::Bot).to receive(:deliver).with(hash_including(sender_action: 'typing_on'), anything)
 
       FAQBot.show_typing('1234')
     end
