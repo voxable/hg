@@ -12,10 +12,10 @@ module Hg
 
       # Fetch the User representing the message's sender
       bot = Kernel.const_get(bot_class_name)
-      user = bot.user_class.find_or_create_by_facebook_psid(user_id)
+      user = bot.user_class.find_or_create_by(facebook_psid: user_id)
 
       # Send the message to API.ai for NLU
-      nlu_response = ApiAiClient.new(user.api_ai_session_id).query(message.text)
+      nlu_response = ApiAiClient.new(user.api_ai_session_id).query(message.message.text)
 
       # Build a request object.
       request = Hashie::Mash.new
@@ -26,6 +26,8 @@ module Hg
 
       # Send the request to the bot's router.
       bot.router.handle(request)
+
+      # TODO: Set jobs to not retry on fail!!!!!!!!!!
     end
   end
 end

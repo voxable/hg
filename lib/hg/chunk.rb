@@ -6,7 +6,6 @@ module Hg
       base.id = base.to_s
       base.deliverables = []
       base.dynamic = false
-      base.add_to_router
       base.add_to_chunks
       base.include_chunks
     end
@@ -78,10 +77,6 @@ module Hg
         @label = text
       end
 
-      def add_to_router
-        bot_class.routes.merge(@id.to_sym => self)
-      end
-
       def add_to_chunks
         bot_class.chunks << self
       end
@@ -104,9 +99,9 @@ module Hg
       end
 
       def keywords(*chunk_keywords)
-        chunk_keywords.each do |keyword|
-          bot_class.routes[keyword] = self
-        end
+        #chunk_keywords.each do |keyword|
+        #  bot_class.routes[keyword] = self
+        #end
       end
 
       def text(message)

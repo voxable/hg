@@ -15,7 +15,7 @@ class Hg::MessageStore
       key = message_key(user_id, namespace)
 
       Hg::Redis.execute do |conn|
-        conn.rpush(key, message.to_json)
+        conn.rpush(key, message.messaging.to_json)
       end
     end
 

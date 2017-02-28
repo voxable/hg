@@ -31,7 +31,9 @@ RSpec.describe Hg::MessageWorker, type: :worker do
     let(:message) {
       Hashie::Mash.new({
         sender: { id: user_id },
-        text: text
+        message: {
+          text: text
+        }
       })
     }
     let(:api_ai_response) { double('api_ai_response', intent: nil, action: nil, parameters: nil)}
@@ -46,7 +48,7 @@ RSpec.describe Hg::MessageWorker, type: :worker do
       allow(Hg::ApiAiClient).to receive(:new).and_return(api_ai_client)
       allow(bot_class).to receive(:user_class).and_return(user_class)
       allow(bot_class).to receive(:router).and_return(router_class)
-      allow(user_class).to receive(:find_or_create_by_facebook_psid).and_return(user)
+      allow(user_class).to receive(:find_or_create_by).and_return(user)
     end
 
     context 'sending the message to API.ai for parsing' do
@@ -72,7 +74,7 @@ RSpec.describe Hg::MessageWorker, type: :worker do
 
       context 'constructing the request object' do
         it 'fetches or creates the user representing the sender' do
-          allow(user_class).to receive(:find_or_create_by_facebook_psid).with(user_id).and_return(user)
+          allow(user_class).to receive(:find_or_create_by).with(facebook_psid: user_id).and_return(user)
           expect(router_class).to receive(:handle).with(hash_including(user: user))
 
           subject.perform(*valid_args)

@@ -55,7 +55,7 @@ module Hg
 
       # @return [Class] The bot's router class.
       def router
-        @router ||= const_get(:Router)
+        @router ||= self.const_get(:Router)
       rescue NameError
         raise NoRouterClassExistsError.new
       end
@@ -208,7 +208,7 @@ module Hg
 
           # TODO: Build a custom logger, make production logging optional
           # Log the message
-          Rails.logger.info "MESSAGE: #{message.payload}"
+          Rails.logger.info "MESSAGE: #{message.text}"
 
           # Queue the message for processing
           queue_message(message)
