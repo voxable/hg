@@ -15,10 +15,14 @@ module Hg
       user = bot.user_class.find_or_create_by_facebook_psid(user_id)
 
       # Send the message to API.ai for NLU
-      api_ai_client = ApiAiClient.new(user.api_ai_session_id).query(message.text)
+      nlu_response = ApiAiClient.new(user.api_ai_session_id).query(message.text)
 
       # Build a request object.
       request = Hashie::Mash.new
+      request.user = user
+      request.intent = nlu_response.intent
+      request.action = nlu_response.action
+      request.parameters = nlu_response.parameters
 
       # Send the request to the bot's router.
       bot.router.handle(request)

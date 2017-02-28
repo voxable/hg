@@ -34,7 +34,8 @@ RSpec.describe Hg::MessageWorker, type: :worker do
         text: text
       })
     }
-    let(:api_ai_client) { instance_double('Hg::ApiAiClient', query: nil) }
+    let(:api_ai_response) { double('api_ai_response', intent: nil, action: nil, parameters: nil)}
+    let(:api_ai_client) { instance_double('Hg::ApiAiClient', query: api_ai_response) }
     let(:user_class) { class_double('User').as_stubbed_const }
     let(:user_api_ai_session_id) { 's0m3id' }
     let(:user) { double('user', api_ai_session_id: user_api_ai_session_id) }
@@ -70,13 +71,12 @@ RSpec.describe Hg::MessageWorker, type: :worker do
       end
 
       context 'constructing the request object' do
-        it 'fetches or creates the user representing the sender' #do
-          #allow(user_class).to receive(:find_or_create_by_facebook_psid).with(user_id).and_return(user)
+        it 'fetches or creates the user representing the sender' do
+          allow(user_class).to receive(:find_or_create_by_facebook_psid).with(user_id).and_return(user)
+          expect(router_class).to receive(:handle).with(hash_including(user: user))
 
-          #subject.perform(*valid_args)
-
-          #expect
-        #end
+          subject.perform(*valid_args)
+        end
 
         it 'contains the matched intent'
 
