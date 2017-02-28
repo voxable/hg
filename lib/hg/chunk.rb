@@ -41,7 +41,7 @@ module Hg
           template.new(recipient: @recipient, context: @context).deliver
         # Otherwise, it's just a raw message. Deliver it.
         else
-          Facebook::Messenger::Bot.deliver(deliverable.merge(recipient: @recipient), access_token: ENV['ACCESS_TOKEN'])
+          Facebook::Messenger::Bot.deliver(deliverable.merge(recipient: @recipient), access_token: ENV['FB_ACCESS_TOKEN'])
         end
       end
     end
@@ -100,7 +100,7 @@ module Hg
         Facebook::Messenger::Bot.deliver({
           recipient: recipient,
           sender_action: 'typing_on'
-        }, access_token: ENV['ACCESS_TOKEN'])
+        }, access_token: ENV['FB_ACCESS_TOKEN'])
       end
 
       def keywords(*chunk_keywords)

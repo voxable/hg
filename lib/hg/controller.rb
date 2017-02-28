@@ -54,7 +54,7 @@ module Hg
           message: {
             text: message_text
           }
-        }, access_token: ENV['ACCESS_TOKEN'])
+        }, access_token: ENV['FB_ACCESS_TOKEN'])
       # If we're attempting to deliver a chunk...
       elsif args.first.is_a?(Class)
         # ....deliver the chunk
