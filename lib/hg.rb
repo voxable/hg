@@ -3,6 +3,7 @@ require 'fuzzy_match'
 require 'interactor/rails'
 require 'hashie/mash'
 require 'sidekiq'
+require 'api-ai-ruby'
 
 require 'hg/version'
 require 'hg/engine'
