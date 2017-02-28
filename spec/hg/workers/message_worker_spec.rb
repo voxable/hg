@@ -1,6 +1,8 @@
 require 'support/rails_helper'
 
 RSpec.describe Hg::MessageWorker, type: :worker do
+  BOT_CLASS_NAME = 'NewsBot'
+
   let(:user_id) { '1' }
   # TODO: likely need a message factory
   let(:message) {
@@ -8,11 +10,14 @@ RSpec.describe Hg::MessageWorker, type: :worker do
       sender: {id: user_id}
     })
   }
+  let(:bot_class) { class_double(BOT_CLASS_NAME).as_stubbed_const }
   let(:message_store) { class_double('Hg::MessageStore').as_stubbed_const }
-  let(:valid_args) { [user_id, 'faq_bots'] }
+  let(:valid_args) { [user_id, 'faq_bots', BOT_CLASS_NAME] }
 
   before(:example) do
-    allow(message_store).to receive(:fetch_message_for_user).and_return(message)
+    allow(message_store).to receive(:fetch_message_for_user).and_return({})
+    # Access the let variable to instantiate the class double
+    bot_class
   end
 
   it "pops the latest unprocessed message from the user's queue" do
@@ -22,16 +27,20 @@ RSpec.describe Hg::MessageWorker, type: :worker do
   end
 
   context "when a message is present on the user's unprocessed message queue" do
-    let(:message) { Hashie::Mash.new() }
+    let(:message) {
+      Hashie::Mash.new({
+        sender: { id: user_id }
+      })
+    }
     let(:api_ai_client) { instance_double('Hg::ApiAiClient') }
+    let(:user_class) { class_double('User').as_stubbed_const }
+    let(:user) { double('user') }
 
     before(:example) do
       allow(Hg::MessageStore).to receive(:fetch_message_for_user).and_return(message)
       allow(Hg::ApiAiClient).to receive(:new).and_return(api_ai_client)
-    end
-
-    it 'fetches the associated user' do
-
+      allow(bot_class).to receive(:user_class).and_return(user_class)
+      allow(user_class).to receive(:find_or_create_by_facebook_psid).and_return(user)
     end
 
     it 'sends the message to API.ai for parsing' do
@@ -42,7 +51,11 @@ RSpec.describe Hg::MessageWorker, type: :worker do
       it "passes a request to the bot's router"
 
       context 'constructing the request object' do
-        it 'contains the user representing the sender'
+        it 'fetches or creates the user representing the sender' do
+          expect(user_class).to receive(:find_or_create_by_facebook_psid).with(user_id).and_return(user)
+
+          subject.perform(*valid_args)
+        end
 
         it 'contains the matched intent'
 

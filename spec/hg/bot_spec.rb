@@ -225,10 +225,20 @@ describe Hg::Bot do
       FAQBot.queue_message(message)
     end
 
-    it 'queues the message for processing' do
-      expect(Hg::MessageWorker).to receive(:perform_async).with(user_id, anything)
+    context 'queueing the message for processing' do
+      it 'queues for the correct user' do
+        expect(Hg::MessageWorker).to receive(:perform_async).with(user_id, anything, anything)
 
-      FAQBot.queue_message(message)
+        FAQBot.queue_message(message)
+      end
+
+      it 'queues with the correct Redis namespace'
+
+      it 'queues with the correct bot class' do
+        expect(Hg::MessageWorker).to receive(:perform_async).with(anything, anything, FAQBot.to_s)
+
+        FAQBot.queue_message(message)
+      end
     end
   end
 end

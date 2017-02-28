@@ -40,7 +40,7 @@ module Hg
 
       # @return [Class] The class representing bot users.
       def user_class
-        @user_class ||= 'User'.constantize
+        @user_class ||= Kernel.const_get(:User)
       rescue NameError
         raise NoUserClassExistsError.new
       end
@@ -127,6 +127,7 @@ module Hg
 
       def run_postback_payload(payload, recipient, context)
         # TODO: Shouldn't be constantizing user input. Need a way to sanitize this.
+        # TODO: Also, use Kernel.const_get https://gist.github.com/Haniyya/0d52fb8ae4c3cb3d46a07fc4180c3303
         payload.constantize.new(recipient: recipient, context: context).deliver
       end
 
@@ -150,7 +151,7 @@ module Hg
         Hg::MessageStore.store_message_for_user(user_id, message, redis_namespace)
 
         # Queue message for processing.
-        Hg::MessageWorker.perform_async(user_id, redis_namespace)
+        Hg::MessageWorker.perform_async(user_id, redis_namespace, self.to_s)
       end
 
       # Show a typing indicator to the user.
