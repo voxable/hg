@@ -41,13 +41,9 @@ module Hg
 
       # @return [Class] The bot's router class.
       def router
-        return @router if @router
-
-        begin
-          const_get(:Router)
-        rescue NameError
-          raise NoRouterExistsError.new
-        end
+        @router ||= const_get(:Router)
+      rescue NameError
+        raise NoRouterExistsError.new
       end
 
       def default(chunk)
