@@ -38,11 +38,13 @@ RSpec.describe Hg::MessageWorker, type: :worker do
     let(:user_class) { class_double('User').as_stubbed_const }
     let(:user_api_ai_session_id) { 's0m3id' }
     let(:user) { double('user', api_ai_session_id: user_api_ai_session_id) }
+    let(:router_class) { double('router', handle: nil) }
 
     before(:example) do
       allow(Hg::MessageStore).to receive(:fetch_message_for_user).and_return(message)
       allow(Hg::ApiAiClient).to receive(:new).and_return(api_ai_client)
       allow(bot_class).to receive(:user_class).and_return(user_class)
+      allow(bot_class).to receive(:router).and_return(router_class)
       allow(user_class).to receive(:find_or_create_by_facebook_psid).and_return(user)
     end
 
@@ -61,7 +63,11 @@ RSpec.describe Hg::MessageWorker, type: :worker do
     end
 
     context 'when the message is understood by the API.ai agent' do
-      it "passes a request to the bot's router"
+      it "sends a request to the bot router's handle method" do
+        expect(router_class).to receive(:handle)
+
+        subject.perform(*valid_args)
+      end
 
       context 'constructing the request object' do
         it 'fetches or creates the user representing the sender' #do

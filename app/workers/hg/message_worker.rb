@@ -11,11 +11,17 @@ module Hg
       return nil if message.empty?
 
       # Fetch the User representing the message's sender
-      bot_class = Kernel.const_get(bot_class_name)
-      user = bot_class.user_class.find_or_create_by_facebook_psid(user_id)
+      bot = Kernel.const_get(bot_class_name)
+      user = bot.user_class.find_or_create_by_facebook_psid(user_id)
 
       # Send the message to API.ai for NLU
       api_ai_client = ApiAiClient.new(user.api_ai_session_id).query(message.text)
+
+      # Build a request object.
+      request = Hashie::Mash.new
+
+      # Send the request to the bot's router.
+      bot.router.handle(request)
     end
   end
 end
