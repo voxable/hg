@@ -20,7 +20,7 @@ class Hg::Messenger::MessageStore
     end
 
     # TODO: test
-    # Retrieve the latest message for a user.
+    # Retrieve the earliest unprocessed message for a user.
     #
     # @param user_id [String] The ID of a bot user on a particular platform.
     # @param namespace [String] The redis namespace under which to store the message.
@@ -30,7 +30,7 @@ class Hg::Messenger::MessageStore
       key = message_key(user_id, namespace)
 
       message = Hg::Redis.execute do |conn|
-        if message_json = conn.rpop(key)
+        if message_json = conn.lpop(key)
           JSON.parse(message_json)
         else
           {}
