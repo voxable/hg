@@ -74,8 +74,8 @@ RSpec.describe Hg::MessageWorker, type: :worker do
 
       context 'constructing the request object' do
         it 'fetches or creates the user representing the sender' do
-          allow(user_class).to receive(:find_or_create_by).with(facebook_psid: user_id).and_return(user)
-          expect(router_class).to receive(:handle).with(hash_including(user: user))
+          expect(user_class).to receive(:find_or_create_by).with(facebook_psid: user_id).and_return(user)
+          # TODO: Do we need spies to see what's being passed to Hg::Request.new?
 
           subject.perform(*valid_args)
         end

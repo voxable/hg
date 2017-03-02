@@ -20,11 +20,13 @@ module Hg
       nlu_response = ApiAiClient.new(user.api_ai_session_id).query(message.message.text)
 
       # Build a request object.
-      request = Hashie::Mash.new
-      request.user = user
-      request.intent = nlu_response.intent
-      request.action = nlu_response.action
-      request.parameters = nlu_response.parameters
+      request = Hg::Request.new({
+        user: user,
+        message: message,
+        intent: nlu_response.intent,
+        action: nlu_response.action,
+        parameters: nlu_response.parameters
+      })
 
       # Send the request to the bot's router.
       bot.router.handle(request)
