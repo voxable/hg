@@ -11,7 +11,7 @@ RSpec.describe Hg::MessageWorker, type: :worker do
     })
   }
   let(:bot_class) { class_double(BOT_CLASS_NAME).as_stubbed_const }
-  let(:message_store) { class_double('Hg::Messenger::MessageStore').as_stubbed_const }
+  let(:message_store) { class_double('Hg::Queues::Messenger::MessageQueue').as_stubbed_const }
   let(:valid_args) { [user_id, 'faq_bots', BOT_CLASS_NAME] }
 
   before(:example) do
@@ -21,7 +21,7 @@ RSpec.describe Hg::MessageWorker, type: :worker do
   end
 
   it "pops the latest unprocessed message from the user's queue" do
-    expect(Hg::Messenger::MessageStore).to receive(:fetch_message_for_user).with(user_id, anything)
+    expect(Hg::Queues::Messenger::MessageQueue).to receive(:fetch_message_for_user).with(user_id, anything)
 
     subject.perform(*valid_args)
   end
@@ -44,7 +44,7 @@ RSpec.describe Hg::MessageWorker, type: :worker do
     let(:router_class) { double('router', handle: nil) }
 
     before(:example) do
-      allow(Hg::Messenger::MessageStore).to receive(:fetch_message_for_user).and_return(message)
+      allow(Hg::Queues::Messenger::MessageQueue).to receive(:fetch_message_for_user).and_return(message)
       allow(Hg::ApiAiClient).to receive(:new).and_return(api_ai_client)
       allow(bot_class).to receive(:user_class).and_return(user_class)
       allow(bot_class).to receive(:router).and_return(router_class)

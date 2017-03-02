@@ -223,12 +223,12 @@ describe Hg::Messenger::Bot do
     }
 
     before(:example) do
-      allow(Hg::Messenger::MessageStore).to receive(:store_message_for_user)
+      allow(Hg::Queues::Messenger::MessageQueue).to receive(:store_message_for_user)
       allow(Hg::MessageWorker).to receive(:perform_async)
     end
 
     it "stores the message on the user's queue of unprocessed messages" do
-      expect(Hg::Messenger::MessageStore).to receive(:store_message_for_user).with(user_id, message, anything)
+      expect(Hg::Queues::Messenger::MessageQueue).to receive(:store_message_for_user).with(user_id, message, anything)
 
       FAQBot.queue_message(message)
     end

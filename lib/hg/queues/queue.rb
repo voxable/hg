@@ -10,7 +10,7 @@
 # own processing (for example, postbacks vs regular messages in Messenger), a
 # particular bot implementation may need several processing queues.
 # TODO: test
-class Hg
+module Hg
   module Queues
     class Queue
       # Create a new interface to a queue living in redis at `queue_key`.
