@@ -1,6 +1,6 @@
 require 'support/rails_helper'
 
-describe Hg::MessageStore do
+describe Hg::Messenger::MessageStore do
   describe '.store_message_for_user' do
     it 'stores a message'
   end

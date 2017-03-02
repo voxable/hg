@@ -1,7 +1,7 @@
-require_relative 'redis'
+require_relative '../redis'
 
 # Enables temporary storage of an ordered list of unprocessed messages for a user.
-class Hg::MessageStore
+class Hg::Messenger::MessageStore
   class << self
     MESSAGES_QUEUE_KEY = 'messages'
 
@@ -23,7 +23,6 @@ class Hg::MessageStore
     # Retrieve the latest message for a user.
     #
     # @param user_id [String] The ID of a bot user on a particular platform.
-    # @param message [Hash] The message to store.
     # @param namespace [String] The redis namespace under which to store the message.
     #
     # @return [Hashie::Mash] The stored message.
@@ -46,7 +45,6 @@ class Hg::MessageStore
       # Generate a message queue key.
       #
       # @param user_id [String] The ID of a bot user on a particular platform.
-      # @param message [Hash] The message to store.
       # @param namespace [String] The redis namespace under which to store the message.
       #
       # @return [String] The message queue key.
