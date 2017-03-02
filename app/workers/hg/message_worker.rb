@@ -2,6 +2,8 @@
 module Hg
   class MessageWorker
     include Sidekiq::Worker
+    # TODO: Make number of retries configurable.
+    sidekiq_options retry: 1
 
     def perform(user_id, redis_namespace, bot_class_name)
       # Retrieve the latest message for this user
@@ -26,8 +28,6 @@ module Hg
 
       # Send the request to the bot's router.
       bot.router.handle(request)
-
-      # TODO: Set jobs to not retry on fail!!!!!!!!!!
     end
   end
 end
