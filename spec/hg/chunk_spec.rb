@@ -2,7 +2,7 @@ require 'support/rails_helper'
 
 =begin
 class Bot
-  include Hg::Bot
+  include Hg::Messenger::Bot
 
   module Chunks
   end

@@ -1,8 +1,8 @@
 require 'support/rails_helper'
 
-describe Hg::Bot do
+describe Hg::Messenger::Bot do
   class FAQBot
-    include Hg::Bot
+    include Hg::Messenger::Bot
   end
 
   before(:example) do
