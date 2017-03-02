@@ -19,6 +19,9 @@ module Hg
         base.extend ClassMethods
         base.chunks = []
         base.call_to_actions = []
+
+        # Since the class itself represents the bot, it must be immutable for thread-safety.
+        base.freeze
       end
 
       module ClassMethods
@@ -98,10 +101,10 @@ module Hg
             setting_type: 'call_to_actions',
             thread_state: 'new_thread',
             call_to_actions: [
-                            {
-                              payload: chunk.to_s
-                            }
-                          ]
+              {
+                payload: chunk.to_s
+              }
+            ]
           }
         end
 

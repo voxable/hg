@@ -2,6 +2,14 @@ require 'support/rails_helper'
 
 describe Hg::Messenger::Bot do
   class FAQBot
+    # TODO
+    # While we want bots to be frozen after created for thread-safety, as the
+    # constant itself is the object being referenced, leaving our test object
+    # frozen makes testing painful. This situation is suboptimal. Please advise.
+    def self.freeze
+      # noop
+    end
+
     include Hg::Messenger::Bot
   end
 
