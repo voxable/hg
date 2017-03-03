@@ -219,8 +219,9 @@ describe Hg::Messenger::Bot do
   describe '.queue_message' do
     let(:user_id) { '1234' }
     let(:message) {
-      Hashie::Mash.new({sender: { id: user_id }})
+      Hashie::Mash.new({sender: { id: user_id }, messaging: messaging})
     }
+    let(:messaging) { Object.new }
     let(:queue) { instance_double('Hg::Queues::Messenger::MessageQueue') }
 
     before(:example) do
@@ -230,7 +231,7 @@ describe Hg::Messenger::Bot do
     end
 
     it "stores the message on the user's queue of unprocessed messages" do
-      expect(queue).to receive(:push).with(message)
+      expect(queue).to receive(:push).with(message.messaging)
 
       FAQBot.queue_message(message)
     end

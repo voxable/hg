@@ -5,31 +5,18 @@
 # * `action` - The name of the action requested.
 # * `intent` - The name of the intent requested.
 # * `parameters` - Any parsed parameters (entities) for this request.
-#
-# A request is a `Hashie::Mash`, so properties can be accessed either as methods
-# or hash attributes. Any additional info can be added to the request object:
-#
-#   request.processed_at = Time.now
-#
-# In order to check for valid attributes, a request must always be instantiated
-# with a hash with symbolized keys, with all required values present:
-#
-#   Hg::Request.new({
-#     action: 'searchSchedule',
-#     intent: 'searchSchedule',
-#     message: message,
-#     user: user,
-#     parameters: {
-#       artist_name: 'Father John Misty'
-#     }
-#   })
-class Hg::Request < Hashie::Mash
-  # All required attributes for a request
-  REQUIRED_ATTRS = [:action, :intent, :message, :user, :parameters]
+class Hg::Request
+  attr_accessor :action
+  attr_accessor :intent
+  attr_accessor :message
+  attr_accessor :user
+  attr_accessor :parameters
 
-  def initialize(attributes = {})
-    REQUIRED_ATTRS.each do |attribute|
-      raise ArgumentError.new("#{attribute} is required") unless attributes.has_key?(attribute)
-    end
+  def initialize(action:, intent:, message:, user:, parameters: {})
+    @action = action
+    @intent = intent
+    @message = message
+    @user = user
+    @parameters = parameters
   end
 end

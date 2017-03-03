@@ -37,7 +37,7 @@ module Hg
         attr_writer :access_token
 
         def access_token
-          @access_token || ENV['FB_ACCESS_TOKEN']
+          @access_token || ENV['FB_ACCESS_TOKEN'.freeze]
         end
 
         # The class representing users.
@@ -99,8 +99,8 @@ module Hg
 
         def get_started(chunk)
           @get_started_content = {
-            setting_type: 'call_to_actions',
-            thread_state: 'new_thread',
+            setting_type: 'call_to_actions'.freeze,
+            thread_state: 'new_thread'.freeze,
             call_to_actions: [
               {
                 payload: chunk.to_s
@@ -123,7 +123,7 @@ module Hg
 
         def initialize_greeting_text
           Facebook::Messenger::Thread.set({
-            setting_type: 'greeting',
+            setting_type: 'greeting'.freeze,
             greeting: {
               text: @greeting_text
             }
@@ -155,7 +155,7 @@ module Hg
           user_id = message.sender['id'.freeze]
           Hg::Queues::Messenger::MessageQueue
             .new(user_id: user_id, namespace: redis_namespace)
-            .push(message)
+            .push(message.messaging)
 
           # Queue message for processing.
           Hg::MessageWorker.perform_async(user_id, redis_namespace, self.to_s)
@@ -176,7 +176,7 @@ module Hg
         def initialize_message_handlers
           ::Facebook::Messenger::Bot.on :postback do |postback|
             # Show a typing indicator to the user
-            show_typing(postback.sender['id'])
+            show_typing(postback.sender['id'.freeze])
 
             # TODO: Build a custom logger, make production logging optional
             # Log the postback
@@ -188,7 +188,7 @@ module Hg
 
           ::Facebook::Messenger::Bot.on :message do |message|
             # Show a typing indicator to the user
-            show_typing(message.sender['id'])
+            show_typing(message.sender['id'.freeze])
 
             # TODO: Build a custom logger, make production logging optional
             # Log the message
