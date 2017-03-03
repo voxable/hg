@@ -32,15 +32,15 @@ describe Hg::Router do
     end
 
     it 'adds the handler to the routes map' do
-      expect(@routes).to respond_to(action_name)
+      expect(@routes[action_name]).to be_truthy
     end
 
     it 'adds the controller class to the routes map for the specified action' do
-      expect(@routes[action_name].controller).to eq(RecipesController)
+      expect(@routes[action_name][:controller]).to eq(RecipesController)
     end
 
     it 'adds the controller handler method to the routes map for the specified action' do
-      expect(@routes[action_name].handler).to eq(handler)
+      expect(@routes[action_name][:handler]).to eq(handler)
     end
   end
 
@@ -50,7 +50,7 @@ describe Hg::Router do
     end
 
     it 'returns a Hashie::Mash' do
-      expect(RouterWithSingleAction.routes).to be_a(Hashie::Mash)
+      expect(RouterWithSingleAction.routes).to be_a(Hash)
     end
   end
 
@@ -74,12 +74,12 @@ describe Hg::Router do
     it "calls the handler method on the request's action's controller class" do
       expect(controller_instance).to receive(HANDLER)
 
-      RouterWithSingleAction.handle({action: action_name})
+      RouterWithSingleAction.handle(double('action', action: action_name))
     end
 
     context "when the action isn't registered in the routes" do
       it 'throws an error' do
-        expect { RouterWithSingleAction.handle({action: 'foo'}) }.to raise_error(Hg::Router::ActionNotRegisteredError)
+        expect { RouterWithSingleAction.handle(double('action', action: 'foo')) }.to raise_error(Hg::Router::ActionNotRegisteredError)
       end
     end
   end

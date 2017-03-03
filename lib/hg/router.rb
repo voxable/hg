@@ -36,8 +36,8 @@ module Hg
   #
   # ## The route map
   #
-  # The routes map is a `Hashie::Mash` with action names as keys, pointing at
-  # `Hashie::Mash` values with the following structure:
+  # The routes map is a hash with action names as keys, pointing at
+  # nested hash values with the following structure:
   #
   #   {
   #     controller: PizzaOrderController,
@@ -72,15 +72,15 @@ module Hg
     class << self
       # Create a new class instance variable `routes` on any subclasses.
       def inherited(subclass)
-        # Default routes to new `Hashie::Mash`.
-        subclass.instance_variable_set(:@routes, Hashie::Mash.new)
+        # Default routes to new hash.
+        subclass.instance_variable_set(:@routes, {})
 
         # TODO: Need to figure this out.
         # Since the class itself is the router, make it immutable for thread-safety.
         # subclass.freeze
       end
 
-      # @return [Hashie::Mash] The routes map.
+      # @return [Hash] The routes map.
       def routes
         @routes
       end
@@ -93,20 +93,21 @@ module Hg
       # @param handler_method_name [Symbol] The name of the handler method on the
       #   controller class for this action.
       def action(action_name, controller, handler_method_name)
-        @routes[action_name] = Hashie::Mash.new
-        @routes[action_name].controller = controller
-        @routes[action_name].handler = handler_method_name
+        @routes[action_name] = {
+          controller: controller,
+          handler: handler_method_name
+        }
       end
 
       # Handle an inbound request by finding its matching handler method and
       # executing it.
       #
-      # @param request [Hash, Hashie::Mash] The inbound request.
+      # @param request [Hash] The inbound request.
       def handle(request)
-        route = routes.fetch(request[:action])
-        route.controller.new(request: request).send(route.handler)
+        route = routes.fetch(request.action)
+        route[:controller].new(request: request).send(route[:handler])
       rescue KeyError
-        raise ActionNotRegisteredError.new(request[:action])
+        raise ActionNotRegisteredError.new(request.action)
       end
     end
   end
