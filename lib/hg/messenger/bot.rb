@@ -75,8 +75,8 @@ module Hg
 
         def initialize_persistent_menu
           Facebook::Messenger::Thread.set({
-            setting_type:    'call_to_actions',
-            thread_state:    'existing_thread',
+            setting_type:    'call_to_actions'.freeze,
+            thread_state:    'existing_thread'.freeze,
             call_to_actions: @call_to_actions
           }, access_token: access_token)
         end
@@ -87,10 +87,10 @@ module Hg
           }
 
           if options[:to]
-            call_to_action_content[:type] = 'postback'
+            call_to_action_content[:type] = 'postback'.freeze
             call_to_action_content[:payload] = options[:to].to_s
           elsif options[:url]
-            call_to_action_content[:type] = 'web_url'
+            call_to_action_content[:type] = 'web_url'.freeze
             call_to_action_content[:url] = options[:url]
           end
 
@@ -167,36 +167,13 @@ module Hg
         def show_typing(recipient_psid)
           Facebook::Messenger::Bot.deliver({
              recipient: {id: recipient_psid},
-             sender_action: 'typing_on'
+             sender_action: 'typing_on'.freeze
            }, access_token: access_token)
         end
 
-        def initialize_router
-=begin
-          ::Facebook::Messenger::Bot.on :postback do |postback|
-            Rails.logger.info 'POSTBACK'
-            Rails.logger.info postback.payload
-
-            run_postback_payload(postback.payload, postback.sender)
-          end
-
-          ::Facebook::Messenger::Bot.on :message do |message|
-            Rails.logger.info 'MESSAGE'
-            Rails.logger.info message.text
-            Rails.logger.info message.quick_reply
-
-            # Attempt to run a quick reply payload
-            if message.quick_reply
-              run_postback_payload(message.quick_reply, message.sender)
-            # Fall back to fuzzy matching keywords
-            elsif fuzzy_match = FuzzyMatch.new(@routes.keys).find(message.text)
-              @routes[fuzzy_match].deliver(message.sender)
-            # Fallback behavior
-            else
-              @default_chunk.deliver(message.sender)
-            end
-          end
-=end
+        # Initialize the postback and message handlers for the bot, which will
+        # queue the messages for processing.
+        def initialize_message_handlers
           ::Facebook::Messenger::Bot.on :postback do |postback|
             # Show a typing indicator to the user
             show_typing(postback.sender['id'])

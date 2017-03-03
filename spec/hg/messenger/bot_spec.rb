@@ -45,7 +45,7 @@ describe Hg::Messenger::Bot do
     let(:payload) { JSON.generate({foo: 'bar'}) }
 
     before(:all) do
-      FAQBot.initialize_router
+      FAQBot.initialize_message_handlers
     end
 
     context 'when postbacks received' do
