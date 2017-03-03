@@ -7,9 +7,12 @@ module Hg
 
     def perform(user_id, redis_namespace, bot_class_name)
       # Retrieve the latest message for this user
-      message = Hg::Queues::Messenger::MessageQueue.fetch_message_for_user(user_id, redis_namespace)
+      message = Hg::Queues::Messenger::MessageQueue
+                  .new(user_id: user_id, namespace: redis_namespace)
+                  .pop
 
       # Do nothing if no message available. This could be due to multiple execution on the part of Sidekiq.
+      # This ensures idempotence.
       return nil if message.empty?
 
       # Fetch the User representing the message's sender

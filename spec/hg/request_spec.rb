@@ -1,6 +1,6 @@
 require 'support/rails_helper'
 
-describe Hg::Queues::Messenger::MessageQueue do
+describe Hg::Request do
   context 'initializing' do
     context 'when no user is provided' do
       it 'throws an error' do

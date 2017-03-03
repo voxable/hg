@@ -151,8 +151,10 @@ module Hg
         # @param message [Hash] The message to be queued.
         def queue_message(message)
           # Store message on this user's queue of unprocessed messages.
-          user_id = message.sender['id']
-          Hg::Queues::Messenger::MessageQueue.store_message_for_user(user_id, message, redis_namespace)
+          user_id = message.sender['id'.freeze]
+          Hg::Queues::Messenger::MessageQueue
+            .new(user_id: user_id, namespace: redis_namespace)
+            .push(message)
 
           # Queue message for processing.
           Hg::MessageWorker.perform_async(user_id, redis_namespace, self.to_s)

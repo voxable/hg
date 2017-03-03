@@ -11,17 +11,20 @@ RSpec.describe Hg::MessageWorker, type: :worker do
     })
   }
   let(:bot_class) { class_double(BOT_CLASS_NAME).as_stubbed_const }
-  let(:message_store) { class_double('Hg::Queues::Messenger::MessageQueue').as_stubbed_const }
+  let(:queue) { instance_double('Hg::Queues::Messenger::MessageQueue') }
   let(:valid_args) { [user_id, 'faq_bots', BOT_CLASS_NAME] }
 
   before(:example) do
-    allow(message_store).to receive(:fetch_message_for_user).and_return({})
+    allow(Hg::Queues::Messenger::MessageQueue).to receive(:new).and_return(queue)
+    allow(queue).to receive(:pop).and_return({})
     # Access the let variable to instantiate the class double
     bot_class
   end
 
   it "pops the latest unprocessed message from the user's queue" do
-    expect(Hg::Queues::Messenger::MessageQueue).to receive(:fetch_message_for_user).with(user_id, anything)
+    # TODO: two expectations in one it block is poor form
+    expect(Hg::Queues::Messenger::MessageQueue).to receive(:new).with(hash_including(user_id: user_id))
+    expect(queue).to receive(:pop)
 
     subject.perform(*valid_args)
   end
@@ -44,7 +47,7 @@ RSpec.describe Hg::MessageWorker, type: :worker do
     let(:router_class) { double('router', handle: nil) }
 
     before(:example) do
-      allow(Hg::Queues::Messenger::MessageQueue).to receive(:fetch_message_for_user).and_return(message)
+      allow(queue).to receive(:pop).and_return(message)
       allow(Hg::ApiAiClient).to receive(:new).and_return(api_ai_client)
       allow(bot_class).to receive(:user_class).and_return(user_class)
       allow(bot_class).to receive(:router).and_return(router_class)
@@ -101,7 +104,7 @@ RSpec.describe Hg::MessageWorker, type: :worker do
 
   context "when no messages are present on the user's unprocessed message queue" do
     before(:example) do
-      allow(message_store).to receive(:fetch_message_for_user).with(any_args).and_return(Hashie::Mash.new({}))
+      allow(queue).to receive(:pop).and_return(Hashie::Mash.new({}))
     end
 
     it 'does nothing' do
