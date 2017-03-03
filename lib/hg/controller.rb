@@ -15,8 +15,8 @@ module Hg
     # @param request [Hash] The incoming request.
     def initialize(request: {})
       @request = request
-      self.params = request[:parameters] || request[:params]
-      @user = request[:user]
+      self.params = request.parameters
+      @user = request.user
     end
 
     attr_accessor :params
@@ -26,7 +26,7 @@ module Hg
     #
     # @param new_params [Hash] The parameters for the request.
     def params=(new_params)
-      @params = Hashie::Mash.new(new_params)
+      @params = new_params
     end
 
     attr_accessor :request
