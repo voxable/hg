@@ -20,13 +20,14 @@ module Hg
         base.chunks = []
         base.call_to_actions = []
 
+        # TODO: Need to figure this out.
         # Since the class itself represents the bot, it must be immutable for thread-safety.
-        base.freeze
+        # base.freeze
       end
 
       module ClassMethods
         def init
-          initialize_router
+          initialize_message_handlers
           initialize_persistent_menu
           initialize_get_started_button
           initialize_greeting_text

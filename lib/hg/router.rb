@@ -75,8 +75,9 @@ module Hg
         # Default routes to new `Hashie::Mash`.
         subclass.instance_variable_set(:@routes, Hashie::Mash.new)
 
+        # TODO: Need to figure this out.
         # Since the class itself is the router, make it immutable for thread-safety.
-        subclass.freeze
+        # subclass.freeze
       end
 
       # @return [Hashie::Mash] The routes map.
