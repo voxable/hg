@@ -29,8 +29,8 @@ module Hg
         if deliverable.is_a? Class
           deliverable.new(recipient: @recipient, context: @context).deliver
         # If dynamic, then it needs to be evaluated at delivery time. Create a
-        # `template` with empty `@deliverables`, then evaluate
-        # the dynamic block within it and deliver.
+        # `template` dup of the chunk class with empty `@deliverables`, then
+        # evaluate the dynamic block within it and deliver.
         elsif deliverable.is_a? Proc
           template = self.class.dup
           template.deliverables = []
