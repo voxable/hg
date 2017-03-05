@@ -143,13 +143,32 @@ module Hg
           self.to_s.tableize
         end
 
+        # Queue a postback for processing.
+        #
+        # @param message [Facebook::Messenger::Incoming::Postback] The postback to be queued.
         def queue_postback(postback)
+          # Grab the user's PSID.
+          user_id = postback.sender['id'.freeze]
+          # Pull out the raw JSON postback from the `Postback` object.
+          raw_postback = postback.messaging
 
+          # Parse the postback payload as JSON, and store it as the value of
+          # the `payload` key
+          raw_payload = raw_postback['postback']['payload']
+          raw_postback['postback']['payload'] = JSON.parse(raw_payload)
+
+          # Store the transformed postback on the queue
+          Hg::Queues::Messenger::PostbackQueue
+            .new(user_id: user_id, namespace: redis_namespace)
+            .push(raw_postback)
+
+          # Queue postback for processing.
+          Hg::PostbackWorker.perform_async(user_id, redis_namespace, self.to_s)
         end
 
         # Queue a message for processing.
         #
-        # @param message [Hash] The message to be queued.
+        # @param message [Facebook::Messenger::Incoming::Message] The message to be queued.
         def queue_message(message)
           # Store message on this user's queue of unprocessed messages.
           user_id = message.sender['id'.freeze]

@@ -213,7 +213,52 @@ describe Hg::Messenger::Bot do
   end
 
   describe '.queue_postback' do
-    it 'queues the postback'
+    let(:user_id) { '1234' }
+    # This is the actual `Facebook::Messenger::Incoming::Postback` object
+    let(:postback_obj) {
+      Hashie::Mash.new({sender: { id: user_id }, messaging: raw_postback})
+    }
+    let(:raw_postback) {{
+      'postback' => {
+        'payload' => encoded_payload
+      }
+    }}
+    let(:parsed_postback) {{
+      'postback' => {
+        'payload' => payload
+      }
+    }}
+    let(:payload) {{'foo' => 1}}
+    let(:encoded_payload) { JSON.generate(payload) }
+    let(:queue) { instance_double('Hg::Queues::Messenger::PostbackQueue') }
+
+    before(:example) do
+      allow(Hg::Queues::Messenger::PostbackQueue).to receive(:new).and_return(queue)
+      allow(queue).to receive(:push)
+      allow(Hg::PostbackWorker).to receive(:perform_async)
+    end
+
+    it "stores the postback, with the payload parsed as JSON, on the user's queue of unprocessed postbacks" do
+      expect(queue).to receive(:push).with(parsed_postback)
+
+      FAQBot.queue_postback(postback_obj)
+    end
+
+    context 'queueing the postback for processing' do
+      it 'queues for the correct user' do
+        expect(Hg::PostbackWorker).to receive(:perform_async).with(user_id, anything, anything)
+
+        FAQBot.queue_postback(postback_obj)
+      end
+
+      it 'queues with the correct Redis namespace'
+
+      it 'queues with the correct bot class' do
+        expect(Hg::PostbackWorker).to receive(:perform_async).with(anything, anything, FAQBot.to_s)
+
+        FAQBot.queue_postback(postback_obj)
+      end
+    end
   end
 
   describe '.queue_message' do
