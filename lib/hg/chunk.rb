@@ -31,21 +31,26 @@ module Hg
       Rails.logger.info @recipient.inspect
 
       self.class.deliverables.each do |deliverable|
-        # If another chunk, deliver it
+        # If another chunk...
         if deliverable.is_a? Class
+          # ...deliver the chunk.
           deliverable.new(recipient: @recipient, context: context).deliver
-        # If dynamic, then it needs to be evaluated at delivery time. Create a
-        # `template` dup of the chunk class with empty `@deliverables`, then
-        # evaluate the dynamic block within it and deliver.
+
+        # If dynamic, then it needs to be evaluated at delivery time.
         elsif deliverable.is_a? Proc
-          template = self.class.dup
+          # Create a `template` anonymous subclass of the chunk class.
+          template = Class.new(self.class)
           template.deliverables = []
 
+          # Evaluate the dynamic block within it.
           template.class_exec(context, &deliverable)
 
+          # Deliver the chunk.
           template.new(recipient: @recipient, context: context).deliver
-        # Otherwise, it's just a raw message. Deliver it.
+
+        # Otherwise, it's just a raw message.
         else
+          # Deliver the message
           Facebook::Messenger::Bot.deliver(deliverable.merge(recipient: @recipient), access_token: ENV['FB_ACCESS_TOKEN'])
         end
       end
