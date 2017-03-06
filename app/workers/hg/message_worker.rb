@@ -1,10 +1,18 @@
-# Handles processing messages.
+# Handles processing messages. A message is any inbound, freeform text from any platform.
 module Hg
   class MessageWorker
     include Sidekiq::Worker
     # TODO: Make number of retries configurable.
     sidekiq_options retry: 1
 
+    # Process an inbound message.
+    #
+    # @param user_id [String, Integer] The ID representing the user on this platform
+    # @param redis_namespace [String] The redis namespace under which the message to
+    #   process is nested.
+    # @param bot_class_name [String] The string version of the bot's class name
+    #
+    # @return [void]
     def perform(user_id, redis_namespace, bot_class_name)
       # Retrieve the latest message for this user
       message = Hg::Queues::Messenger::MessageQueue
@@ -15,8 +23,12 @@ module Hg
       # This ensures idempotence.
       return nil if message.empty?
 
-      # Fetch the User representing the message's sender
+      # Locate the class representing the bot.
       bot = Kernel.const_get(bot_class_name)
+
+      # Fetch the User representing the message's sender
+      # TODO: pass in a `user_id_field` to indicate how to find user in order to
+      # make this platform agnostic
       user = bot.user_class.find_or_create_by(facebook_psid: user_id)
 
       # Send the message to API.ai for NLU

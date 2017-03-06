@@ -1,57 +1,35 @@
 require 'support/rails_helper'
+require_relative './worker_spec_shared_contexts'
+require_relative './worker_spec_shared_examples'
 
 RSpec.describe Hg::MessageWorker, type: :worker do
-  BOT_CLASS_NAME = 'NewsBot'
-
-  let(:user_id) { '1' }
-  # TODO: likely need a message factory
-  let(:message) {
-    Hashie::Mash.new({
-      sender: {id: user_id}
-    })
-  }
-  let(:bot_class) { class_double(BOT_CLASS_NAME).as_stubbed_const }
-  let(:queue) { instance_double('Hg::Queues::Messenger::MessageQueue') }
-  let(:valid_args) { [user_id, 'faq_bots', BOT_CLASS_NAME] }
-
-  before(:example) do
-    allow(Hg::Queues::Messenger::MessageQueue).to receive(:new).and_return(queue)
-    allow(queue).to receive(:pop).and_return({})
-    # Access the let variable to instantiate the class double
-    bot_class
+  include_context 'with mocked queue' do
+    let(:queue_class) { Hg::Queues::Messenger::MessageQueue }
+    let(:queue) { instance_double(queue_class.to_s) }
   end
 
-  it "pops the latest unprocessed message from the user's queue" do
-    # TODO: two expectations in one it block is poor form
-    expect(Hg::Queues::Messenger::MessageQueue).to receive(:new).with(hash_including(user_id: user_id))
-    expect(queue).to receive(:pop)
-
-    subject.perform(*valid_args)
-  end
+  include_examples 'a message processing worker'
 
   context "when a message is present on the user's unprocessed message queue" do
-    let(:text) { 'hi there' }
-    let(:message) {
-      Hashie::Mash.new({
-        sender: { id: user_id },
-        message: {
-          text: text
-        }
-      })
-    }
-    let(:api_ai_response) { double('api_ai_response', intent: nil, action: nil, parameters: nil)}
-    let(:api_ai_client) { instance_double('Hg::ApiAiClient', query: api_ai_response) }
-    let(:user_class) { class_double('User').as_stubbed_const }
-    let(:user_api_ai_session_id) { 's0m3id' }
-    let(:user) { double('user', api_ai_session_id: user_api_ai_session_id) }
-    let(:router_class) { double('router', handle: nil) }
+    include_context 'when queue has unprocessed message' do
+      let(:text) { 'hi there' }
+      let(:message) {
+        Hashie::Mash.new({
+          sender: { id: user_id },
+          message: {
+            text: text
+          }
+        })
+      }
+      let(:api_ai_response) { double('api_ai_response', intent: nil, action: nil, parameters: nil)}
+      let(:api_ai_client) { instance_double('Hg::ApiAiClient', query: api_ai_response) }
+      let(:user_api_ai_session_id) { 's0m3id' }
+      let(:user) { double('user', api_ai_session_id: user_api_ai_session_id) }
+    end
 
     before(:example) do
       allow(queue).to receive(:pop).and_return(message)
       allow(Hg::ApiAiClient).to receive(:new).and_return(api_ai_client)
-      allow(bot_class).to receive(:user_class).and_return(user_class)
-      allow(bot_class).to receive(:router).and_return(router_class)
-      allow(user_class).to receive(:find_or_create_by).and_return(user)
     end
 
     context 'sending the message to API.ai for parsing' do
