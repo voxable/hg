@@ -86,12 +86,17 @@ module Hg
             title: text
           }
 
+          # TODO: This duplicates code in Chunk.button. Should be abstracted.
           if options[:to]
             call_to_action_content[:type] = 'postback'.freeze
             call_to_action_content[:payload] = options[:to].to_s
           elsif options[:url]
             call_to_action_content[:type] = 'web_url'.freeze
             call_to_action_content[:url] = options[:url]
+          elsif options[:payload]
+            call_to_action_content[:type] = 'postback'.freeze
+            # Encode the payload hash as JSON.
+            call_to_action_content[:payload] = JSON.generate(options[:payload])
           end
 
           @call_to_actions << call_to_action_content

@@ -35,6 +35,8 @@ RSpec.describe Hg::PostbackWorker, type: :worker do
     end
 
     include_examples 'constructing a request object'
+
+    it 'adds the payload to the request'
   end
 
   context "when no postbacks are present on the user's unprocessed postback queue" do

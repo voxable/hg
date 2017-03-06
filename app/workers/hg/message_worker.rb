@@ -33,7 +33,7 @@ module Hg
       # Fetch the User representing the message's sender
       # TODO: pass in a `user_id_field` to indicate how to find user in order to
       # make this platform agnostic
-      user = bot.user_class.find_or_create_by(facebook_psid: user_id)
+      user = find_bot_user(bot, user_id)
 
       # Send the message to API.ai for NLU
       nlu_response = ApiAiClient.new(user.api_ai_session_id).query(message.text)

@@ -23,4 +23,6 @@ RSpec.shared_examples 'constructing a request object' do
 
     it 'contains the matched parameters'
   end
+
+  it 'sends the request to the router'
 end

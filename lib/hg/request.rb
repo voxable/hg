@@ -12,7 +12,7 @@ class Hg::Request
   attr_accessor :user
   attr_accessor :parameters
 
-  def initialize(action:, intent:, message:, user:, parameters: {})
+  def initialize(action:, intent: nil, message: nil, user:, parameters: {})
     @action = action
     @intent = intent
     @message = message

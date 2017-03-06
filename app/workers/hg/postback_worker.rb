@@ -1,5 +1,5 @@
 module Hg
-  class PostbackWorker
+  class PostbackWorker < Workers::Base
     include Sidekiq::Worker
     # TODO: Make number of retries configurable.
     sidekiq_options retry: 1
@@ -14,19 +14,37 @@ module Hg
     # @return [void]
     def perform(user_id, redis_namespace, bot_class_name)
       # Retrieve the latest postback for this user
-      raw_postback = Hg::Queues::Messenger::PostbackQueue
-                  .new(user_id: user_id, namespace: redis_namespace)
-                  .pop
+      raw_postback = pop_from_queue(
+        Hg::Queues::Messenger::PostbackQueue,
+        user_id: user_id,
+        namespace: redis_namespace
+      )
 
       # Do nothing if no postback available. This could be due to multiple execution on the part of Sidekiq.
       # This ensures idempotence.
       return nil if raw_postback.empty?
 
-      # Instantiate a postback object
-      postback = Facebook::Messenger::Incoming::Postback.new(raw_postback)
+      # Extract the payload from the postback.
+      payload = Facebook::Messenger::Incoming::Postback.new(raw_postback).payload
 
       # Locate the class representing the bot.
       bot = Kernel.const_get(bot_class_name)
+
+      # Fetch the User representing the message's sender
+      # TODO: pass in a `user_id_field` to indicate how to find user in order to
+      # make this platform agnostic
+      user = find_bot_user(bot, user_id)
+
+      # Build a request object.
+      request = Hg::Request.new({
+        user: user,
+        intent: payload['intent'.freeze],
+        action: payload['action'.freeze],
+        parameters: payload['parameters'.freeze] || payload['params'.freeze]
+      })
+
+      # Send the request to the bot's router.
+      bot.router.handle(request)
     end
   end
 end
