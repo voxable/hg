@@ -45,6 +45,19 @@ module Hg
           conn.rpush(@key, message.to_json)
         end
       end
+
+      private
+
+        # Generate a key for the queue in redis.
+        #
+        # @param user_id [String] The ID of a bot user on a particular platform.
+        # @param namespace [String] The redis namespace under which to store the message.
+        # @param key_portion [String] The portion of the queue representing this message queue.
+        #
+        # @return [String] The message queue key.
+        def message_key(user_id:, namespace:, key_portion:)
+          "#{namespace}:users:#{user_id}:#{key_portion}"
+        end
     end
   end
 end
