@@ -1,3 +1,3 @@
-class Hg::Action
+class Hg::Interactor
   include ::Interactor
 end

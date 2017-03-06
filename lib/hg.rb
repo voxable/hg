@@ -7,7 +7,7 @@ require 'api-ai-ruby'
 
 require 'hg/version'
 require 'hg/engine'
-require 'hg/action'
+require 'hg/interactor'
 require 'hg/api_ai_client'
 require 'hg/queues/queue'
 require 'hg/messenger/bot'
