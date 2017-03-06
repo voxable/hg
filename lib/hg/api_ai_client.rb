@@ -15,11 +15,11 @@ module Hg
 
       return nil if api_ai_response[:result][:action] == 'input.unknown'
 
-      return Hashie::Mash.new({
+      return {
         intent: api_ai_response[:result][:metadata][:intentName],
         action: api_ai_response[:result][:action],
         parameters: api_ai_response[:result][:parameters]
-      })
+      }
     end
   end
 end
