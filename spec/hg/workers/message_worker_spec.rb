@@ -27,7 +27,7 @@ RSpec.describe Hg::MessageWorker, type: :worker do
           'text' => text
         }
       }}
-      let(:api_ai_response) { double('api_ai_response', intent: nil, action: nil, parameters: nil)}
+      let(:api_ai_response) { {intent: nil, action: nil, parameters: nil} }
       let(:api_ai_client) { instance_double('Hg::ApiAiClient', query: api_ai_response) }
       let(:user_api_ai_session_id) { 's0m3id' }
       let(:user) { double('user', api_ai_session_id: user_api_ai_session_id) }

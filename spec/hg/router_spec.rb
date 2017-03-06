@@ -14,9 +14,11 @@ describe Hg::Router do
     end
 
     def show; end
+
+    def process_action(*args); end
   end
 
-  let(:controller_instance) { instance_double('RecipesController', show: nil) }
+  let(:controller_instance) { instance_double('RecipesController', show: nil, process_action: nil) }
 
   class RouterWithSingleAction < Hg::Router
     action ACTION_NAME, RecipesController, HANDLER
@@ -72,7 +74,7 @@ describe Hg::Router do
     end
 
     it "calls the handler method on the request's action's controller class" do
-      expect(controller_instance).to receive(HANDLER)
+      expect(controller_instance).to receive(:process_action).with(handler)
 
       RouterWithSingleAction.handle(double('action', action: action_name))
     end
