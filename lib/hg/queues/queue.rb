@@ -34,7 +34,7 @@ module Hg
           end
         end
 
-        return Hashie::Mash.new(message)
+        return message
       end
 
       # Push a message onto the queue.

@@ -14,13 +14,19 @@ RSpec.describe Hg::MessageWorker, type: :worker do
     include_context 'when queue has unprocessed message' do
       let(:text) { 'hi there' }
       let(:message) {
-        Hashie::Mash.new({
-          sender: { id: user_id },
-          message: {
-            text: text
-          }
-        })
+        instance_double('Facebook::Messenger::Incoming::Message',
+          sender: { 'id': user_id },
+          text: text
+        )
       }
+      let(:raw_message) {{
+        'sender' => {
+          'id' => user_id,
+        },
+        'message' => {
+          'text' => text
+        }
+      }}
       let(:api_ai_response) { double('api_ai_response', intent: nil, action: nil, parameters: nil)}
       let(:api_ai_client) { instance_double('Hg::ApiAiClient', query: api_ai_response) }
       let(:user_api_ai_session_id) { 's0m3id' }
@@ -28,7 +34,8 @@ RSpec.describe Hg::MessageWorker, type: :worker do
     end
 
     before(:example) do
-      allow(queue).to receive(:pop).and_return(message)
+      allow(queue).to receive(:pop).and_return(raw_message)
+      allow(Facebook::Messenger::Incoming::Message).to receive(:initialize).and_return(message)
       allow(Hg::ApiAiClient).to receive(:new).and_return(api_ai_client)
     end
 

@@ -15,13 +15,16 @@ module Hg
     # @return [void]
     def perform(user_id, redis_namespace, bot_class_name)
       # Retrieve the latest message for this user
-      message = Hg::Queues::Messenger::MessageQueue
-                  .new(user_id: user_id, namespace: redis_namespace)
-                  .pop
+      raw_message = Hg::Queues::Messenger::MessageQueue
+                      .new(user_id: user_id, namespace: redis_namespace)
+                      .pop
 
       # Do nothing if no message available. This could be due to multiple execution on the part of Sidekiq.
       # This ensures idempotence.
-      return nil if message.empty?
+      return nil if raw_message.empty?
+
+      # Instantiate a message object
+      message = Facebook::Messenger::Incoming::Message.new(raw_message)
 
       # Locate the class representing the bot.
       bot = Kernel.const_get(bot_class_name)
@@ -32,7 +35,7 @@ module Hg
       user = bot.user_class.find_or_create_by(facebook_psid: user_id)
 
       # Send the message to API.ai for NLU
-      nlu_response = ApiAiClient.new(user.api_ai_session_id).query(message.message.text)
+      nlu_response = ApiAiClient.new(user.api_ai_session_id).query(message.text)
 
       # Build a request object.
       request = Hg::Request.new({
