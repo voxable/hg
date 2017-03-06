@@ -5,6 +5,7 @@ require 'hashie/mash'
 require 'sidekiq'
 require 'api-ai-ruby'
 
+# TODO: List subordinate requires in their respective files.
 require 'hg/version'
 require 'hg/engine'
 require 'hg/interactor'

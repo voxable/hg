@@ -8,7 +8,7 @@ describe Hg::Controller do
   let(:request) {
     instance_double(
       'Hg::Request',
-      parameters: { toppings: ['cheese', 'pepperoni'] },
+      parameters: { 'toppings' => ['cheese', 'pepperoni'] },
       user: BotUser.new
     )
   }
@@ -21,6 +21,10 @@ describe Hg::Controller do
   describe '#initialize' do
     it "sets the params instance variable to the value of the request's params" do
       expect(@controller_instance.instance_variable_get(:@params)).to eq(@params)
+    end
+
+    it 'coerces params to HashWithIndifferentAccess' do
+      expect(@controller_instance.instance_variable_get(:@params)).to be_a(ActiveSupport::HashWithIndifferentAccess)
     end
 
     it 'sets the user instance variable' do
@@ -36,6 +40,10 @@ describe Hg::Controller do
     it 'is aliased to #parameters' do
       expect(@controller_instance.parameters).to eq(@controller_instance.params)
     end
+  end
+
+  describe '#process_action' do
+    it 'processes the action'
   end
 
   describe '#respond' do
@@ -112,5 +120,9 @@ describe Hg::Controller do
         @controller_instance.respond(BotChunk, context: context)
       end
     end
+  end
+
+  context 'filtering' do
+    it 'works with filters'
   end
 end

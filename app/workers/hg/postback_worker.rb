@@ -38,9 +38,7 @@ module Hg
       user = find_bot_user(bot, user_id)
 
       # Generate the params hash.
-      parameters = ActiveSupport::HashWithIndifferentAccess.new(
-        payload['parameters'.freeze] || payload['params'.freeze]
-      )
+      parameters = payload['parameters'.freeze] || payload['params'.freeze]
 
       # Build a request object.
       request = Hg::Request.new({

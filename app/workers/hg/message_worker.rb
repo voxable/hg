@@ -45,7 +45,7 @@ module Hg
         message: message,
         intent: nlu_response[:intent],
         action: nlu_response[:action],
-        parameters: ActiveSupport::HashWithIndifferentAccess.new(nlu_response[:parameters])
+        parameters: nlu_response[:parameters]
       })
 
       # Send the request to the bot's router.
