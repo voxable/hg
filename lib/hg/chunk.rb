@@ -10,6 +10,12 @@ module Hg
       base.include_chunks
     end
 
+
+    # @return [OpenStruct] The execution context for this chunk instance.
+    def context
+      @memoized_context ||= @context
+    end
+
     def deliver
       self.class.show_typing(@recipient)
 
@@ -27,7 +33,7 @@ module Hg
       self.class.deliverables.each do |deliverable|
         # If another chunk, deliver it
         if deliverable.is_a? Class
-          deliverable.new(recipient: @recipient, context: @context).deliver
+          deliverable.new(recipient: @recipient, context: context).deliver
         # If dynamic, then it needs to be evaluated at delivery time. Create a
         # `template` dup of the chunk class with empty `@deliverables`, then
         # evaluate the dynamic block within it and deliver.
@@ -35,9 +41,9 @@ module Hg
           template = self.class.dup
           template.deliverables = []
 
-          template.class_exec(@context, &deliverable)
+          template.class_exec(context, &deliverable)
 
-          template.new(recipient: @recipient, context: @context).deliver
+          template.new(recipient: @recipient, context: context).deliver
         # Otherwise, it's just a raw message. Deliver it.
         else
           Facebook::Messenger::Bot.deliver(deliverable.merge(recipient: @recipient), access_token: ENV['FB_ACCESS_TOKEN'])
@@ -274,8 +280,12 @@ module Hg
       #
       # @param [lambda, String] option Either a lambda to be evaluated, or a value
       # @return [String] The option value
+      #
+      # TODO: Is this method still necessary? Only place it's used doesn't seem to
+      #   make use of this functionality.
       def evaluate_option(option)
         if option.respond_to?(:call)
+          # TODO: BUG - @context is a class instance variable, this isn't going to work correctly
           option.call(@context)
         else
           option

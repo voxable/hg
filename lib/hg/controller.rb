@@ -42,7 +42,7 @@ module Hg
     def respond(*args)
       # If we're attempting to send back a simple text message...
       if args.first.is_a?(String)
-        # ...deliver the method.
+        # ...deliver the message.
 
         message_text = args.first
 
@@ -66,6 +66,7 @@ module Hg
       end
     end
     alias_method :reply, :respond
+    alias_method :respond_with, :respond
 
   end
 end

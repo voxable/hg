@@ -89,7 +89,12 @@ module Hg
           # TODO: This duplicates code in Chunk.button. Should be abstracted.
           if options[:to]
             call_to_action_content[:type] = 'postback'.freeze
-            call_to_action_content[:payload] = options[:to].to_s
+            call_to_action_content[:payload] = JSON.generate({
+            action: Hg::InternalActions::DISPLAY_CHUNK,
+            parameters: {
+              chunk: options[:to].to_s
+            }
+          })
           elsif options[:url]
             call_to_action_content[:type] = 'web_url'.freeze
             call_to_action_content[:url] = options[:url]

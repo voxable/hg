@@ -70,6 +70,14 @@ module Hg
     end
 
     class << self
+      # The actions used internally by Hg.
+      INTERNAL_ROUTES = {
+        Hg::InternalActions::DISPLAY_CHUNK => {
+          controller: Hg::Controllers::ChunksController,
+          handler: :display_chunk
+        }
+      }
+
       # Create a new class instance variable `routes` on any subclasses.
       def inherited(subclass)
         # Default routes to new hash.
@@ -82,7 +90,7 @@ module Hg
 
       # @return [Hash] The routes map.
       def routes
-        @routes
+        @memoized_routes ||= INTERNAL_ROUTES.merge(@routes)
       end
 
       # Add the action to the routes map.

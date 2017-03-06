@@ -1,4 +1,6 @@
 module Hg
+  # Handles processing postbacks. A postback is any structured request from
+  # any platform (i.e. button and quick replies, which send hash payloads).
   class PostbackWorker < Workers::Base
     include Sidekiq::Worker
     # TODO: Make number of retries configurable.

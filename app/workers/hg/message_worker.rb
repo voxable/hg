@@ -1,5 +1,6 @@
-# Handles processing messages. A message is any inbound, freeform text from any platform.
 module Hg
+  # Handles processing messages. A message is any inbound, freeform text from
+  # any platform.
   class MessageWorker < Workers::Base
     # TODO: Make number of retries configurable.
     sidekiq_options retry: 1
@@ -20,8 +21,8 @@ module Hg
         namespace: redis_namespace
       )
 
-      # Do nothing if no message available. This could be due to multiple execution on the part of Sidekiq.
-      # This ensures idempotence.
+      # Do nothing if no message available. This could be due to multiple execution
+      # on the part of Sidekiq. This ensures idempotence.
       return nil if raw_message.empty?
 
       # Instantiate a message object
