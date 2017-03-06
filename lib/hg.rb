@@ -17,6 +17,7 @@ require 'hg/chunk'
 require 'hg/controller'
 require 'hg/request'
 require 'hg/router'
+require 'hg/workers/base'
 
 # Ensure Hashie logs to Rails logger
 Hashie.logger = Rails.logger

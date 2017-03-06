@@ -11,14 +11,39 @@ RSpec.describe Hg::PostbackWorker, type: :worker do
 
   context "when a postback is present on the user's unprocessed postback queue" do
     include_context 'when queue has unprocessed message' do
-      let(:postback) {}
+      let(:payload) { JSON.generate({foo: 'bar'}) }
+      let(:postback) {
+        instance_double('Facebook::Messenger::Incoming::Postback',
+          sender: { 'id' => user_id },
+          payload: payload
+        )
+      }
+      let(:raw_postback) {{
+        'sender' => {
+          'id' => user_id,
+        },
+        'postback' => {
+          'payload' => payload
+        }
+      }}
+      let(:user) { double('user') }
     end
 
     before(:example) do
-      allow(queue).to receive(:pop).and_return(postback)
-      allow(bot_class).to receive(:user_class).and_return(user_class)
-      allow(bot_class).to receive(:router).and_return(router_class)
-      allow(user_class).to receive(:find_or_create_by).and_return(user)
+      allow(queue).to receive(:pop).and_return(raw_postback)
+      allow(Facebook::Messenger::Incoming::Postback).to receive(:initialize).and_return(postback)
+    end
+
+    include_examples 'constructing a request object'
+  end
+
+  context "when no postbacks are present on the user's unprocessed postback queue" do
+    before(:example) do
+      allow(queue).to receive(:pop).and_return({})
+    end
+
+    it 'does nothing' do
+      expect(subject.perform(*valid_args)).to be_nil
     end
   end
 end

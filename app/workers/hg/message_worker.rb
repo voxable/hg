@@ -1,7 +1,6 @@
 # Handles processing messages. A message is any inbound, freeform text from any platform.
 module Hg
-  class MessageWorker
-    include Sidekiq::Worker
+  class MessageWorker < Workers::Base
     # TODO: Make number of retries configurable.
     sidekiq_options retry: 1
 
@@ -15,9 +14,11 @@ module Hg
     # @return [void]
     def perform(user_id, redis_namespace, bot_class_name)
       # Retrieve the latest message for this user
-      raw_message = Hg::Queues::Messenger::MessageQueue
-                      .new(user_id: user_id, namespace: redis_namespace)
-                      .pop
+      raw_message = pop_from_queue(
+        Hg::Queues::Messenger::MessageQueue,
+        user_id: user_id,
+        namespace: redis_namespace
+      )
 
       # Do nothing if no message available. This could be due to multiple execution on the part of Sidekiq.
       # This ensures idempotence.

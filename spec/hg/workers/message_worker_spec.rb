@@ -15,7 +15,7 @@ RSpec.describe Hg::MessageWorker, type: :worker do
       let(:text) { 'hi there' }
       let(:message) {
         instance_double('Facebook::Messenger::Incoming::Message',
-          sender: { 'id': user_id },
+          sender: { 'id' => user_id },
           text: text
         )
       }
@@ -60,20 +60,7 @@ RSpec.describe Hg::MessageWorker, type: :worker do
         subject.perform(*valid_args)
       end
 
-      context 'constructing the request object' do
-        it 'fetches or creates the user representing the sender' do
-          expect(user_class).to receive(:find_or_create_by).with(facebook_psid: user_id).and_return(user)
-          # TODO: Do we need spies to see what's being passed to Hg::Request.new?
-
-          subject.perform(*valid_args)
-        end
-
-        it 'contains the matched intent'
-
-        it 'contains the matched action'
-
-        it 'contains the matched parameters'
-      end
+      include_examples 'constructing a request object'
     end
 
     context "when the message isn't understood by the API.ai agent" do
