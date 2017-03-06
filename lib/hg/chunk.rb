@@ -186,7 +186,7 @@ module Hg
 
           button_content = {
             title: text,
-            type: 'postback',
+            type: 'postback'.freeze,
             payload: klass.to_s
           }
         else
@@ -197,8 +197,13 @@ module Hg
 
         # If a `to` option is present, assume this is a postback link to another chunk.
         if options[:to]
-          button_content[:type] = 'postback'
-          button_content[:payload] = options[:to].to_s
+          button_content[:type] = 'postback'.freeze
+          button_content[:payload] = JSON.generate({
+            action: Hg::InternalActions::DISPLAY_CHUNK,
+            parameters: {
+              chunk: options[:to].to_s
+            }
+          })
         # If a different type of button is specified (e.g. "Log in"), then pass
         # through the `type` and `url`.
         elsif options[:type]
@@ -210,6 +215,10 @@ module Hg
           button_content[:type] = 'web_url'
 
           button_content[:url] = evaluate_option(options[:url])
+        elsif options[:payload]
+          button_content[:type] = 'postback'.freeze
+          # Encode the payload hash as JSON.
+          button_content[:payload] = JSON.generate(options[:payload])
         end
 
         # Pass through the `webview_height_ratio` option.

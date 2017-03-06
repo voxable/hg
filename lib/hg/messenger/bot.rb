@@ -25,6 +25,9 @@ module Hg
         # base.freeze
       end
 
+      # Ensure Controllers constant in bot class is defined for router.
+      module Controllers; end
+
       module ClassMethods
         def init
           initialize_message_handlers
@@ -90,11 +93,11 @@ module Hg
           if options[:to]
             call_to_action_content[:type] = 'postback'.freeze
             call_to_action_content[:payload] = JSON.generate({
-            action: Hg::InternalActions::DISPLAY_CHUNK,
-            parameters: {
-              chunk: options[:to].to_s
-            }
-          })
+              action: Hg::InternalActions::DISPLAY_CHUNK,
+              parameters: {
+                chunk: options[:to].to_s
+              }
+            })
           elsif options[:url]
             call_to_action_content[:type] = 'web_url'.freeze
             call_to_action_content[:url] = options[:url]
