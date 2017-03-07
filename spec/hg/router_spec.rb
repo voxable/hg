@@ -21,7 +21,7 @@ describe Hg::Router do
   let(:controller_instance) { instance_double('RecipesController', show: nil, process_action: nil) }
 
   class RouterWithSingleAction < Hg::Router
-    action ACTION_NAME, RecipesController, HANDLER
+    action ACTION_NAME, controller: RecipesController, with: HANDLER
   end
 
   before(:example) do
