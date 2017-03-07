@@ -35,7 +35,8 @@ module Hg
     # @param request [Hash] The incoming request.
     def initialize(request: {})
       @request = request
-      self.params = ActiveSupport::HashWithIndifferentAccess.new(@request.parameters)
+      # TODO: Test that params or parameters works, here.
+      @params = ActiveSupport::HashWithIndifferentAccess.new(request.parameters || request.params)
       @user = request.user
       @performed = false
     end
