@@ -102,6 +102,15 @@ module Hg
       alias_method :append_around_handler, :append_around_action
     end
 
+    # Generate a context based on merging the params into the user's current context.
+    #
+    # @return [ActiveSupport::HashWithIndifferentAccess] The merged context.
+    def merged_context
+      ActiveSupport::HashWithIndifferentAccess
+        .new((user.context_hash || {})
+        .merge(params))
+    end
+
     # Send a message back to the user. It's possible to either pass a string,
     # which will be delivered as a text message, or a chunk and its context:
     #
@@ -129,8 +138,7 @@ module Hg
       elsif args.first.is_a?(Class)
         # ....deliver the chunk
         chunk_class = args[0]
-        chunk_options = args[1] || {}
-        chunk_context = chunk_options[:context]
+        chunk_context = args[1] || {}
 
         chunk_class.new(recipient: user.facebook_psid, context: chunk_context).deliver
       end

@@ -125,4 +125,8 @@ describe Hg::Controller do
   context 'filtering' do
     it 'works with filters'
   end
+
+  describe '#merged_context' do
+    it 'generates a merged context'
+  end
 end

@@ -115,6 +115,8 @@ module Hg
       # @param handler_method_name [Symbol] The name of the handler method on the
       #   controller class for this action.
       def handler(action_name, handler_method_name)
+        # TODO: BUG Thread.current isn't going to work in case of multiple routers
+        # Needs to be a concurrent object
         action(action_name,
                controller: Thread.current[:current_controller],
                with: handler_method_name)
