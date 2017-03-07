@@ -46,6 +46,10 @@ describe Hg::Router do
     end
   end
 
+  describe '.controller' do
+    it 'adds the handler to the routes map'
+  end
+
   describe '.routes' do
     it 'returns the route map' do
       expect(RouterWithSingleAction.routes).to_not be_nil

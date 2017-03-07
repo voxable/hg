@@ -26,7 +26,7 @@ module Hg
   # You can add a route for an action with the `action` method:
   #
   #   class PizzaBotRouter < Hg::Router
-  #     action 'orderPizza', PizzaOrdersController, :create
+  #     action 'orderPizza', controller: PizzaOrdersController, with: :create
   #   end
   #
   #  Here, we're specifying that the `orderPizza` action should map to the
@@ -98,13 +98,32 @@ module Hg
       # @param action_name [String, Symbol] The name of the action to be matched by the router.
       # @param controller [Class] The class of the controller which contains this
       #   action's handler method.
-      # @param handler_method_name [Symbol] The name of the handler method on the
+      # @param with[Symbol] The name of the handler method on the
       #   controller class for this action.
-      def action(action_name, controller, handler_method_name)
+      def action(action_name, controller:, with:)
+        handler_method_name = with
+
         @routes[action_name] = {
           controller: controller,
           handler: handler_method_name
         }
+      end
+
+      # Add a route for an action from within a `controller` block.
+      #
+      # @param action_name [String, Symbol] The name of the action to be matched by the router.
+      # @param handler_method_name [Symbol] The name of the handler method on the
+      #   controller class for this action.
+      def handler(action_name, handler_method_name)
+        action(action_name,
+               controller: Thread.current[:current_controller],
+               with: handler_method_name)
+      end
+
+      def controller(controller_class, &block)
+        Thread.current[:current_controller] = controller_class
+
+        yield
       end
 
       # Handle an inbound request by finding its matching handler method and
