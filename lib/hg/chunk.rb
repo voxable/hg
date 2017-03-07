@@ -17,8 +17,6 @@ module Hg
     end
 
     def deliver
-      self.class.show_typing(@recipient)
-
       Rails.logger.info 'DELIVERABLES'
       self.class.deliverables.each do |deliverable|
         if deliverable.is_a? Hash
@@ -68,7 +66,7 @@ module Hg
           }
         end
 
-        @context = OpenStruct.new(context)
+        @context = HashWithIndifferentAccess.new(context)
       end
     end
 
