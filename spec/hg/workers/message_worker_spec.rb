@@ -11,6 +11,8 @@ RSpec.describe Hg::MessageWorker, type: :worker do
   include_examples 'a message processing worker'
 
   context "when a message is present on the user's unprocessed message queue" do
+    it 'handles quick replies', priority: :high
+
     include_context 'when queue has unprocessed message' do
       let(:text) { 'hi there' }
       let(:message) {

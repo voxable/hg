@@ -37,16 +37,8 @@ module Hg
       # make this platform agnostic
       user = find_bot_user(bot, user_id)
 
-      # Generate the params hash.
-      parameters = payload['parameters'.freeze] || payload['params'.freeze]
-
       # Build a request object.
-      request = Hg::Request.new({
-        user: user,
-        intent: payload['intent'.freeze],
-        action: payload['action'.freeze],
-        parameters: parameters
-      })
+      request = build_payload_request(payload, user)
 
       # Send the request to the bot's router.
       bot.router.handle(request)
