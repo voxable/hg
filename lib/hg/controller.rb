@@ -111,6 +111,19 @@ module Hg
         .merge(params))
     end
 
+    # Show a typing indicator to the user.
+    def show_typing
+      Facebook::Messenger::Bot.deliver({
+        recipient: {id: user.facebook_psid},
+        sender_action: 'typing_on'.freeze
+      }, access_token: ENV['FB_ACCESS_TOKEN'])
+    end
+
+    def flash(message)
+      respond(message)
+      show_typing
+    end
+
     # Send a message back to the user. It's possible to either pass a string,
     # which will be delivered as a text message, or a chunk and its context:
     #
