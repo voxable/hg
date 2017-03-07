@@ -11,6 +11,7 @@ class Hg::Request
   attr_accessor :message
   attr_accessor :user
   attr_accessor :parameters
+  alias_method :params, :parameters
 
   def initialize(action:, intent: nil, message: nil, user:, parameters: {})
     @action = action
