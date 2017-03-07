@@ -45,12 +45,15 @@ module Hg
         # ...send the message to API.ai for NLU.
         nlu_response = ApiAiClient.new(user.api_ai_session_id).query(message.text)
 
+        # TODO: HIGH send default when message is not recognized
+        # Likely needs to be some kind of default route.
+
         # Build a request object.
         request = Hg::Request.new({
           user: user,
           message: message,
           intent: nlu_response[:intent],
-          action: nlu_response[:action],
+          action: nlu_response[:action] || nlu_response[:intent],
           parameters: nlu_response[:parameters]
         })
       end

@@ -65,7 +65,7 @@ RSpec.describe Hg::MessageWorker, type: :worker do
       include_examples 'constructing a request object'
     end
 
-    context "when the message isn't understood by the API.ai agent" do
+    context "when the message isn't understood by the API.ai agent", priority: :high do
       context 'when the bot has a chunk with a fuzzily-matching keyword' do
         it 'delivers that chunk to the user'
       end

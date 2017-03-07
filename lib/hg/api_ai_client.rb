@@ -15,9 +15,14 @@ module Hg
 
       return nil if api_ai_response[:result][:action] == 'input.unknown'
 
+      # Use intent name as action name if no action name is defined for this intent.
+      intent_name = api_ai_response[:result][:metadata][:intentName]
+      action_from_response = api_ai_response[:action]
+      action_name = action_from_response.blank? ? intent_name : action_from_response
+
       return {
-        intent: api_ai_response[:result][:metadata][:intentName],
-        action: api_ai_response[:result][:action],
+        intent: intent_name,
+        action: action_name,
         parameters: api_ai_response[:result][:parameters]
       }
     end
