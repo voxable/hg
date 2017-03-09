@@ -209,27 +209,39 @@ module Hg
         # queue the messages for processing.
         def initialize_message_handlers
           ::Facebook::Messenger::Bot.on :postback do |postback|
-            # Show a typing indicator to the user
-            show_typing(postback.sender['id'.freeze])
+            begin
+              # Show a typing indicator to the user
+              show_typing(postback.sender['id'.freeze])
 
-            # TODO: Build a custom logger, make production logging optional
-            # Log the postback
-            Rails.logger.info "POSTBACK: #{postback.payload}"
+              # TODO: Build a custom logger, make production logging optional
+              # Log the postback
+              Rails.logger.info "POSTBACK: #{postback.payload}"
 
-            # Queue the postback for processing
-            queue_postback(postback)
+              # Queue the postback for processing
+              queue_postback(postback)
+            rescue StandardError => e
+              # TODO: high
+              Rails.logger.error e.inspect
+              Rails.logger.error e.backtrace
+            end
           end
 
           ::Facebook::Messenger::Bot.on :message do |message|
-            # Show a typing indicator to the user
-            show_typing(message.sender['id'.freeze])
+            begin
+              # TODO: Build a custom logger, make production logging optional
+              # Log the message
+              Rails.logger.info "MESSAGE: #{message.text}"
 
-            # TODO: Build a custom logger, make production logging optional
-            # Log the message
-            Rails.logger.info "MESSAGE: #{message.text}"
+              # Show a typing indicator to the user
+              show_typing(message.sender['id'.freeze])
 
-            # Queue the message for processing
-            queue_message(message)
+              # Queue the message for processing
+              queue_message(message)
+            rescue StandardError => e
+              # TODO: high
+              Rails.logger.error e.inspect
+              Rails.logger.error e.backtrace
+            end
           end
         end
       end
