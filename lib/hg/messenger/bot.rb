@@ -110,13 +110,15 @@ module Hg
           @call_to_actions << call_to_action_content
         end
 
-        def get_started(chunk)
+        def get_started(payload)
+          # TODO: Support to: option
           @get_started_content = {
             setting_type: 'call_to_actions'.freeze,
             thread_state: 'new_thread'.freeze,
             call_to_actions: [
               {
-                payload: chunk.to_s
+                # TODO: High - generation of the display chunk options should be a method
+                payload: JSON.generate(payload)
               }
             ]
           }
