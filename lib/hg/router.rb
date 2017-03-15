@@ -138,6 +138,18 @@ module Hg
       rescue KeyError
         raise ActionNotRegisteredError.new(request.action)
       end
+
+      # Set up a handler for the default action.
+      #
+      # @param controller [Class] The class of the controller which contains the
+      #   default action's handler method.
+      # @param handler_method_name [Symbol] The name of the handler method on the
+      #   controller class for the default action.
+      def default(controller, handler_method_name)
+        action Hg::InternalActions::DEFAULT,
+               controller: controller,
+               with: handler_method_name
+      end
     end
   end
 end
