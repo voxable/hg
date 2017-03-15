@@ -54,7 +54,6 @@ module Hg
         end
 
         attr_accessor :chunks
-        attr_accessor :default_chunk
         attr_accessor :call_to_actions
         attr_accessor :image_url_base_portion
 
@@ -66,10 +65,6 @@ module Hg
           @router ||= self.const_get(:Router)
         rescue NameError
           raise NoRouterClassExistsError.new
-        end
-
-        def default(chunk)
-          @default_chunk = chunk
         end
 
         def persistent_menu(&block)
