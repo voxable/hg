@@ -47,13 +47,16 @@ module Hg
         # ...send the message to API.ai for NLU.
         nlu_response = ApiAiClient.new(user.api_ai_session_id).query(message.text)
 
+        # Drop any params that weren't recognized.
+        params = nlu_response[:parameters].reject { |k, v| v.blank? }
+
         # Build a request object.
         request = Hg::Request.new(
           user: user,
           message: message,
           intent: nlu_response[:intent],
           action: nlu_response[:action] || nlu_response[:intent],
-          parameters: nlu_response[:parameters],
+          parameters: params,
           response: nlu_response[:response]
         )
       end
