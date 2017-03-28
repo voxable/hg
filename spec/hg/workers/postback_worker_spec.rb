@@ -18,15 +18,17 @@ RSpec.describe Hg::PostbackWorker, type: :worker do
           payload: payload
         )
       }
-      let(:raw_postback) {{
-        'sender' => {
-          'id' => user_id,
-        },
-        'postback' => {
-          'payload' => payload
+      let(:raw_postback) {
+        {
+          'sender' => {
+            'id' => user_id,
+          },
+          'postback' => {
+            'payload' => payload
+          }
         }
-      }}
-      let(:user) { double('user') }
+      }
+      let(:valid_args) { [1, 'foo', 'NewsBot'] }
     end
 
     before(:example) do

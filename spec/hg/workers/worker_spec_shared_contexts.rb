@@ -1,7 +1,8 @@
-RSpec.shared_context 'with mocked queue' do
-  BOT_CLASS_NAME = 'NewsBot'
+BOT_CLASS_NAME = 'NewsBot'
 
-  let(:user_id) { '1' }
+RSpec.shared_context 'with mocked queue' do
+  let(:user) { double('user') }
+  let(:user_id) { 1 }
   # TODO: likely need a message factory
   let(:message) {
     Hashie::Mash.new({
@@ -20,6 +21,7 @@ RSpec.shared_context 'with mocked queue' do
 end
 
 RSpec.shared_context 'when queue has unprocessed message' do
+  let(:bot_class) { class_double(BOT_CLASS_NAME).as_stubbed_const }
   let(:user_class) { class_double('User').as_stubbed_const }
   let(:router_class) { double('router', handle: nil) }
 

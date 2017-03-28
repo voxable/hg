@@ -13,8 +13,18 @@ describe Hg::Controller do
     )
   }
 
+  let(:router) {
+    class_double('Hg::Router')
+  }
+
+  let(:handler_name) { :place }
+
   before(:example) do
-    @controller_instance = OrdersController.new(request: request)
+    @controller_instance = OrdersController.new(
+      request:      request,
+      router:       router,
+      handler_name: handler_name
+    )
     @params = request.parameters
   end
 
@@ -33,6 +43,14 @@ describe Hg::Controller do
 
     it 'sets the request instance variable' do
       expect(@controller_instance.instance_variable_get(:@request)).to eq(request)
+    end
+
+    it 'sets the router instance variable' do
+      expect(@controller_instance.instance_variable_get(:@router)).to eq(router)
+    end
+
+    it 'sets the handler_name instance variable' do
+      expect(@controller_instance.instance_variable_get(:@handler_name)).to eq(handler_name.to_s)
     end
   end
 

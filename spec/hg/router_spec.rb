@@ -75,6 +75,8 @@ describe Hg::Router do
 
         #RouterWithSingleAction.handle(request)
       #end
+
+      it 'sets the router to itself'
     end
 
     it "calls the handler method on the request's action's controller class" do

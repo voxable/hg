@@ -16,23 +16,29 @@ RSpec.describe Hg::MessageWorker, type: :worker do
     include_context 'when queue has unprocessed message' do
       let(:text) { 'hi there' }
       let(:message) {
-        instance_double('Facebook::Messenger::Incoming::Message',
+        instance_double(
+          'Facebook::Messenger::Incoming::Message',
           sender: { 'id' => user_id },
           text: text
         )
       }
-      let(:raw_message) {{
-        'sender' => {
-          'id' => user_id,
-        },
-        'message' => {
-          'text' => text
+      let(:raw_message) {
+        {
+          'sender' => {
+            'id' => user_id,
+          },
+          'message' => {
+            'text' => text
+          }
         }
-      }}
-      let(:api_ai_response) { {intent: nil, action: nil, parameters: nil} }
-      let(:api_ai_client) { instance_double('Hg::ApiAiClient', query: api_ai_response) }
+      }
       let(:user_api_ai_session_id) { 's0m3id' }
       let(:user) { double('user', api_ai_session_id: user_api_ai_session_id) }
+      let(:api_ai_response) { { intent: nil, action: nil, parameters: { foo: 1 } }}
+      let(:api_ai_client) {
+        instance_double('Hg::ApiAiClient', query: api_ai_response)
+      }
+      let(:valid_args) { [1, 'foo', 'NewsBot'] }
     end
 
     before(:example) do

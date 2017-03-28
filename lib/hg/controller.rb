@@ -32,19 +32,28 @@ module Hg
   class Controller
     # Create a new instance of Controller.
     #
-    # @param request [Hash] The incoming request.
-    def initialize(request: {})
+    # @option request [Hash] The incoming request.
+    # @option router [Hg::Router] The router that handled the request.
+    # @option handler_name [String] The name of the handler to be executed.
+    def initialize(request: {}, router: nil, handler_name: nil)
       @request = request
       # TODO: Test that params or parameters works, here.
       @params = ActiveSupport::HashWithIndifferentAccess.new(request.parameters || request.params)
       @user = request.user
       @performed = false
+      @router = router
+      @handler_name = handler_name.to_s
     end
 
     attr_accessor :params
     alias_method :parameters, :params
     attr_accessor :request
     attr_accessor :user
+
+    # Necessary for compatibility with `ActiveSupport::Callbacks` `only` and
+    # `except` options
+    attr_accessor :handler_name
+    alias_method :action_name, :handler_name
 
     # Call the action. Override this in a subclass to modify the
     # behavior around processing an action. This, and not `#process`,
@@ -159,5 +168,15 @@ module Hg
     end
     alias_method :reply, :respond
     alias_method :respond_with, :respond
+
+    # TODO: High - document and test
+    def redirect_to(payload)
+      request.action = payload[:action]
+      request.intent = payload[:intent]
+      # TODO: Seems like we need a method for fetching params value.
+      request.parameters = payload[:parameters] || payload[:params]
+
+      @router.handle(request)
+    end
   end
 end
