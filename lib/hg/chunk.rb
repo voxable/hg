@@ -237,7 +237,7 @@ module Hg
         quick_reply_content = {
           content_type: 'text',
           title: title,
-          payload: options[:to].to_s
+          payload: JSON.generate(options[:payload])
         }
 
         unless @deliverables.last[:message][:quick_replies]

@@ -37,7 +37,9 @@ module Hg
       user = find_bot_user(bot, user_id)
 
       # If the message is a quick reply...
-      if payload = message.quick_reply
+      if quick_reply_payload = message.quick_reply
+        # Parse the JSON from the payload.
+        payload = JSON.parse(quick_reply_payload)
         # ...build a request object from the payload.
         request = build_payload_request(payload, user)
       # If the message is text...
@@ -46,14 +48,14 @@ module Hg
         nlu_response = ApiAiClient.new(user.api_ai_session_id).query(message.text)
 
         # Build a request object.
-        request = Hg::Request.new({
+        request = Hg::Request.new(
           user: user,
           message: message,
           intent: nlu_response[:intent],
           action: nlu_response[:action] || nlu_response[:intent],
           parameters: nlu_response[:parameters],
           response: nlu_response[:response]
-        })
+        )
       end
 
       # Send the request to the bot's router.
