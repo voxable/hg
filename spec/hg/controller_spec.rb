@@ -117,7 +117,7 @@ describe Hg::Controller do
           hash_including({context: context})
         ).and_return(chunk_instance)
 
-        @controller_instance.respond(BotChunk, context: context)
+        @controller_instance.respond(BotChunk, context)
       end
     end
   end
