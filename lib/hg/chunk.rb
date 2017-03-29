@@ -17,16 +17,16 @@ module Hg
     end
 
     def deliver
-      logger.info 'DELIVERABLES'
+      Sidekiq::Logging.logger.info 'DELIVERABLES'
       self.class.deliverables.each do |deliverable|
         if deliverable.is_a? Hash
-          logger.info JSON.pretty_generate(deliverable)
+          Sidekiq::Logging.logger.info JSON.pretty_generate(deliverable)
         else
-          logger.info deliverable.inspect
+          Sidekiq::Logging.logger.info deliverable.inspect
         end
       end
-      logger.info 'RECIPIENT'
-      logger.info @recipient.inspect
+      Sidekiq::Logging.logger.info 'RECIPIENT'
+      Sidekiq::Logging.logger.info @recipient.inspect
 
       self.class.deliverables.each do |deliverable|
         # If another chunk...

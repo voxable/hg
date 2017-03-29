@@ -210,22 +210,22 @@ module Hg
 
               # TODO: Build a custom logger, make production logging optional
               # Log the postback
-              logger.info "POSTBACK: #{postback.payload}"
+              Rails.logger.info "POSTBACK: #{postback.payload}"
 
               # Queue the postback for processing
               queue_postback(postback)
             rescue StandardError => e
               # TODO: high
-              logger.error e.inspect
-              logger.error e.backtrace
+              Rails.logger.error e.inspect
+              Rails.logger.error e.backtrace
             end
           end
 
           ::Facebook::Messenger::Bot.on :message do |message|
             begin
-              # TODO: Build a custom logger, make production logging optional
+              # TODO: Build a custom Rails.logger, make production logging optional
               # Log the message
-              logger.info "MESSAGE: #{message.text}"
+              Rails.logger.info "MESSAGE: #{message.text}"
 
               # Show a typing indicator to the user
               show_typing(message.sender['id'.freeze])
@@ -234,8 +234,8 @@ module Hg
               queue_message(message)
             rescue StandardError => e
               # TODO: high
-              logger.error e.inspect
-              logger.error e.backtrace
+              Rails.logger.error e.inspect
+              Rails.logger.error e.backtrace
             end
           end
         end

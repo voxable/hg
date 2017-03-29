@@ -18,15 +18,15 @@ module Hg
       begin
         api_ai_response = @client.text_request(message)
       rescue StandardError => e
-        logger.error 'Error with API.ai request'.freeze
-        logger.error e
-        logger.error e.backtrace.join("\n".freeze)
+        Sidekiq::Logging.logger.error 'Error with API.ai request'.freeze
+        Sidekiq::Logging.logger.error e
+        Sidekiq::Logging.logger.error e.backtrace.join("\n".freeze)
       end
 
       # If the API.ai call fails...
       if api_ai_response[:status][:code] != 200
         # ...log an error.
-        logger.error "Error with API.ai request: #{api_ai_response.inspect}"
+        Sidekiq::Logging.logger.error "Error with API.ai request: #{api_ai_response.inspect}"
 
         # Return the default action.
         return {
