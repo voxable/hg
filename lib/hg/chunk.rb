@@ -17,16 +17,16 @@ module Hg
     end
 
     def deliver
-      Rails.logger.info 'DELIVERABLES'
+      logger.info 'DELIVERABLES'
       self.class.deliverables.each do |deliverable|
         if deliverable.is_a? Hash
-          Rails.logger.info JSON.pretty_generate(deliverable)
+          logger.info JSON.pretty_generate(deliverable)
         else
-          Rails.logger.info deliverable.inspect
+          logger.info deliverable.inspect
         end
       end
-      Rails.logger.info 'RECIPIENT'
-      Rails.logger.info @recipient.inspect
+      logger.info 'RECIPIENT'
+      logger.info @recipient.inspect
 
       self.class.deliverables.each do |deliverable|
         # If another chunk...

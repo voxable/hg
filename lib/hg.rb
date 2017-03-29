@@ -24,7 +24,7 @@ require 'hg/router'
 require 'hg/workers/base'
 
 # Ensure Hashie logs to Rails logger
-Hashie.logger = Rails.logger
+Hashie.logger = logger
 
 module Hg
   # TODO: Move to Bot itself, default to User.

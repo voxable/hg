@@ -210,14 +210,14 @@ module Hg
 
               # TODO: Build a custom logger, make production logging optional
               # Log the postback
-              Rails.logger.info "POSTBACK: #{postback.payload}"
+              logger.info "POSTBACK: #{postback.payload}"
 
               # Queue the postback for processing
               queue_postback(postback)
             rescue StandardError => e
               # TODO: high
-              Rails.logger.error e.inspect
-              Rails.logger.error e.backtrace
+              logger.error e.inspect
+              logger.error e.backtrace
             end
           end
 
@@ -225,7 +225,7 @@ module Hg
             begin
               # TODO: Build a custom logger, make production logging optional
               # Log the message
-              Rails.logger.info "MESSAGE: #{message.text}"
+              logger.info "MESSAGE: #{message.text}"
 
               # Show a typing indicator to the user
               show_typing(message.sender['id'.freeze])
@@ -234,8 +234,8 @@ module Hg
               queue_message(message)
             rescue StandardError => e
               # TODO: high
-              Rails.logger.error e.inspect
-              Rails.logger.error e.backtrace
+              logger.error e.inspect
+              logger.error e.backtrace
             end
           end
         end
