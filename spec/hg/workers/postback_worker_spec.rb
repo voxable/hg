@@ -32,7 +32,7 @@ RSpec.describe Hg::PostbackWorker, type: :worker do
     end
 
     before(:example) do
-      allow(queue).to receive(:pop).and_return(raw_postback)
+      allow(queue).to receive(:pop).and_return(raw_postback, {})
       allow(Facebook::Messenger::Incoming::Postback).to receive(:initialize).and_return(postback)
     end
 

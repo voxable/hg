@@ -42,7 +42,7 @@ RSpec.describe Hg::MessageWorker, type: :worker do
     end
 
     before(:example) do
-      allow(queue).to receive(:pop).and_return(raw_message)
+      allow(queue).to receive(:pop).and_return(raw_message, {})
       allow(Facebook::Messenger::Incoming::Message).to receive(:initialize).and_return(message)
       allow(Hg::ApiAiClient).to receive(:new).and_return(api_ai_client)
     end
