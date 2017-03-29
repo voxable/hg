@@ -22,7 +22,7 @@ module Hg
       # execution on the part of Sidekiq. This ensures idempotence. We loop
       # here to ensure that this worker attempts to drain the queue for
       # the user.
-      while raw_postback != {}
+      until raw_postback.empty?
         # Extract the payload from the postback.
         payload = Facebook::Messenger::Incoming::Postback.new(raw_postback).payload
 
@@ -41,7 +41,7 @@ module Hg
         bot.router.handle(request)
 
         # Attempt to pop another postback from the queue for processing.
-        raw_postback = fetch_raw_postback(user_id, redis_namespace)
+        raw_postback = pop_raw_postback(user_id, redis_namespace)
       end
     end
 

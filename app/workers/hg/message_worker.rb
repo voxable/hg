@@ -16,13 +16,13 @@ module Hg
     # @return [void]
     def perform(user_id, redis_namespace, bot_class_name)
       # Retrieve the latest message for this user.
-      raw_message = fetch_raw_message(user_id, redis_namespace)
+      raw_message = pop_raw_message(user_id, redis_namespace)
 
       # Do nothing if no message available. This could be due to multiple
       # execution on the part of Sidekiq. This ensures idempotence. We loop
       # here to ensure that this worker attempts to drain the queue for
       # the user.
-      while raw_message != {}
+      until raw_message.empty?
         # Instantiate a message object with the raw message from the queue.
         message = Facebook::Messenger::Incoming::Message.new(raw_message)
 
@@ -53,7 +53,7 @@ module Hg
         bot.router.handle(build_request(message, nlu_response, params, user))
 
         # Attempt to pop another message from the queue for processing.
-        raw_message = fetch_raw_message(user_id, redis_namespace)
+        raw_message = pop_raw_message(user_id, redis_namespace)
       end
     end
 
@@ -86,7 +86,7 @@ module Hg
     #   message to process is nested.
     #
     # @return [Hash] The latest raw message from this user's queue.
-    def fetch_raw_message(user_id, redis_namespace)
+    def pop_raw_message(user_id, redis_namespace)
       pop_from_queue(
         Hg::Queues::Messenger::MessageQueue,
         user_id:   user_id,
