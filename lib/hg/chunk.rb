@@ -236,9 +236,21 @@ module Hg
       def quick_reply(title, options = {})
         quick_reply_content = {
           content_type: 'text',
-          title: title,
-          payload: JSON.generate(options[:payload])
+          title: title
         }
+
+        # If a `to` option is present, assume this is a postback link to another chunk.
+        if options[:to]
+          quick_reply_content[:payload] = JSON.generate({
+            action: Hg::InternalActions::DISPLAY_CHUNK,
+            parameters: {
+              chunk: options[:to].to_s
+            }
+          })
+        # Otherwise, just take the payload as passed.
+        else
+          quick_reply_content[:payload] = JSON.generate(options[:payload])
+        end
 
         unless @deliverables.last[:message][:quick_replies]
           @deliverables.last[:message][:quick_replies] = []
