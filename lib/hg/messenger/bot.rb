@@ -31,6 +31,7 @@ module Hg
 
       module ClassMethods
         def init
+          subscribe_to_messages
           initialize_message_handlers
           initialize_persistent_menu
           initialize_get_started_button
@@ -70,6 +71,11 @@ module Hg
 
         def persistent_menu(&block)
           yield
+        end
+
+        # Subscribe to Facebook message webhook notifications.
+        def subscribe_to_messages
+          Facebook::Messenger::Subscriptions.subscribe(access_token: ENV['FB_ACCESS_TOKEN'])
         end
 
         def initialize_persistent_menu
@@ -139,12 +145,6 @@ module Hg
               text: @greeting_text
             }
           }, access_token: access_token)
-        end
-
-        def run_postback_payload(payload, recipient, context)
-          # TODO: Shouldn't be constantizing user input. Need a way to sanitize this.
-          # TODO: Also, use Kernel.const_get https://gist.github.com/Haniyya/0d52fb8ae4c3cb3d46a07fc4180c3303
-          payload.constantize.new(recipient: recipient, context: context).deliver
         end
 
         # Generate a redis namespace, based on the class's name.
