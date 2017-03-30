@@ -15,7 +15,7 @@ module Hg
   # You have access to [all of the same filters you're used to](http://guides.rubyonrails.org/action_controller_overview.html#filters)
   # from ActionController. They can either be accessed in their normal form, or with
   # `handler` in place of `action` in the method name. If the filter chain should
-  # be terminated, you must call the `terminate` method.
+  # be halted, you must call the `halt` method.
   #
   #   class BotController < Hg::Controller
   #     before_handler :require_login
@@ -25,7 +25,7 @@ module Hg
   #       def require_login
   #         unless user.logged_in?
   #           respond 'You must be logged in to access this.'
-  #           respond_with OrderBot::Chunks::Login and terminate
+  #           respond_with OrderBot::Chunks::Login and halt
   #         end
   #       end
   #  end
@@ -78,17 +78,18 @@ module Hg
     # method.
     alias_method :send_action, :send
 
-    # Will be set to `true` by calling `terminate`, thus halting the execution
+    # Will be set to `true` by calling `halt`, thus halting the execution
     # of the filter chain.
     #
     # @see AbstractController::Base#performed?
-    # @see #terminate
+    # @see #halt
     def performed?
       @performed
     end
 
     # Halt the execution of the filter chain.
-    def terminate
+    def halt
+      # TODO: This is a gross hack. You're supposed to throw(:abort).
       @performed = true
     end
 
