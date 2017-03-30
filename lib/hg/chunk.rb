@@ -79,7 +79,7 @@ module Hg
       attr_accessor :dynamic
 
       def bot_class
-        self.to_s.split('::').first.constantize
+        Kernel.const_get(self.to_s.split('::').first)
       end
 
       def label(text)

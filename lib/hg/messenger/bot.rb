@@ -17,6 +17,7 @@ module Hg
     module Bot
       def self.included(base)
         base.extend ClassMethods
+        base.extend ActiveSupport::Autoload
         base.chunks = []
         base.call_to_actions = []
 
@@ -62,7 +63,7 @@ module Hg
 
         # @return [Class] The bot's router class.
         def router
-          @router ||= self.const_get(:Router)
+          @router ||= const_get(:Router)
         rescue NameError
           raise NoRouterClassExistsError.new
         end
