@@ -65,7 +65,7 @@ module Hg
         # @return [Class] The bot's router class.
         def router
           @router ||= const_get(:Router)
-        rescue NameError
+        rescue LoadError
           raise NoRouterClassExistsError.new
         end
 
