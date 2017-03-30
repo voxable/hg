@@ -47,10 +47,13 @@ module Hg
 
           # Drop any params that weren't recognized.
           params = nlu_response[:parameters].reject { |k, v| v.blank? }
+
+          # Build a request.
+          request = build_request(message, nlu_response, params, user)
         end
 
         # Send the request to the bot's router.
-        bot.router.handle(build_request(message, nlu_response, params, user))
+        bot.router.handle(request)
 
         # Attempt to pop another message from the queue for processing.
         raw_message = pop_raw_message(user_id, redis_namespace)
