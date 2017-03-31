@@ -97,7 +97,7 @@ module Hg
         action:     handler_name,
         parameters: parameters,
         route: {
-          controller: user.context[:dialog_controller].constantize,
+          controller: Kernel.const_get(user.context[:dialog_controller]),
           handler:    handler_name
         }
       )
