@@ -19,13 +19,17 @@ class Hg::Request
   alias_method :params, :parameters
   # The response suggested by the NLU
   attr_accessor :response
+  # An (optional) specified route for the request. Used for prompts.
+  attr_accessor :route
 
-  def initialize(action:, intent: nil, message: nil, user:, parameters: {}, response: nil)
-    @action = action
-    @intent = intent
-    @message = message
-    @user = user
-    @parameters = parameters
-    @response = response
+  # TODO: Use dry-initializer
+  def initialize(options = {})
+    @action     = options.fetch(:action)
+    @user       = options.fetch(:user)
+    @intent     = options.fetch(:intent) { nil }
+    @message    = options.fetch(:message) { nil }
+    @parameters = options.fetch(:parameters) { {} }
+    @response   = options.fetch(:response) { nil }
+    @route      = options.fetch(:route) { nil }
   end
 end

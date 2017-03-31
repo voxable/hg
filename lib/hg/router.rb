@@ -116,7 +116,7 @@ module Hg
       #   controller class for this action.
       def handler(action_name, handler_method_name)
         # TODO: BUG Thread.current isn't going to work in case of multiple routers
-        # Needs to be a concurrent object
+        # Needs to be a concurrent object, or dry-ruby_configurable
         action(action_name,
                controller: Thread.current[:current_controller],
                with: handler_method_name)
@@ -133,20 +133,22 @@ module Hg
       #
       # @param request [Hash] The inbound request.
       def handle(request)
-        begin
-          route = routes.fetch(request.action)
-        rescue KeyError
-          raise ActionNotRegisteredError.new(request.action)
+        unless request.route
+          begin
+            request.route = routes.fetch(request.action)
+          rescue KeyError
+            raise ActionNotRegisteredError.new(request.action)
+          end
         end
 
-        handler_name = route[:handler]
+        handler_name = request.route[:handler]
 
-        controller = route[:controller].new(
+        controller_for_request = request.route[:controller].new(
           request:      request,
           router:       self,
           handler_name: handler_name
         )
-        controller.process_action(handler_name)
+        controller_for_request.process_action(handler_name)
       end
 
       # Set up a handler for the default action.

@@ -40,6 +40,9 @@ module Hg
           payload = JSON.parse(quick_reply_payload)
           # ...build a request object from the payload.
           request = build_payload_request(payload, user)
+        # If the user is in the middle of a dialog.
+        elsif user.context[:dialog_handler]
+          request = build_dialog_request(user, message)
         # If the message is text...
         else
           # ...send the message to API.ai for NLU.
@@ -78,6 +81,25 @@ module Hg
         action:     nlu_response[:action] || nlu_response[:intent],
         parameters: params,
         response:   nlu_response[:response]
+      )
+    end
+
+    # TODO: High - document and test
+    def build_dialog_request(user, message)
+      handler_name = user.context[:dialog_handler]
+      parameters   = user.context[:dialog_parameters]
+
+      # Build a request object.
+      request = Hg::Request.new(
+        user:       user,
+        message:    message,
+        intent:     handler_name,
+        action:     handler_name,
+        parameters: parameters,
+        route: {
+          controller: user.context[:dialog_controller].constantize,
+          handler:    handler_name
+        }
       )
     end
 

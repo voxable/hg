@@ -176,6 +176,10 @@ module Hg
       Hg::Messenger::Prompt.new(options.merge(user: request.user, controller: self.class.to_s))
     end
 
+    def answer(options = {})
+      Hg::Messenger::Answer.new(request.message)
+    end
+
     # TODO: passing options to both of these is confusing
     def ask(message, options = {})
       prompt(options).ask(message, options)
