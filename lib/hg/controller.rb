@@ -186,9 +186,10 @@ module Hg
     end
 
     # TODO: High - document and test
-    def redirect_to(payload)
+    def redirect_to(payload = {})
       request.action = payload[:action]
-      request.intent = payload[:intent]
+      request.intent = payload[:action] || payload[:intent]
+      request.route  = payload[:route]
       # TODO: Seems like we need a method for fetching params value.
       request.parameters = payload[:parameters] || payload[:params]
 
