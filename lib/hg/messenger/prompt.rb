@@ -2,9 +2,10 @@ module Hg
   module Messenger
     class Prompt < Hg::Prompt
       def initialize(options = {})
-        messenger_prompt = Hg::Prompt::Outputs::MessengerOutput.new(user_id: options.fetch(:user_id))
+        user = options.fetch(:user)
+        messenger_prompt = Hg::Prompt::Outputs::MessengerOutput.new(user_id: user.facebook_psid)
 
-        super(output: messenger_prompt)
+        super(options.merge(output: messenger_prompt, user: user))
       end
     end
   end

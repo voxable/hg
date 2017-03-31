@@ -17,13 +17,17 @@ module Hg
 
     # @api public
     def initialize(options = {})
-      @output = options.fetch(:output)
+      @output  = options.fetch(:output)
+      @user    = options.fetch(:user)
+      @handler = options.fetch(:handler)
+
+      store_dialog_handler_for_user!(options)
     end
 
     # Invoke a question type of prompt.
     #
     # @example
-    #   prompt = Hg::Prompt.new
+    #   prompt = TTY::Prompt.new
     #   prompt.invoke_question(Question, "Your name? ")
     #
     # @return [String]
@@ -39,22 +43,32 @@ module Hg
     # Ask a question.
     #
     # @example
-    #   propmt = Hg::Prompt.new
+    #   propmt = TTY::Prompt.new
     #   prompt.ask("What is your name?")
     #
     # @param [String] message
     #   The question to be asked.
     #
-    # @yieldparam [Hg::Prompt::Question] question
+    # @yieldparam [TTY::Prompt::Question] question
     #   Further configure the question.
     #
     # @yield [question]
     #
-    # @return [Hg::Prompt::Question]
+    # @return [TTY::Prompt::Question]
     #
     # @api public
     def ask(message, *args, &block)
       invoke_question(Hg::Prompt::Question, message, *args, &block)
+    end
+
+    private
+
+    def store_dialog_handler_for_user!(options = {})
+      @user.update_context(
+        dialog: true,
+        dialog_handler: options.fetch(:handler),
+        dialog_controller: options.fetch(:controller)
+      )
     end
   end
 end
