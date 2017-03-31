@@ -29,6 +29,8 @@ module Hg
   #         end
   #       end
   #  end
+  #
+  # TODO: Should this object be Controllers::Base?
   class Controller
     # Create a new instance of Controller.
     #
@@ -178,6 +180,11 @@ module Hg
       request.parameters = payload[:parameters] || payload[:params]
 
       @router.handle(request)
+    end
+
+    # Expose the Sidekiq logger to the controller.
+    def logger
+      Sidekiq::Logging.logger
     end
   end
 end
