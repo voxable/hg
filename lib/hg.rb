@@ -22,12 +22,12 @@ require 'hg/organizer'
 require 'hg/request'
 require 'hg/router'
 require 'hg/workers/base'
+require 'hg/utils'
 require 'hg/prompt'
 require 'hg/prompt/answer'
 require 'hg/prompt/question'
 require 'hg/prompt/outputs/messenger_output'
 require 'hg/messenger/answer'
-require 'hg/messanger/utils'
 require 'hg/messenger/prompt'
 
 module Hg
