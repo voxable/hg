@@ -177,7 +177,7 @@ module Hg
     end
 
     def answer(options = {})
-      Hg::Messenger::Answer.new(request.message)
+      Hg::Messenger::Answer.new(request.message, user: request.user)
     end
 
     # TODO: passing options to both of these is confusing

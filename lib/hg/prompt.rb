@@ -63,10 +63,10 @@ module Hg
 
     private
 
+    # TODO: This should be a message on User (we need a User module)
     def store_dialog_handler_for_user!(options = {})
       @user.update_context(
-        dialog: true,
-        dialog_handler: options.fetch(:handler),
+        dialog_handler:    options.fetch(:handler),
         dialog_controller: options.fetch(:controller)
       )
     end

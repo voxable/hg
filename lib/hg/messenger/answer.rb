@@ -1,8 +1,8 @@
 module Hg
   module Messenger
     class Answer < Hg::Prompt::Answer
-      def initialize(message)
-        super(message.text)
+      def initialize(message, options = {})
+        super(message.text, options)
       end
     end
   end
