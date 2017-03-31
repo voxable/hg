@@ -27,6 +27,7 @@ require 'hg/prompt/answer'
 require 'hg/prompt/question'
 require 'hg/prompt/outputs/messenger_output'
 require 'hg/messenger/answer'
+require 'hg/messanger/utils'
 require 'hg/messenger/prompt'
 
 module Hg
