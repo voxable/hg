@@ -133,7 +133,12 @@ module Hg
       #
       # @param request [Hash] The inbound request.
       def handle(request)
-        route = routes.fetch(request.action)
+        begin
+          route = routes.fetch(request.action)
+        rescue KeyError
+          raise ActionNotRegisteredError.new(request.action)
+        end
+
         handler_name = route[:handler]
 
         controller = route[:controller].new(
@@ -142,8 +147,6 @@ module Hg
           handler_name: handler_name
         )
         controller.process_action(handler_name)
-      rescue KeyError
-        raise ActionNotRegisteredError.new(request.action)
       end
 
       # Set up a handler for the default action.

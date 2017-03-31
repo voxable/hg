@@ -172,6 +172,14 @@ module Hg
     alias_method :reply, :respond
     alias_method :respond_with, :respond
 
+    def prompt(options = {})
+      Hg::Messenger::Prompt.new(options.merge(user_id: request.user.facebook_psid))
+    end
+
+    def ask(message)
+      prompt.ask(message)
+    end
+
     # TODO: High - document and test
     def redirect_to(payload)
       request.action = payload[:action]
