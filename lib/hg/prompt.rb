@@ -23,7 +23,7 @@ module Hg
     # Invoke a question type of prompt.
     #
     # @example
-    #   prompt = TTY::Prompt.new
+    #   prompt = Hg::Prompt.new
     #   prompt.invoke_question(Question, "Your name? ")
     #
     # @return [String]
@@ -39,18 +39,18 @@ module Hg
     # Ask a question.
     #
     # @example
-    #   propmt = TTY::Prompt.new
+    #   propmt = Hg::Prompt.new
     #   prompt.ask("What is your name?")
     #
     # @param [String] message
     #   The question to be asked.
     #
-    # @yieldparam [TTY::Prompt::Question] question
+    # @yieldparam [Hg::Prompt::Question] question
     #   Further configure the question.
     #
     # @yield [question]
     #
-    # @return [TTY::Prompt::Question]
+    # @return [Hg::Prompt::Question]
     #
     # @api public
     def ask(message, *args, &block)
