@@ -1,7 +1,10 @@
 # coding: utf-8
+
 lib = File.expand_path('../lib', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 require 'hg/version'
+
+# rubocop:disable Metrics/BlockLength
 
 Gem::Specification.new do |spec|
   spec.name          = 'hg'
@@ -9,22 +12,16 @@ Gem::Specification.new do |spec|
   spec.authors       = ['Matt Buck']
   spec.email         = ['matt@voxable.io']
 
-  spec.summary       = %q{A library for building Facebook Messenger bots.}
-  spec.homepage      = "https://rubygems.org/hg"
+  spec.summary       = 'A conversational interface framework for Ruby on Rails.'
+  spec.homepage      = 'https://rubygems.org/hg'
+  # TODO: Add description
+  # spec.description   =
+  spec.license       = 'MIT'
 
-  # Prevent pushing this gem to RubyGems.org. To allow pushes either set the 'allowed_push_host'
-  # to allow pushing to a single host or delete this section to allow pushing to any host.
-  if spec.respond_to?(:metadata)
-    spec.metadata['allowed_push_host'] = 'https://rubygems.org'
-  else
-    raise "RubyGems 2.0 or newer is required to protect against " \
-      "public gem pushes."
-  end
-
-  spec.files         = `git ls-files -z`.split("\x0").reject do |f|
-    f.match(%r{^(test|spec|features)/})
-  end
-  spec.test_files = Dir['spec/**/*']
+  spec.files         = Dir[
+    '{app,bin,config,lib}/**/*', 'LICENSE', 'Rakefile', 'README.md'
+  ]
+  spec.test_files    = Dir['spec/**/*']
 
   spec.bindir        = 'exe'
   spec.executables   = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
@@ -46,5 +43,6 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'rake', '~> 12.0'
   spec.add_development_dependency 'rspec-rails', '~> 3.5.2'
   spec.add_development_dependency 'sqlite3', '~> 1.3.11'
-
 end
+
+# rubocop:enable Metrics/BlockLength

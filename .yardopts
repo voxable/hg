@@ -1,0 +1,10 @@
+--verbose
+--markup markdown
+--asset docs/images:images
+--readme README.markdown
+--hide-void-return
+app/**/*.rb
+config/**/*.rb
+lib/**/*.rb
+-
+LICENSE
