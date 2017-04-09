@@ -61,14 +61,19 @@ describe Hg::Router do
   end
 
   describe '.handle' do
-    context 'initializing controller' do
-      let(:request) {{
-        action: action_name,
+    let(:request) {
+      double(
+        'request',
+        action: ACTION_NAME,
         parameters: {
           ingredient: 'pepper'
-        }
-      }}
+        },
+        route: nil,
+        'route=' => nil
+      )
+    }
 
+    context 'initializing controller' do
       # TODO: Not entirely sure how to test this
       it 'sets the request' #do
         #expect(RecipesController).to receive(:initialize).with(hash_including({request: request}))
@@ -80,15 +85,19 @@ describe Hg::Router do
     end
 
     it "calls the handler method on the request's action's controller class" do
-      expect(controller_instance).to receive(:process_action).with(handler)
+      expect(controller_instance).to receive(:process_action).with(HANDLER)
 
-      RouterWithSingleAction.handle(double('action', action: action_name))
+      RouterWithSingleAction.handle(request)
     end
 
     context "when the action isn't registered in the routes" do
       it 'throws an error' do
         expect { RouterWithSingleAction.handle(double('action', action: 'foo')) }.to raise_error(Hg::Router::ActionNotRegisteredError)
       end
+    end
+
+    context 'when the route is passed explicitly' do
+      it 'uses the passed route'
     end
   end
 end
