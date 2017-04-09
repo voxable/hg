@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # TODO: Test & Document
 module Hg
   class ApiAiClient
@@ -7,8 +9,8 @@ module Hg
     def initialize(session_id)
       # TODO: access token should be set by Hg config option
       @client = ApiAiRuby::Client.new(
-        client_access_token: ENV['API_AI_CLIENT_ACCESS_TOKEN'.freeze],
-        api_version: '20170210'.freeze,
+        client_access_token: ENV['API_AI_CLIENT_ACCESS_TOKEN'],
+        api_version: '20170210',
         api_session_id: session_id
       )
     end
@@ -18,9 +20,9 @@ module Hg
       begin
         api_ai_response = @client.text_request(message)
       rescue StandardError => e
-        Sidekiq::Logging.logger.error 'Error with API.ai request'.freeze
+        Sidekiq::Logging.logger.error 'Error with API.ai request'
         Sidekiq::Logging.logger.error e
-        Sidekiq::Logging.logger.error e.backtrace.join("\n".freeze)
+        Sidekiq::Logging.logger.error e.backtrace.join("\n")
       end
 
       # If the API.ai call fails...

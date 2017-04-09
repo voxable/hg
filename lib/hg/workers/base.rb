@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Hg
   module Workers
     class Base
@@ -38,13 +40,13 @@ module Hg
       # @return [Hg::Request] The generated request.
       def build_payload_request(payload, user)
         # Generate the params hash.
-        parameters = payload['parameters'.freeze] || payload['params'.freeze]
+        parameters = payload['parameters'] || payload['params']
 
         # Build a request object.
         request = Hg::Request.new(
           user:       user,
-          intent:     payload['intent'.freeze],
-          action:     payload['action'.freeze],
+          intent:     payload['intent'],
+          action:     payload['action'],
           parameters: parameters
         )
       end

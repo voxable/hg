@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Hg
   # Error thrown when no router class exists.
   class NoRouterClassExistsError < StandardError
@@ -41,7 +43,7 @@ module Hg
         attr_writer :access_token
 
         def access_token
-          @access_token || ENV['FB_ACCESS_TOKEN'.freeze]
+          @access_token || ENV['FB_ACCESS_TOKEN']
         end
 
         # The class representing users.
@@ -79,8 +81,8 @@ module Hg
 
         def initialize_persistent_menu
           Facebook::Messenger::Thread.set({
-            setting_type:    'call_to_actions'.freeze,
-            thread_state:    'existing_thread'.freeze,
+            setting_type:    'call_to_actions',
+            thread_state:    'existing_thread',
             call_to_actions: @call_to_actions
           }, access_token: access_token)
         end
@@ -92,7 +94,7 @@ module Hg
 
           # TODO: This duplicates code in Chunk.button. Should be abstracted.
           if options[:to]
-            call_to_action_content[:type] = 'postback'.freeze
+            call_to_action_content[:type] = 'postback'
             call_to_action_content[:payload] = JSON.generate({
               action: Hg::InternalActions::DISPLAY_CHUNK,
               parameters: {
@@ -100,10 +102,10 @@ module Hg
               }
             })
           elsif options[:url]
-            call_to_action_content[:type] = 'web_url'.freeze
+            call_to_action_content[:type] = 'web_url'
             call_to_action_content[:url] = options[:url]
           elsif options[:payload]
-            call_to_action_content[:type] = 'postback'.freeze
+            call_to_action_content[:type] = 'postback'
             # Encode the payload hash as JSON.
             call_to_action_content[:payload] = JSON.generate(options[:payload])
           end
@@ -114,8 +116,8 @@ module Hg
         def get_started(payload)
           # TODO: Support to: option
           @get_started_content = {
-            setting_type: 'call_to_actions'.freeze,
-            thread_state: 'new_thread'.freeze,
+            setting_type: 'call_to_actions',
+            thread_state: 'new_thread',
             call_to_actions: [
               {
                 # TODO: High - generation of the display chunk options should be a method
@@ -139,7 +141,7 @@ module Hg
 
         def initialize_greeting_text
           Facebook::Messenger::Thread.set({
-            setting_type: 'greeting'.freeze,
+            setting_type: 'greeting',
             greeting: {
               text: @greeting_text
             }
@@ -158,7 +160,7 @@ module Hg
         # @param message [Facebook::Messenger::Incoming::Postback] The postback to be queued.
         def queue_postback(postback)
           # Grab the user's PSID.
-          user_id = postback.sender['id'.freeze]
+          user_id = postback.sender['id']
           # Pull out the raw JSON postback from the `Postback` object.
           raw_postback = postback.messaging
 
@@ -181,7 +183,7 @@ module Hg
         # @param message [Facebook::Messenger::Incoming::Message] The message to be queued.
         def queue_message(message)
           # Store message on this user's queue of unprocessed messages.
-          user_id = message.sender['id'.freeze]
+          user_id = message.sender['id']
           Hg::Queues::Messenger::MessageQueue
             .new(user_id: user_id, namespace: redis_namespace)
             .push(message.messaging)
@@ -196,7 +198,7 @@ module Hg
         def show_typing(recipient_psid)
           Facebook::Messenger::Bot.deliver({
              recipient: {id: recipient_psid},
-             sender_action: 'typing_on'.freeze
+             sender_action: 'typing_on'
            }, access_token: access_token)
         end
 
@@ -206,7 +208,7 @@ module Hg
           ::Facebook::Messenger::Bot.on :postback do |postback|
             begin
               # Show a typing indicator to the user
-              show_typing(postback.sender['id'.freeze])
+              show_typing(postback.sender['id'])
 
               # TODO: Build a custom logger, make production logging optional
               # Log the postback
@@ -228,7 +230,7 @@ module Hg
               Rails.logger.info "MESSAGE: #{message.text}"
 
               # Show a typing indicator to the user
-              show_typing(message.sender['id'.freeze])
+              show_typing(message.sender['id'])
 
               # Queue the message for processing
               queue_message(message)

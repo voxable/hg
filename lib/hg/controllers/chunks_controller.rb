@@ -10,7 +10,7 @@ module Hg
         # TODO: Also, use Kernel.const_get https://gist.github.com/Haniyya/0d52fb8ae4c3cb3d46a07fc4180c3303
         chunk_class = Kernel.const_get(params[:chunk])
         respond_with chunk_class, context: {
-          user: request.user
+          user: user
         }
       end
     end

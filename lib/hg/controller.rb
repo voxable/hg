@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Hg
   # An Hg controller defines a number of handler functions for actions. These
   # are analogous to the concept of "controller actions" in Rails.
@@ -128,7 +130,7 @@ module Hg
     def show_typing
       Facebook::Messenger::Bot.deliver({
         recipient: {id: user.facebook_psid},
-        sender_action: 'typing_on'.freeze
+        sender_action: 'typing_on'
       }, access_token: ENV['FB_ACCESS_TOKEN'])
     end
 
@@ -173,11 +175,11 @@ module Hg
     alias_method :respond_with, :respond
 
     def prompt(options = {})
-      Hg::Messenger::Prompt.new(options.merge(user: request.user, controller: self.class.to_s))
+      Hg::Messenger::Prompt.new(options.merge(user: user, controller: self.class.to_s))
     end
 
     def answer(options = {})
-      Hg::Messenger::Answer.new(request.message, user: request.user)
+      Hg::Messenger::Answer.new(request.message, user: user)
     end
 
     # TODO: passing options to both of these is confusing
