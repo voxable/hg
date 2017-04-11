@@ -27,7 +27,7 @@ module Hg
       # @param bot [Class] The class representing the bot in question.
       # @param user_id [String, Integer] The id of the user to fetch.
       #
-      # @return [Class] The user that initiated the request.
+      # @return [Object] The user that initiated the request.
       def find_bot_user(bot, user_id)
         bot.user_class.find_or_create_by(facebook_psid: user_id)
       end
