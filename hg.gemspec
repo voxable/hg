@@ -1,5 +1,3 @@
-# coding: utf-8
-
 lib = File.expand_path('../lib', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 require 'hg/version'
@@ -43,6 +41,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'rake', '~> 12.0'
   spec.add_development_dependency 'rspec-rails', '~> 3.5.2'
   spec.add_development_dependency 'sqlite3', '~> 1.3.11'
+  spec.add_development_dependency 'rubocop', '~> 0.48.0'
 end
 
 # rubocop:enable Metrics/BlockLength
