@@ -1,6 +1,8 @@
 module Hg
   class Engine < ::Rails::Engine
-    config.autoload_paths += Dir["#{config.root}/lib/**/"]
+    AUTOLOAD_PATHS = Dir.glob(File.join(Hg::Engine.root, 'lib', '**/'))
+    config.autoload_paths   += AUTOLOAD_PATHS
+    config.eager_load_paths += AUTOLOAD_PATHS
 
     isolate_namespace Hg
   end
