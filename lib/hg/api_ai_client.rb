@@ -15,6 +15,12 @@ module Hg
       )
     end
 
+    # Parse a natural language message with API.ai.
+    #
+    # @param message [String]
+    #   The natural language query to be parsed.
+    #
+    # @return [Hash] The information parsed from the message.
     def query(message)
       # TODO: which logger?
       begin
@@ -41,24 +47,39 @@ module Hg
 
       # Determine the action name
       action_from_response = api_ai_response[:result][:action]
-                    # Use intent name as action name if no action name is defined for this intent.
-      action_name = if action_from_response.blank?
-                      intent_name
-                    # Set to default action if message is not recognized.
-                    elsif action_from_response == UNKNOWN_SYSTEM_ACTION.freeze
-                      Hg::InternalActions::DEFAULT
-                    else
-                      action_from_response
-                    end
+
+      # Use intent name as action name if no action name is defined for this intent.
+      action_name =
+        if action_from_response.blank?
+          intent_name
+        # Set to default action if message is not recognized.
+        elsif action_from_response == UNKNOWN_SYSTEM_ACTION.freeze
+          Hg::InternalActions::DEFAULT
+        else
+          action_from_response
+        end
 
       response = api_ai_response[:result][:fulfillment][:speech]
 
       return {
         intent: intent_name,
         action: action_name,
-        parameters: api_ai_response[:result][:parameters],
+        parameters: parsed_params(api_ai_response[:result][:parameters]),
         response: response
       }
+    end
+
+    private
+
+    # Remove any params which were not matched.
+    #
+    # @param params [Hash]
+    #   The raw parsed params.
+    #
+    # @return [Hash]
+    #   Only those params that were matched.
+    def parsed_params(params)
+      params.reject{ |p| p.blank? }
     end
   end
 end
