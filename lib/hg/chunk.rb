@@ -300,6 +300,10 @@ module Hg
         @deliverables << chunk_class
       end
 
+      def t(*args)
+        I18n.t(*args)
+      end
+
       private
 
       # Take an option, and either call it (if a lambda) or return its value.

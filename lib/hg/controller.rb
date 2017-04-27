@@ -202,5 +202,9 @@ module Hg
     def logger
       Sidekiq::Logging.logger
     end
+
+    def t(*args)
+      I18n.t(*args)
+    end
   end
 end
