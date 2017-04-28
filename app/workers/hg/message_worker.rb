@@ -41,7 +41,7 @@ module Hg
           # ...build a request object from the payload.
           request = build_payload_request(payload, user)
         # If the message has attachments.
-        elsif message.attachments.any?
+        elsif message.attachments
           attachment = message.attachments.first
 
           # If the attachment is coordinates.
