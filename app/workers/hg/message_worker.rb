@@ -40,6 +40,26 @@ module Hg
           payload = JSON.parse(quick_reply_payload)
           # ...build a request object from the payload.
           request = build_payload_request(payload, user)
+        # If the message has attachments.
+        elsif message.attachments.any?
+          attachment = message.attachments.first
+
+          # If the attachment is coordinates.
+          if attachment['type'] == 'location'
+            # Generate a coordinates request with lat/long as parameters.
+            request = Hg::Request.new(
+              user:       user,
+              message:    message,
+              intent:     Hg::InternalActions::HANDLE_COORDINATES,
+              action:     Hg::InternalActions::HANDLE_COORDINATES,
+              parameters: {
+                lat:  attachment['payload']['coordinates']['lat'],
+                long:  attachment['payload']['coordinates']['long'],
+              }
+            )
+          else
+            # TODO: What should we do if attachments aren't recognized?
+          end
         # If the user is in the middle of a dialog.
         elsif user.context[:dialog_handler]
           request = build_dialog_request(user, message)
