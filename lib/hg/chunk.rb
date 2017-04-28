@@ -249,6 +249,10 @@ module Hg
               chunk: options[:to].to_s
             }
           })
+        # If this is a location request, send the appropriate options.
+        elsif options[:location_request]
+          quick_reply_content[:content_type] = 'location'
+          quick_reply_content[:title] = nil
         # Otherwise, just take the payload as passed.
         else
           quick_reply_content[:payload] = JSON.generate(options[:payload])
@@ -259,6 +263,11 @@ module Hg
         end
 
         @deliverables.last[:message][:quick_replies] << quick_reply_content
+      end
+
+      # Generate a quick reply button that requests the user's location.
+      def quick_reply_location_request
+        quick_reply nil, location_request: true
       end
 
       def card(&block)
