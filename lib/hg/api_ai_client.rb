@@ -35,14 +35,14 @@ module Hg
         retry_counter += 1
         api_ai_response = @client.text_request(message)
       rescue ApiAiRuby::ClientError, ApiAiRuby::RequestError => e
-        Sidekiq::Logging.logger.error 'Error with API.ai request'
+        Sidekiq::Logging.logger.error 'Error with API.ai query request'
         Sidekiq::Logging.logger.error e
         Sidekiq::Logging.logger.error e.backtrace.join("\n")
 
-        raise QueryError.new
-
         # Retry the call 3 times.
         retry if retry_counter < 3
+
+        raise QueryError.new
       else
         # If the API.ai call fails...
         if api_ai_response[:status][:code] != 200
