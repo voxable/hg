@@ -53,8 +53,8 @@ module Hg
               intent:     Hg::InternalActions::HANDLE_COORDINATES,
               action:     Hg::InternalActions::HANDLE_COORDINATES,
               parameters: {
-                lat:  attachment['payload']['coordinates']['lat'],
-                long:  attachment['payload']['coordinates']['long'],
+                lat:   attachment['payload']['coordinates']['lat'],
+                long:  attachment['payload']['coordinates']['long']
               }
             )
           else
