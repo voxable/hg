@@ -74,6 +74,28 @@ module Hg
           yield
         end
 
+        def nested_menu(title, &block)
+
+          @nested_menu_items = yield
+
+          @nested_menu = {
+              title: title,
+              type: 'nested',
+              call_to_actions: @nested_menu_items
+          }
+          @call << @nested_menu
+
+        end
+
+        def menu_item(text, options = {})
+          @call_to_actions << call_to_action(text, options)
+        end
+
+        def nested_menu_item(text, options = {})
+          call_to_action(text, options)
+        end
+
+
         # Subscribe to Facebook message webhook notifications.
         def subscribe_to_messages
           Facebook::Messenger::Subscriptions.subscribe(access_token: ENV['FB_ACCESS_TOKEN'])
@@ -88,6 +110,7 @@ module Hg
         end
 
         def call_to_action(text, options = {})
+
           call_to_action_content = {
             title: text
           }
@@ -110,7 +133,7 @@ module Hg
             call_to_action_content[:payload] = JSON.generate(options[:payload])
           end
 
-          @call_to_actions << call_to_action_content
+          call_to_action_content
         end
 
         def get_started(payload)
