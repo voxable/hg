@@ -83,7 +83,7 @@ module Hg
               type: 'nested',
               call_to_actions: @nested_menu_items
           }
-          @call << @nested_menu
+          @call_to_actions << @nested_menu
 
         end
 
@@ -102,10 +102,12 @@ module Hg
         end
 
         def initialize_persistent_menu
-          Facebook::Messenger::Thread.set({
-            setting_type:    'call_to_actions',
-            thread_state:    'existing_thread',
-            call_to_actions: @call_to_actions
+          Facebook::Messenger::Profile.set({
+            persistent_menu: [
+              locale: 'default',
+              composer_input_disabled: true,
+              call_to_actions: @call_to_actions
+            ]
           }, access_token: access_token)
         end
 

@@ -25,7 +25,6 @@ Gem::Specification.new do |spec|
   spec.executables   = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
   spec.require_paths = ['lib']
 
-  spec.add_runtime_dependency 'facebook-messenger', '~> 0.11.0'
   spec.add_runtime_dependency 'fuzzy_match', '~> 2.1.0'
   spec.add_runtime_dependency 'rails', '>= 5.0.0'
   # Enhanced Hashes
