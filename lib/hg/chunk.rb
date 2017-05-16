@@ -219,6 +219,10 @@ module Hg
           button_content[:type] = 'postback'
           # Encode the payload hash as JSON.
           button_content[:payload] = JSON.generate(options[:payload])
+
+        elsif options[:phone_number]
+          button_content[:type] = 'phone_number'
+          button_content[:payload] = options[:phone_number]
         end
 
         # Pass through the `webview_height_ratio` option.
