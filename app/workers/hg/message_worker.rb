@@ -53,8 +53,8 @@ module Hg
               intent:     Hg::InternalActions::HANDLE_COORDINATES,
               action:     Hg::InternalActions::HANDLE_COORDINATES,
               parameters: {
-                lat:  attachment['payload']['coordinates']['lat'],
-                long:  attachment['payload']['coordinates']['long'],
+                lat:   attachment['payload']['coordinates']['lat'],
+                long:  attachment['payload']['coordinates']['long']
               }
             )
           else
@@ -65,18 +65,22 @@ module Hg
           request = build_dialog_request(user, message)
         # If the message is text...
         else
-          # ...send the message to API.ai for NLU.
-          nlu_response = ApiAiClient.new(user.api_ai_session_id).query(message.text)
+          begin
+            # ...send the message to API.ai for NLU.
+            nlu_response = ApiAiClient.new(user.api_ai_session_id).query(message.text)
+          rescue Hg::ApiAiClient::QueryError => e
+            # TODO: High - what should be the general method for reporting errors to the user?
+          else
+            # Drop any params that weren't recognized.
+            params = nlu_response[:parameters].reject { |k, v| v.blank? }
 
-          # Drop any params that weren't recognized.
-          params = nlu_response[:parameters].reject { |k, v| v.blank? }
-
-          # Build a request.
-          request = build_request(message, nlu_response, params, user)
+            # Build a request.
+            request = build_request(message, nlu_response, params, user)
+          end
         end
 
         # Send the request to the bot's router.
-        bot.router.handle(request)
+        bot.router.handle(request) if request
 
         # Attempt to pop another message from the queue for processing.
         raw_message = pop_raw_message(user_id, redis_namespace)
