@@ -153,7 +153,7 @@ module Hg
         end
 
         def initialize_get_started_button
-          Facebook::Messenger::Thread.set @get_started_content, access_token: access_token
+          Facebook::Messenger::Profile.set @get_started_content, access_token: access_token
         end
 
         def greeting_text(text)
@@ -165,11 +165,11 @@ module Hg
         end
 
         def initialize_greeting_text
-          Facebook::Messenger::Thread.set({
-            setting_type: 'greeting',
-            greeting: {
+          Facebook::Messenger::Profile.set({
+            greeting: [
+                locale: 'default',
               text: @greeting_text
-            }
+            ]
           }, access_token: access_token)
         end
 
