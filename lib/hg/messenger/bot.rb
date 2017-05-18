@@ -21,6 +21,7 @@ module Hg
         base.extend ClassMethods
         base.chunks = []
         base.call_to_actions = []
+        base.nested_menu_items =[]
 
         # TODO: Need to figure this out.
         # Since the class itself represents the bot, it must be immutable for thread-safety.
@@ -59,6 +60,7 @@ module Hg
         attr_accessor :chunks
         attr_accessor :call_to_actions
         attr_accessor :image_url_base_portion
+        attr_accessor :nested_menu_items
 
         # The class representing the router.
         attr_writer :router
@@ -76,7 +78,7 @@ module Hg
 
         def nested_menu(title, &block)
 
-          @nested_menu_items = yield
+          @nested_menu_items << yield
 
           @nested_menu = {
               title: title,
