@@ -188,7 +188,7 @@ module Hg
       # @see https://developers.facebook.com/docs/messenger-platform/send-api-reference/call-button
       #
       # @return [void]
-      def call_button(text, number)
+      def call_button(text, number:)
         add_button({
           type:    'phone_number',
           title:   text,
