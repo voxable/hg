@@ -189,11 +189,11 @@ module Hg
       #
       # @return [void]
       def call_button(text, number)
-        {
+        add_button({
           type:    'phone_number',
           title:   text,
           payload: number
-        }
+        })
       end
 
       # TODO: High - buttons need their own module
