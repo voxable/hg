@@ -169,6 +169,7 @@ module Hg
         @deliverables << deliverable
       end
 
+      # TODO: should log_in and log_out be log_in_button and log_out_button?
       def log_in(url)
         button nil, url: url, type: 'account_link'
       end
@@ -177,6 +178,25 @@ module Hg
         button nil, type: 'account_unlink'
       end
 
+      # Add a call button to a card.
+      #
+      # @param text [String]
+      #   The text to appear in the button.
+      # @param number [String]
+      #   The number to call when the button is pressed.
+      #
+      # @see https://developers.facebook.com/docs/messenger-platform/send-api-reference/call-button
+      #
+      # @return [void]
+      def call_button(text, number)
+        add_button({
+          type:    'phone_number',
+          title:   text,
+          payload: number
+        })
+      end
+
+      # TODO: High - buttons need their own module
       def button(text, options = {})
         # TODO: text needs a better name
         # If the first argument is a chunk, then make this button a link to that chunk
@@ -224,6 +244,10 @@ module Hg
         # Pass through the `webview_height_ratio` option.
         button_content[:webview_height_ratio] = options[:webview_height_ratio]
 
+        add_button(button_content)
+      end
+
+      def add_button(button_content)
         @card[:buttons] = [] unless @card[:buttons]
 
         @card[:buttons] << button_content
