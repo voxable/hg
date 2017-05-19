@@ -21,6 +21,7 @@ module Hg
         base.extend ClassMethods
         base.chunks = []
         base.call_to_actions = []
+        base.nested_menu_items =[]
 
         # TODO: Need to figure this out.
         # Since the class itself represents the bot, it must be immutable for thread-safety.
@@ -59,6 +60,7 @@ module Hg
         attr_accessor :chunks
         attr_accessor :call_to_actions
         attr_accessor :image_url_base_portion
+        attr_accessor :nested_menu_items
 
         # The class representing the router.
         attr_writer :router
@@ -74,20 +76,45 @@ module Hg
           yield
         end
 
+        def nested_menu(title, &block)
+
+          @nested_menu_items << yield
+
+          @nested_menu = {
+              title: title,
+              type: 'nested',
+              call_to_actions: @nested_menu_items
+          }
+          @call_to_actions << @nested_menu
+
+        end
+
+        def menu_item(text, options = {})
+          @call_to_actions << call_to_action(text, options)
+        end
+
+        def nested_menu_item(text, options = {})
+          call_to_action(text, options)
+        end
+
+
         # Subscribe to Facebook message webhook notifications.
         def subscribe_to_messages
           Facebook::Messenger::Subscriptions.subscribe(access_token: ENV['FB_ACCESS_TOKEN'])
         end
 
         def initialize_persistent_menu
-          Facebook::Messenger::Thread.set({
-            setting_type:    'call_to_actions',
-            thread_state:    'existing_thread',
-            call_to_actions: @call_to_actions
+          Facebook::Messenger::Profile.set({
+            persistent_menu: [
+              locale: 'default',
+              composer_input_disabled: true,
+              call_to_actions: @call_to_actions
+            ]
           }, access_token: access_token)
         end
 
         def call_to_action(text, options = {})
+
           call_to_action_content = {
             title: text
           }
@@ -110,7 +137,7 @@ module Hg
             call_to_action_content[:payload] = JSON.generate(options[:payload])
           end
 
-          @call_to_actions << call_to_action_content
+          call_to_action_content
         end
 
         def get_started(payload)
@@ -128,7 +155,7 @@ module Hg
         end
 
         def initialize_get_started_button
-          Facebook::Messenger::Thread.set @get_started_content, access_token: access_token
+          Facebook::Messenger::Profile.set @get_started_content, access_token: access_token
         end
 
         def greeting_text(text)
@@ -140,11 +167,11 @@ module Hg
         end
 
         def initialize_greeting_text
-          Facebook::Messenger::Thread.set({
-            setting_type: 'greeting',
-            greeting: {
+          Facebook::Messenger::Profile.set({
+            greeting: [
+                locale: 'default',
               text: @greeting_text
-            }
+            ]
           }, access_token: access_token)
         end
 
