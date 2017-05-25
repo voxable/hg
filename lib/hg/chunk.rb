@@ -196,6 +196,29 @@ module Hg
         })
       end
 
+      # Add a share button to a card.
+      #
+      # @param text [String]
+      #   The text to appear in the button.
+      # @param content [String]
+      #   The share email view
+      #
+      # @see https://developers.facebook.com/docs/messenger-platform/send-api-reference/share-button
+      #
+      # @return [void]
+      def share_button(text, options = {})
+        add_button({
+                     type:    'element_share',
+                     title:   text,
+                     share_contents:  JSON.generate({
+                                                      action: Hg::InternalActions::DISPLAY_CHUNK,
+                                                      parameters: {
+                                                        chunk: options[:chunk]
+                                                      }
+                                                    })
+                   })
+      end
+
       # TODO: High - buttons need their own module
       def button(text, options = {})
         # TODO: text needs a better name
