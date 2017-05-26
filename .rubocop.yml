@@ -1,2 +1,7 @@
 inherit_from:
   - https://raw.githubusercontent.com/voxable-labs/ruby-style-guide/master/.rubocop.yml
+
+# Don't require documentation for generator methods.
+Style/DocumentationMethod:
+  Exclude:
+    - lib/generators/**/*.rb
