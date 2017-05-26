@@ -1,0 +1,28 @@
+class #{bot_name}Bot::Router < Hg::Router
+	include #{bot_name}Bot::Actions
+
+	controller #{bot_name}Bot::Controllers::WelcomeController do
+		handler GET_STARTED, :welcome
+	end
+
+	# Smalltalk domain
+	SMALLTALK_ACTIONS = %w(
+		smalltalk.agent
+		smalltalk.appraisal
+		smalltalk.confirmation
+		smalltalk.dialog
+		smalltalk.emotions
+		smalltalk.greetings
+		smalltalk.person
+		smalltalk.topics
+		smalltalk.unknown
+		smalltalk.user
+	).freeze
+
+	SMALLTALK_ACTIONS.each do |smalltalk_action|
+		action: smalltalk_action,
+		controller: ::#{bot_name}Bot::Controllers::DefaultController,
+		with:       :smalltalk
+	end
+end
+
