@@ -138,6 +138,11 @@ module Hg
         else
           @card[:image_url] = url
         end
+
+        # If aspect ratio changed to square from the horizontal default
+        if options[:square_aspect_ratio]
+          set_square_image_ratio
+        end
       end
 
       def item_url(url)
@@ -389,6 +394,15 @@ module Hg
             }
           }
         }
+      end
+
+      # Sets image ratio on gallery to square. Horizontal by default.
+      #
+      # see: https://developers.facebook.com/docs/messenger-platform/send-api-reference/generic-template
+      #
+      # @return [void]
+      def set_square_image_ratio
+        @gallery[:message][:attachment][:payload][:image_aspect_ratio] = 'square'
       end
     end
   end
