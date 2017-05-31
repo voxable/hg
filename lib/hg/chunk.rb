@@ -12,6 +12,18 @@ module Hg
       base.include_chunks
     end
 
+    GENERIC_TEMPLATE = {
+      cards: [],
+      message: {
+        attachment: {
+          type: 'template',
+          payload: {
+            template_type: 'generic',
+            elements: []
+          }
+        }
+      }
+    }
 
     # @return [OpenStruct] The execution context for this chunk instance.
     def context
@@ -203,25 +215,43 @@ module Hg
 
       # Add a share button to a card.
       #
-      # @param text [String]
-      #   The text to appear in the button.
-      # @param content [String]
-      #   The share email view
-      #
       # @see https://developers.facebook.com/docs/messenger-platform/send-api-reference/share-button
       #
       # @return [void]
-      def share_button(text, options = {})
-        add_button({
-                     type:    'element_share',
-                     title:   text,
-                     share_contents:  JSON.generate({
-                                                      action: Hg::InternalActions::DISPLAY_CHUNK,
-                                                      parameters: {
-                                                        chunk: options[:chunk]
-                                                      }
-                                                    })
-                   })
+      def share_button(&block)
+
+
+        button_options = {
+          type: 'element_share'
+        }
+
+        # If a chunk is passed, add as share_contents option.
+        if block_given?
+          original_gallery = @gallery.clone
+          original_card = @card.clone
+
+          @gallery = {
+            cards: [],
+            attachment: {
+              type: 'template',
+              payload: {
+                template_type: 'generic',
+                elements: []
+              }
+            }
+          }
+
+          card(&block)
+
+          @gallery[:attachment][:payload][:elements] = @gallery.delete(:cards)
+
+          button_options[:share_contents] = @gallery.clone
+
+          @gallery = original_gallery
+          @card = original_card
+        end
+
+        add_button(button_options)
       end
 
       # TODO: High - buttons need their own module
@@ -329,18 +359,7 @@ module Hg
       end
 
       def gallery(&block)
-        @gallery = {
-          cards: [],
-          message: {
-            attachment: {
-              type: 'template',
-              payload: {
-                template_type: 'generic',
-                elements: []
-              }
-            }
-          }
-        }
+        @gallery = GENERIC_TEMPLATE
 
         yield
 
