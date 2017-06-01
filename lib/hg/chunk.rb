@@ -12,19 +12,6 @@ module Hg
       base.include_chunks
     end
 
-    GENERIC_TEMPLATE = {
-      cards: [],
-      message: {
-        attachment: {
-          type: 'template',
-          payload: {
-            template_type: 'generic',
-            elements: []
-          }
-        }
-      }
-    }
-
     # @return [OpenStruct] The execution context for this chunk instance.
     def context
       @memoized_context ||= @context
@@ -219,8 +206,6 @@ module Hg
       #
       # @return [void]
       def share_button(&block)
-
-
         button_options = {
           type: 'element_share'
         }
@@ -359,7 +344,18 @@ module Hg
       end
 
       def gallery(&block)
-        @gallery = GENERIC_TEMPLATE
+        @gallery = {
+          cards: [],
+          message: {
+            attachment: {
+              type: 'template',
+              payload: {
+                template_type: 'generic',
+                elements: []
+              }
+            }
+          }
+        }
 
         yield
 
