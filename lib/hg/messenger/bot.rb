@@ -59,6 +59,7 @@ module Hg
 
         attr_accessor :chunks
         attr_accessor :call_to_actions
+        attr_accessor :input_disabled
         attr_accessor :image_url_base_portion
         attr_accessor :nested_menu_items
 
@@ -76,8 +77,16 @@ module Hg
           yield
         end
 
-        def nested_menu(title, &block)
+        # Enable free-text input for the bot.
+        #
+        # @see https://developers.facebook.com/docs/messenger-platform/messenger-profile/persistent-menu
+        #
+        # @return [void]
+        def enable_input
+          @input_disabled = false
+        end
 
+        def nested_menu(title, &block)
           @nested_menu_items << yield
 
           @nested_menu = {
@@ -86,7 +95,6 @@ module Hg
               call_to_actions: @nested_menu_items
           }
           @call_to_actions << @nested_menu
-
         end
 
         def menu_item(text, options = {})
@@ -107,14 +115,13 @@ module Hg
           Facebook::Messenger::Profile.set({
             persistent_menu: [
               locale: 'default',
-              composer_input_disabled: true,
+              composer_input_disabled: @input_disabled,
               call_to_actions: @call_to_actions
             ]
           }, access_token: access_token)
         end
 
         def call_to_action(text, options = {})
-
           call_to_action_content = {
             title: text
           }
