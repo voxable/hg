@@ -50,6 +50,17 @@ module Hg
           parameters: parameters
         )
       end
+
+      # Build a request object from a referral and user.
+      #
+      # @param referral [Facebook::Messenger::Incoming::Referral] The postback referral code.
+      # @param user [Object] The user that sent the payload.
+      #
+      # @return [Hg::Request] The generated request.
+      def build_referral_request(referral, user)
+        payload = JSON.parse(URI.decode(referral.ref))
+        build_payload_request(payload['payload'], user)
+      end
     end
   end
 end
