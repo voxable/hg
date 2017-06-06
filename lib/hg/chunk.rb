@@ -380,6 +380,10 @@ module Hg
         I18n.t(*args)
       end
 
+      def ref_link(page_id, payload)
+        "http://m.me/#{page_id}?ref=#{URI.encode(payload.to_json)}"
+      end
+
       private
 
       # Take an option, and either call it (if a lambda) or return its value.
