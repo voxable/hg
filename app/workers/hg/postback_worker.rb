@@ -23,9 +23,6 @@ module Hg
       # here to ensure that this worker attempts to drain the queue for
       # the user.
       until raw_postback.empty?
-        # Extract the payload from the postback.
-        payload = Facebook::Messenger::Incoming::Postback.new(raw_postback).payload
-
         # Locate the class representing the bot.
         bot = Kernel.const_get(bot_class_name)
 
@@ -34,8 +31,17 @@ module Hg
         # make this platform agnostic
         user = find_bot_user(bot, user_id)
 
-        # Build a request object.
-        request = build_payload_request(payload, user)
+        # Extract the payload from the postback.
+        postback = Facebook::Messenger::Incoming::Postback.new(raw_postback)
+
+        # Build the request object
+        request =
+          if postback.referral
+            build_referral_request(postback.referral, user)
+          else
+            build_payload_request(postback.payload, user)
+          end
+
 
         # Send the request to the bot's router.
         bot.router.handle(request)
