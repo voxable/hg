@@ -12,7 +12,6 @@ module Hg
       base.include_chunks
     end
 
-
     # @return [OpenStruct] The execution context for this chunk instance.
     def context
       @memoized_context ||= @context
@@ -138,6 +137,11 @@ module Hg
         else
           @card[:image_url] = url
         end
+
+        # If aspect ratio changed to square from the horizontal default
+        if options[:square_aspect_ratio]
+          set_square_image_ratio
+        end
       end
 
       def item_url(url)
@@ -194,6 +198,45 @@ module Hg
           title:   text,
           payload: number
         })
+      end
+
+      # Add a share button to a card.
+      #
+      # @see https://developers.facebook.com/docs/messenger-platform/send-api-reference/share-button
+      #
+      # @return [void]
+      def share_button(&block)
+        button_options = {
+          type: 'element_share'
+        }
+
+        # If a chunk is passed, add as share_contents option.
+        if block_given?
+          original_gallery = @gallery.clone
+          original_card = @card.clone
+
+          @gallery = {
+            cards: [],
+            attachment: {
+              type: 'template',
+              payload: {
+                template_type: 'generic',
+                elements: []
+              }
+            }
+          }
+
+          card(&block)
+
+          @gallery[:attachment][:payload][:elements] = @gallery.delete(:cards)
+
+          button_options[:share_contents] = @gallery.clone
+
+          @gallery = original_gallery
+          @card = original_card
+        end
+
+        add_button(button_options)
       end
 
       # TODO: High - buttons need their own module
@@ -337,6 +380,10 @@ module Hg
         I18n.t(*args)
       end
 
+      def ref_link(page_id, payload)
+        "http://m.me/#{page_id}?ref=#{URI.encode(payload.to_json)}"
+      end
+
       private
 
       # Take an option, and either call it (if a lambda) or return its value.
@@ -366,6 +413,15 @@ module Hg
             }
           }
         }
+      end
+
+      # Sets image ratio on gallery to square. Horizontal by default.
+      #
+      # see: https://developers.facebook.com/docs/messenger-platform/send-api-reference/generic-template
+      #
+      # @return [void]
+      def set_square_image_ratio
+        @gallery[:message][:attachment][:payload][:image_aspect_ratio] = 'square'
       end
     end
   end
