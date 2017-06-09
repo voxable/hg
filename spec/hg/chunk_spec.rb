@@ -59,20 +59,9 @@ describe Hg::Chunk do
     context 'when passed no cards ' do
       it 'creates an empty gallery' do
         l = lambda {}
-        test_chunk.gallery(&l)
-        expect(deliverables).to eq([{
-          message: {
-            attachment: {
-              type: 'template',
-              payload: {
-                template_type: 'generic',
-                elements: []
-              }
-            }
-          }
-        }])
-      end
+        expect { test_chunk.gallery(&l) }.to raise_error(Hg::Errors::EmptyGalleryError)
 
+      end
     end
   end
 end
