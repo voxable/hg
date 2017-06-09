@@ -1,4 +1,4 @@
-require 'support/rails_helper'
+require 'rails_helper'
 require_relative './worker_spec_shared_contexts'
 require_relative './worker_spec_shared_examples'
 

@@ -1,4 +1,4 @@
-require 'support/rails_helper'
+require 'rails_helper'
 
 describe Hg::Request do
 end

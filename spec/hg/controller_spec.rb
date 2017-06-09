@@ -1,4 +1,4 @@
-require 'support/rails_helper'
+require 'rails_helper'
 
 describe Hg::Controller do
   class OrdersController < Hg::Controller; end

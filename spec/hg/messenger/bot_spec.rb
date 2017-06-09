@@ -1,4 +1,4 @@
-require 'support/rails_helper'
+require 'rails_helper'
 
 RSpec.describe Hg::Messenger::Bot do
   class FAQBot
