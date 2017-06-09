@@ -1,4 +1,4 @@
-require 'support/rails_helper'
+require 'rails_helper'
 
 describe Hg::Queues::Messenger::MessageQueue do
   describe '.store_message_for_user' do
