@@ -9,56 +9,71 @@ class Bot
 end
 
 describe Hg::Chunk do
-  describe '#text' do
+  let(:test_chunk){
     class Bot
       module Chunks
-        class ChunkWithText
+        class DummyChunk
           include Hg::Chunk
-
-          text 'some text'
         end
       end
     end
+  }
+  let(:deliverables){Bot::Chunks::DummyChunk.deliverables}
 
+  describe '#text' do
+    let(:some_text){'some text'}
     it 'generates a proper structured message for a text message' do
-      expect(Bot::Chunks::ChunkWithText.deliverables.first).to eq(
+      test_chunk.text(some_text)
+      expect(deliverables.first).to eq(
         {
           message: {
-            text: 'some text'
+            text: some_text
           }
         }
       )
     end
   end
 
-  describe '#attachment' do
-    let(:type){'image'}
-    let(:url){'www.example.com'}
-
-    it 'generates a proper structured message for a text message' do
-
-      class Bot
-        module Chunks
-          class ChunkWithAttachment
-            include Hg::Chunk
-
-            attachment(:type, :url)
-          end
-        end
+  describe 'attachments' do
+    let(:attachment){deliverables.first[:message][:attachment]}
+    let(:some_url){'www.example.com'}
+    describe '#image' do
+      it 'generates a proper structured message for a image message' do
+        test_chunk.image(some_url)
+        expect(attachment[:type]).to eq('image')
+        expect(attachment[:payload][:url]).to eq(some_url)
       end
-      expect(Bot::Chunks::ChunkWithAttachment.deliverables.first).to eq(
-       {
-         message: {
-           attachment: {
-             type: :type,
-             payload: {
-               url: :url
-             }
-           }
-         }
-       })
     end
 
+    describe '#video' do
+      let(:some_url){'www.example.com'}
+      it 'generates a proper structured message for a video message' do
+        test_chunk.video(some_url)
+        expect(attachment[:type]).to eq('video')
+        expect(attachment[:payload][:url]).to eq(some_url)
+      end
+    end
+  end
+
+  describe '#gallery' do
+    context 'when passed no cards ' do
+      it 'creates an empty gallery' do
+        l = lambda {}
+        test_chunk.gallery(&l)
+        expect(deliverables).to eq([{
+          message: {
+            attachment: {
+              type: 'template',
+              payload: {
+                template_type: 'generic',
+                elements: []
+              }
+            }
+          }
+        }])
+      end
+
+    end
   end
 end
 

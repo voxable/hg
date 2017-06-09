@@ -360,7 +360,7 @@ module Hg
         yield
 
         @gallery[:message][:attachment][:payload][:elements] = @gallery.delete(:cards)
-
+add 
         @deliverables << @gallery
       end
 
