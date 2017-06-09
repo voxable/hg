@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+require_relative 'errors/errors'
 
 module Hg
   module Chunk
@@ -360,7 +361,9 @@ module Hg
         yield
 
         @gallery[:message][:attachment][:payload][:elements] = @gallery.delete(:cards)
-add 
+
+        raise Errors::EmptyGalleryError if  @gallery[:message][:attachment][:payload][:elements].empty?
+
         @deliverables << @gallery
       end
 
