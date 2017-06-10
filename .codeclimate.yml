@@ -1,4 +1,8 @@
 ---
+prepare:
+  fetch:
+  - url: "https://raw.githubusercontent.com/voxable-labs/ruby-style-guide/master/.rubocop.yml"
+    path: "rubocop-code-climate.yml"
 engines:
   duplication:
     enabled: true
@@ -9,6 +13,8 @@ engines:
     enabled: true
   rubocop:
     enabled: true
+    config:
+      file: "rubocop-code-climate.yml"
   brakeman:
     enabled: true
   bundler-audit:
