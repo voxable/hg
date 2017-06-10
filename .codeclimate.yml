@@ -7,9 +7,8 @@ engines:
       - ruby
   fixme:
     enabled: true
-  # Disabled for the moment, due to Code Climate bug.
   rubocop:
-    enabled: false
+    enabled: true
   brakeman:
     enabled: true
   bundler-audit:

@@ -1,2 +1,6 @@
-inherit_from:
-  - https://raw.githubusercontent.com/voxable-labs/ruby-style-guide/master/.rubocop.yml
+inherit_gem:
+  voxable-style-guide: .rubocop.yml
+
+AllCops:
+  Exclude:
+    - 'spec/support/dummy/**/*'

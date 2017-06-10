@@ -42,6 +42,9 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'rubocop', '~> 0.49.1'
   spec.add_development_dependency 'simplecov', '~> 0.13.0'
   spec.add_development_dependency 'codeclimate-test-reporter', '~> 1.0.8'
+
+  # Ruby style guide
+  spec.add_development_dependency 'voxable-style-guide', '~> 0.0.1'
 end
 
 # rubocop:enable Metrics/BlockLength
