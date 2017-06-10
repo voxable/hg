@@ -1,11 +1,23 @@
 # Hg
 
 <p align=center>
-<a title="Code Climate" href="https://codeclimate.com/github/voxable-labs/hg">
+  <a title="Gem Version" href="https://rubygems.org/gems/hg">
+    <img src="https://img.shields.io/gem/v/hg.svg" />
+  </a>
+  <a title="Linux Build Status" href="https://travis-ci.org/voxable-labs/expando">
+    <img src="https://img.shields.io/travis/voxable-labs/expando/master.svg?label=Linux%20build" />
+  </a>
+    <a title="Code Climate" href="https://codeclimate.com/github/voxable-labs/hg">
     <img src="https://img.shields.io/codeclimate/github/voxable-labs/hg.svg" />
   </a>
   <a title="Test Coverage" href="https://codeclimate.com/github/voxable-labs/hg/coverage">
     <img src="https://img.shields.io/codeclimate/coverage/github/voxable-labs/hg.svg" />
+  </a>
+  <a title="Dependency Status" href="https://gemnasium.com/voxable-labs/hg">
+    <img src="https://img.shields.io/gemnasium/voxable-labs/hg.svg" />
+  </a>
+  <a title="Security" href="https://hakiri.io/github/voxable-labs/hg/master">
+    <img src="https://hakiri.io/github/voxable-labs/hg/master.svg" />
   </a>
 </p>
 
