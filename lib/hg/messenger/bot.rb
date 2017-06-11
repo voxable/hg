@@ -35,8 +35,8 @@ module Hg
         def init
           subscribe_to_messages
           initialize_message_handlers
-          initialize_persistent_menu
           initialize_get_started_button
+          initialize_persistent_menu
           initialize_greeting_text
         end
 
