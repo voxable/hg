@@ -12,25 +12,19 @@ describe Hg::Chunk do
   let(:test_chunk){
     class Bot
       module Chunks
-        class DummyChunk
+        class TestChunk
           include Hg::Chunk
         end
       end
     end
   }
-  let(:deliverables){Bot::Chunks::DummyChunk.deliverables}
+  let(:deliverables){Bot::Chunks::TestChunk.deliverables}
 
   describe '#text' do
     let(:some_text){'some text'}
     it 'generates a proper structured message for a text message' do
       test_chunk.text(some_text)
-      expect(deliverables.first).to eq(
-        {
-          message: {
-            text: some_text
-          }
-        }
-      )
+      expect(deliverables.first[:message][:text]).to eq(text: some_text)
     end
   end
 
@@ -60,7 +54,6 @@ describe Hg::Chunk do
       it 'creates an empty gallery' do
         l = lambda {}
         expect { test_chunk.gallery(&l) }.to raise_error(Hg::Errors::EmptyGalleryError)
-
       end
     end
   end
