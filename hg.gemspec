@@ -39,8 +39,10 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'rake', '~> 12.0'
   spec.add_development_dependency 'rspec-rails', '~> 3.5.2'
   spec.add_development_dependency 'sqlite3', '~> 1.3.11'
-  spec.add_development_dependency 'rubocop', '~> 0.48.0'
   spec.add_development_dependency 'yard', '~> 0.9.9'
+  spec.add_development_dependency 'rubocop', '~> 0.49.1'
+  spec.add_development_dependency 'simplecov', '~> 0.13.0'
+  spec.add_development_dependency 'codeclimate-test-reporter', '~> 1.0.8'
 end
 
 # rubocop:enable Metrics/BlockLength
