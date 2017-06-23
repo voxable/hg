@@ -17,3 +17,9 @@ require 'rspec/core/rake_task'
 RSpec::Core::RakeTask.new(:spec)
 
 task :default => :spec
+
+YARD::Rake::YardocTask.new do |t|
+  t.files   = ['lib/**/*.rb', 'app/**/*/.rb']
+  t.options = ['--verbose', '--debug', '--backtrace']
+  t.stats_options = ['--list-undoc']
+end
