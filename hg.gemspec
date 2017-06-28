@@ -32,7 +32,9 @@ Gem::Specification.new do |spec|
   # Background Jobs
   spec.add_runtime_dependency 'sidekiq', '~> 5.0.0'
   # API.ai NLU
-  spec.add_runtime_dependency 'api-ai-ruby', '~> 1.2.3'
+  # Don't pin to a version for the moment, so we can reference specific commits
+  # This library doesn't get released very often
+  spec.add_runtime_dependency 'api-ai-ruby'#, '~> 1.2.3'
 
   spec.add_development_dependency 'bundler', '~> 1.13'
   spec.add_development_dependency 'rake', '~> 12.0'

@@ -2,7 +2,7 @@ PATH
   remote: .
   specs:
     hg (0.1.0)
-      api-ai-ruby (~> 1.2.3)
+      api-ai-ruby
       facebook-messenger (~> 0.13.0)
       fuzzy_match (~> 2.1.0)
       rails (>= 5.0.0)
@@ -80,13 +80,13 @@ GEM
       domain_name (~> 0.5)
     http-form_data (1.0.3)
     http_parser.rb (0.6.0)
-    httparty (0.14.0)
+    httparty (0.15.5)
       multi_xml (>= 0.5.2)
     i18n (0.8.4)
     json (2.1.0)
     loofah (2.0.3)
       nokogiri (>= 1.5.9)
-    mail (2.6.5)
+    mail (2.6.6)
       mime-types (>= 1.16, < 4)
     method_source (0.8.2)
     mime-types (3.1)
@@ -160,7 +160,7 @@ GEM
       ruby-progressbar (~> 1.7)
       unicode-display_width (~> 1.0, >= 1.0.1)
     ruby-progressbar (1.8.1)
-    sidekiq (5.0.2)
+    sidekiq (5.0.3)
       concurrent-ruby (~> 1.0)
       connection_pool (~> 2.2, >= 2.2.0)
       rack-protection (>= 1.5.0)
