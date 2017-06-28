@@ -87,7 +87,7 @@ module Hg
         end
 
         def nested_menu(title, &block)
-          @nested_menu_items << yield
+         yield
 
           @nested_menu = {
               title: title,
@@ -102,7 +102,7 @@ module Hg
         end
 
         def nested_menu_item(text, options = {})
-          call_to_action(text, options)
+         @nested_menu_items << call_to_action(text, options)
         end
 
 
