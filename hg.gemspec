@@ -28,8 +28,7 @@ Gem::Specification.new do |spec|
   spec.add_runtime_dependency 'facebook-messenger', '~> 0.13.0'
   spec.add_runtime_dependency 'fuzzy_match', '~> 2.1.0'
   spec.add_runtime_dependency 'rails', '>= 5.0.0'
-  # Enhanced Hashes
-  spec.add_runtime_dependency 'hashie', '~> 3.5.4'
+
   # Background Jobs
   spec.add_runtime_dependency 'sidekiq', '~> 5.0.0'
   # API.ai NLU
@@ -42,6 +41,8 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'rubocop', '~> 0.49.1'
   spec.add_development_dependency 'simplecov', '~> 0.13.0'
   spec.add_development_dependency 'codeclimate-test-reporter', '~> 1.0.8'
+  # TODO: Drop these from tests
+  spec.add_development_dependency 'hashie', '~> 3.5.4'
 end
 
 # rubocop:enable Metrics/BlockLength
