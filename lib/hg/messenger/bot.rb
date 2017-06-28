@@ -73,6 +73,10 @@ module Hg
           raise NoRouterClassExistsError.new
         end
 
+        # bot persistent menu
+        #
+        # @see https://developers.facebook.com/docs/messenger-platform/messenger-profile/persistent-menuhttps://developers.facebook.com/docs/messenger-platform/messenger-profile/persistent-menu
+        # @return [void]
         def persistent_menu(&block)
           yield
         end
@@ -86,23 +90,52 @@ module Hg
           @input_disabled = false
         end
 
+        # nested menu for persistent menu
+        # example usage:
+        # persistent_menu do
+        #   menu_item 'Regular menu item', action: SOME_ACTION
+        #   nested_menu 'Nested Title' do
+        #     nested_menu_item 'Title', action: SOME_ACTION
+        #   end
+        # end
+        # @param title [String] text of the link
+        # @return [void]
         def nested_menu(title, &block)
-         yield
+          yield
 
           @nested_menu = {
-              title: title,
-              type: 'nested',
-              call_to_actions: @nested_menu_items
+            title: title,
+            type: 'nested',
+            call_to_actions: @nested_menu_items
           }
           @call_to_actions << @nested_menu
         end
 
+        # menu items for persistent menu
+        # example usage:
+        # persistent_menu do
+        #   menu_item 'Regular menu item', action: SOME_ACTION
+        # end
+        # @param text [String] text of the link
+        # @param options [Hash] menu item options, ie, an action
+        # @return [void]
         def menu_item(text, options = {})
           @call_to_actions << call_to_action(text, options)
         end
 
+        # nested menu item for persistent menu
+        # example usage:
+        # persistent_menu do
+        #   menu_item 'Regular menu item', action: SOME_ACTION
+        #   nested_menu 'Nested Title' do
+        #     nested_menu_item 'Title', action: SOME_ACTION
+        #   end
+        # end
+        # @param text [String] text of the link
+        # @param options [Hash] menu item options, ie, an action
+        # @return [void]
         def nested_menu_item(text, options = {})
-         @nested_menu_items << call_to_action(text, options)
+          @nested_menu_items << call_to_action(text, options)
         end
 
 
