@@ -60,7 +60,7 @@ module Hg
           else
             # TODO: What should we do if attachments aren't recognized?
           end
-        # If the user is in the middle of a dialog.
+        # If the user is in the middle of a dialog...
         elsif user.context[:dialog_handler]
           request = build_dialog_request(user, message)
         # If the message is text...
