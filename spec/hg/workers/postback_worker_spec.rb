@@ -55,29 +55,23 @@ RSpec.describe Hg::PostbackWorker, type: :worker do
 
     include_examples 'constructing a request object'
 
-    it 'adds the payload to the request' do
-    end
-
     context 'when the postback is a referral' do
       let(:referral_payload) {
-        JSON.generate(
-          {
-            ref: {
-              payload: {
-                action: 'someaction',
-                params: {
-                  invite_code: 'somerefcode'
-                }
+        {
+          'ref' => {
+            'payload' => {
+              'action' => 'someaction',
+              'params' => {
+                'invite_code' => 'somerefcode'
               }
-            },
-            source: 'SHORTLINK',
-            type: 'OPEN_THREAD'
-          }
-        )
+            }
+          },
+          'source' => 'SHORTLINK',
+          'type' => 'OPEN_THREAD'
+        }
       }
-      let(:referral) {
-        instance_double(
-          'Facebook::Messenger::Incoming::Referral::Referral',
+      let(:referral_double) { instance_double(
+          'Facebook::Messenger::Incoming::Postback',
           referral: referral_payload
         )
       }
@@ -104,16 +98,19 @@ RSpec.describe Hg::PostbackWorker, type: :worker do
 
       before(:example) do
         allow(queue).to receive(:pop).and_return(raw_referral, {})
-        #allow(Facebook::Messenger::Incoming::Postback).to receive(:referral).and_return(referral)
       end
 
-      it 'adds the ref to the payload' do
+      it 'processes as referral' do
         expect(subject).to receive(:build_referral_request).and_return(ref_request)
 
         subject.perform(*valid_args)
       end
 
-      it 'adds the ref to the payload'
+      it 'sends to the bot router' do
+        expect(bot_class.router).to receive(:handle)
+
+        subject.perform(*valid_args)
+      end
     end
   end
 
