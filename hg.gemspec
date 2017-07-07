@@ -28,6 +28,8 @@ Gem::Specification.new do |spec|
   spec.add_runtime_dependency 'facebook-messenger', '~> 0.13.0'
   spec.add_runtime_dependency 'fuzzy_match', '~> 2.1.0'
   spec.add_runtime_dependency 'rails', '>= 5.0.0'
+  spec.add_runtime_dependency 'dry-types', '~> 0.11.0'
+  spec.add_runtime_dependency 'dry-struct', '~>0.3.1'
 
   # Background Jobs
   spec.add_runtime_dependency 'sidekiq', '~> 5.0.0'
