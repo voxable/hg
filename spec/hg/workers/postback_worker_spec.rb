@@ -12,14 +12,16 @@ RSpec.describe Hg::PostbackWorker, type: :worker do
 
   context "when a postback is present on the user's unprocessed postback queue" do
     include_context 'when queue has unprocessed message' do
-      let(:payload) { JSON.generate(
+      let(:payload_hash) {
         {
-          action: 'someaction',
-          params: {
-            foo: 'bar'
+          'action' => 'someaction',
+          'intent' => 'someintent',
+          'params' => {
+            'foo:' => 'bar'
           }
         }
-      )}
+      }
+      let(:payload) { JSON.generate( payload_hash )}
       let(:postback) {
         instance_double(
           'Facebook::Messenger::Incoming::Postback',
@@ -41,8 +43,7 @@ RSpec.describe Hg::PostbackWorker, type: :worker do
       let(:request) {
         instance_double(
           Hg::Request,
-          action: 'someaction',
-          intent: 'someintent'
+          payload_hash
         )
       }
     end
@@ -58,19 +59,19 @@ RSpec.describe Hg::PostbackWorker, type: :worker do
     context 'when the postback is a referral' do
       let(:referral_payload) {
         {
-          'ref' => {
-            'payload' => {
-              'action' => 'someaction',
-              'params' => {
-                'invite_code' => 'somerefcode'
+          'ref' => JSON.generate(
+            {
+              'payload' => {
+                'action' => 'someaction',
+                'params' => {
+                  'invite_code' => 'somerefcode'
+                }
               }
             }
-          },
-          'source' => 'SHORTLINK',
-          'type' => 'OPEN_THREAD'
+          )
         }
       }
-      let(:referral_double) { instance_double(
+      let(:ref_payload) { instance_double(
           'Facebook::Messenger::Incoming::Postback',
           referral: referral_payload
         )
@@ -106,8 +107,8 @@ RSpec.describe Hg::PostbackWorker, type: :worker do
         subject.perform(*valid_args)
       end
 
-      it 'sends to the bot router' do
-        expect(bot_class.router).to receive(:handle)
+      it 'adds the ref to the payload' do
+        expect(subject).to receive(:build_payload_request).and_return(ref_request)
 
         subject.perform(*valid_args)
       end
