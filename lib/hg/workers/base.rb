@@ -32,6 +32,30 @@ module Hg
         bot.user_class.find_or_create_by(facebook_psid: user_id)
       end
 
+      # Parse a message via an NLU service (at the moment, API.ai).
+      #
+      # @param text [String]
+      #   The raw text of the message.
+      # @param user [API]
+      #   The user that sent the message.
+      #
+      # @return [Array<Hash>]
+      #   An array in which the first element is the raw NLU response, and the
+      #   second element is the parsed parameters.
+      def parse_message(text, user)
+        begin
+          # ...send the message to API.ai for NLU.
+          nlu_response = ApiAiClient.new(user.api_ai_session_id).query(text)
+        rescue Hg::ApiAiClient::QueryError => e
+          # TODO: High - what should be the general method for reporting errors to the user?
+        else
+          # Drop any params that weren't recognized.
+          params = nlu_response[:parameters].reject {|k, v| v.blank?}
+        end
+
+        return nlu_response, params
+      end
+
       # Build a request object from a payload and user.
       #
       # @param payload [Facebook::Messenger::Incoming] The postback payload.
