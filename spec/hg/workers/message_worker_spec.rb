@@ -25,7 +25,7 @@ RSpec.describe Hg::MessageWorker, type: :worker do
       let(:raw_message) {
         {
           'sender' => {
-            'id' => user_id,
+            'id' => user_id
           },
           'message' => {
             'text' => text
@@ -45,20 +45,71 @@ RSpec.describe Hg::MessageWorker, type: :worker do
         instance_double('Hg::ApiAiClient', query: api_ai_response)
       }
       let(:valid_args) { [1, 'foo', 'NewsBot'] }
+      let(:payload_hash) {
+        {
+          'action' => 'someaction',
+          'intent' => 'someintent',
+          'params' => {
+            'foo:' => 'bar'
+          }
+        }
+      }
+      let(:payload) { JSON.generate(payload_hash)}
+      let(:qr_payload_hash) {
+        {
+          'content_type' => 'text',
+          'title'        => 'sometitle',
+          'payload'      => payload
+        }
+      }
+      let(:quick_reply) { JSON.generate(qr_payload_hash)}
+      let(:raw_message_qr) {
+        {
+          'sender' => {
+            'id' => user_id
+          },
+          'message' => {
+            'text' => text,
+            'quick_reply' => qr_payload_hash
+          }
+        }
+      }
+      let(:message_qr) {
+        instance_double(
+          'Facebook::Messenger::Incoming::Message',
+          sender: { 'id' => user_id },
+          text: text,
+          quick_reply: quick_reply
+        )
+      }
+      let(:request) {
+        instance_double(
+          'Hg::Request',
+          payload_hash
+        )
+      }
+    end
+
+
+    context 'when the message is a quick reply' do
+      it 'builds a payload request' do
+        allow(queue).to receive(:pop).and_return(raw_message_qr, {})
+        allow(Facebook::Messenger::Incoming::Message).to receive(:initialize).and_return(message_qr)
+
+        expect(subject).to receive(:build_payload_request).with(payload_hash, user).and_return(request)
+
+        subject.perform(*valid_args)
+      end
+    end
+
+    context 'when the user is in the midst of a dialog' do
+      it 'builds a dialog request'
     end
 
     before(:example) do
       allow(queue).to receive(:pop).and_return(raw_message, {})
       allow(Facebook::Messenger::Incoming::Message).to receive(:initialize).and_return(message)
       allow(Hg::ApiAiClient).to receive(:new).and_return(api_ai_client)
-    end
-
-    context 'when the message is a quick reply' do
-      it 'builds a payload request'
-    end
-
-    context 'when the user is in the midst of a dialog' do
-      it 'builds a dialog request'
     end
 
     context 'sending the message to API.ai for parsing' do
