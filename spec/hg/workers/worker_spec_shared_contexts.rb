@@ -3,12 +3,6 @@ BOT_CLASS_NAME = 'NewsBot'
 RSpec.shared_context 'with mocked queue' do
   let(:user) { double('user') }
   let(:user_id) { 1 }
-  # TODO: likely need a message factory
-  let(:message) {
-    Hashie::Mash.new({
-      sender: {id: user_id}
-    })
-  }
   let(:bot_class) { class_double(BOT_CLASS_NAME).as_stubbed_const }
   let(:valid_args) { [user_id, 'news_bots', BOT_CLASS_NAME] }
 
