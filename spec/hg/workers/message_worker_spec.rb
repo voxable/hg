@@ -103,7 +103,31 @@ RSpec.describe Hg::MessageWorker, type: :worker do
     end
 
     context 'when the user is in the midst of a dialog' do
+      let(:controller) { stub_const("controller", controller)}
+      let(:user_in_dialog) {
+        double(
+          'user',
+          api_ai_session_id: user_api_ai_session_id,
+          context: {
+            dialog_handler:    'somehandler',
+            dialog_controller: :controller,
+            dialog_parameters: 'someparams'
+          }
+        )
+      }
+
       it 'builds a dialog request'
+      #allow(user_class).to receive(:find_or_create_by).and_return(user_in_dialog)
+      #
+      # subject.perform(*valid_args)
+      #
+      # expect(subject).to receive(:build_dialog_request).with(user, message).and_return(request)
+    end
+
+    context 'when the message has an attachment' do
+      context 'the attachment is a loaction' do
+        it 'adds the coordinates to the request'
+      end
     end
 
     before(:example) do
