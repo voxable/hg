@@ -103,14 +103,14 @@ RSpec.describe Hg::MessageWorker, type: :worker do
     end
 
     context 'when the user is in the midst of a dialog' do
-      let(:controller) { stub_const("controller", controller)}
+      let(:controller) { class_double("SomeController").as_stubbed_const }
       let(:user_in_dialog) {
         double(
           'user',
           api_ai_session_id: user_api_ai_session_id,
           context: {
             dialog_handler:    'somehandler',
-            dialog_controller: 'somecontroller',
+            dialog_controller: controller,
             dialog_parameters: 'someparams'
           }
         )
@@ -118,10 +118,14 @@ RSpec.describe Hg::MessageWorker, type: :worker do
 
       it 'builds a dialog request' do
         allow(user_class).to receive(:find_or_create_by).and_return(user_in_dialog)
+        allow(queue).to receive(:pop).and_return(raw_message, {})
+        allow(Facebook::Messenger::Incoming::Message).to receive(:initialize).and_return(message)
+        allow(Kernel).to receive(:const_get).and_return(bot_class, controller)
+
+        #TODO: Why does build_dialog_request receive a Message object instead of the :message double?
+        expect(subject).to receive(:build_dialog_request).and_return(request)
 
         subject.perform(*valid_args)
-
-        expect(subject).to receive(:build_dialog_request).with(user, message).and_return(request)
       end
     end
 
@@ -158,8 +162,7 @@ RSpec.describe Hg::MessageWorker, type: :worker do
         subject.perform(*valid_args)
       end
 
-      # TODO
-      #include_examples 'constructing a request object'
+      include_examples 'constructing a request object'
     end
 
     context "when the message isn't understood by the API.ai agent", priority: :high do
