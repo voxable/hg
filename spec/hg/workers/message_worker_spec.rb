@@ -110,18 +110,19 @@ RSpec.describe Hg::MessageWorker, type: :worker do
           api_ai_session_id: user_api_ai_session_id,
           context: {
             dialog_handler:    'somehandler',
-            dialog_controller: :controller,
+            dialog_controller: 'somecontroller',
             dialog_parameters: 'someparams'
           }
         )
       }
 
-      it 'builds a dialog request'
-      #allow(user_class).to receive(:find_or_create_by).and_return(user_in_dialog)
-      #
-      # subject.perform(*valid_args)
-      #
-      # expect(subject).to receive(:build_dialog_request).with(user, message).and_return(request)
+      it 'builds a dialog request' do
+        allow(user_class).to receive(:find_or_create_by).and_return(user_in_dialog)
+
+        subject.perform(*valid_args)
+
+        expect(subject).to receive(:build_dialog_request).with(user, message).and_return(request)
+      end
     end
 
     context 'when the message has an attachment' do
