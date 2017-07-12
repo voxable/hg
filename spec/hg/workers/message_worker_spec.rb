@@ -11,8 +11,6 @@ RSpec.describe Hg::MessageWorker, type: :worker do
   include_examples 'a message processing worker'
 
   context "when a message is present on the user's unprocessed message queue" do
-    it 'handles quick replies', priority: :high
-
     include_context 'when queue has unprocessed message' do
       let(:text) { 'hi there' }
       let(:message) {
@@ -134,30 +132,34 @@ RSpec.describe Hg::MessageWorker, type: :worker do
         allow(Kernel).to receive(:const_get).and_return(bot_class, controller)
       end
 
-      before(:each) do
-        allow(subject).to receive(:build_dialog_request).and_return(dialog_request)
-        @result = subject.send(:build_dialog_request, user_in_dialog, message)
+      context 'when building a dialog request' do
+        it 'adds the dialog handler to the request' do
+          allow(bot_class.router).to receive(:handle) do |request|
+            expect(request.intent).to eq user_in_dialog.context[:dialog_handler]
+          end
+
+          subject.perform(*valid_args)
+        end
+
+        it 'adds the parameters to the request' do
+          allow(bot_class.router).to receive(:handle) do |request|
+            expect(request.parameters).to eq user_in_dialog.context[:dialog_parameters]
+          end
+
+          subject.perform(*valid_args)
+        end
+
+        it 'adds the dialog controller to the request' do
+          allow(bot_class.router).to receive(:handle) do |request|
+            expect(request.route[:controller]).to eq user_in_dialog.context[:dialog_controller]
+          end
+
+          subject.perform(*valid_args)
+        end
       end
 
-      it 'adds the dialog handler to the request' do
-        expect(@result.intent).to eq user_in_dialog.context[:dialog_handler]
-
-        subject.perform(*valid_args)
-      end
-
-      it 'adds the parameters to the request' do
-        expect(@result.parameters).to eq user_in_dialog.context[:dialog_parameters]
-
-        subject.perform(*valid_args)
-      end
-
-      it 'adds the dialog controller to the request' do
-        expect(@result.route[:controller]).to eq user_in_dialog.context[:dialog_controller]
-
-        subject.perform(*valid_args)
-      end
       it 'creates the request' do
-        expect(subject).to receive(:build_dialog_request).with(user_in_dialog, an_instance_of(Facebook::Messenger::Incoming::Message)).and_return(dialog_request)
+        expect(subject).to receive(:build_dialog_request).with(user_in_dialog, an_instance_of(Facebook::Messenger::Incoming::Message))
 
         subject.perform(*valid_args)
       end
@@ -213,13 +215,7 @@ RSpec.describe Hg::MessageWorker, type: :worker do
         allow(Facebook::Messenger::Incoming::Message).to receive(:initialize).with(raw_message_w_attach).and_return(message_w_attach)
       end
 
-      it 'finds the attachment' do
-        #subject.perform(*valid_args)
-
-        expect(message_w_attach.attachments).to_not be_nil
-      end
-
-      context 'the attachment is a location' do
+      context 'when the attachment is a location' do
         it 'adds the coordinates to the request' do
           allow(user_class).to receive(:find_or_create_by).and_return(user)
           allow(Hg::Request).to receive(:initialize) { attach_request }
@@ -263,7 +259,9 @@ RSpec.describe Hg::MessageWorker, type: :worker do
 
     context "when the message isn't understood by the API.ai agent", priority: :high do
       context 'when the bot has a chunk with a fuzzily-matching keyword' do
-        it 'delivers that chunk to the user'
+        it 'delivers that chunk to the user' do
+
+        end
       end
 
       context 'when the bot does not have a chunk with a fuzzily-matching keyword' do
