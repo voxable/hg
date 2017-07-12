@@ -35,7 +35,7 @@ RSpec.describe Hg::PostbackWorker, type: :worker do
             'id' => user_id,
           },
           'postback' => {
-            'payload' => payload
+            'payload' => payload_hash
           }
         }
       }

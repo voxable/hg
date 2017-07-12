@@ -38,7 +38,7 @@ RSpec.describe Hg::MessageWorker, type: :worker do
           context: {}
         )
       }
-      let(:api_ai_response) { { intent: nil, action: nil, parameters: { foo: 1 } }}
+      let(:api_ai_response) { { intent: 'someintent', action: 'someaction', parameters: { 'foo' => 'bar' } }}
       let(:api_ai_client) {
         instance_double('Hg::ApiAiClient', query: api_ai_response)
       }
@@ -48,7 +48,7 @@ RSpec.describe Hg::MessageWorker, type: :worker do
           'action' => 'someaction',
           'intent' => 'someintent',
           'params' => {
-            'foo:' => 'bar'
+            'foo' => 'bar'
           }
         }
       }
@@ -88,6 +88,13 @@ RSpec.describe Hg::MessageWorker, type: :worker do
       }
     end
 
+    before(:example) do
+      allow(queue).to receive(:pop).and_return(raw_message, {})
+      allow(Facebook::Messenger::Incoming::Postback).to receive(:initialize).and_return(message)
+      allow(bot_class.router).to receive(:handle).with(request)
+    end
+
+    include_examples 'constructing a request object'
 
     context 'when the message is a quick reply' do
       it 'builds a payload request' do
@@ -248,8 +255,6 @@ RSpec.describe Hg::MessageWorker, type: :worker do
 
         subject.perform(*valid_args)
       end
-
-      include_examples 'constructing a request object'
     end
 
     context "when the message isn't understood by the API.ai agent", priority: :high do

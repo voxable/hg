@@ -21,29 +21,28 @@ RSpec.shared_examples 'constructing a request object' do
       subject.perform(*valid_args)
     end
 
-    before(:each) do
-      request = subject.send(:build_payload_request, payload_hash, user)
-    end
-
     it 'contains the matched intent' do
-      expect(request.action).to eq payload_hash['action']
+      allow(bot_class.router).to receive(:handle) do |request|
+        expect(request.intent).to eq payload_hash['intent']
+      end
+
       subject.perform(*valid_args)
     end
 
     it 'contains the matched action' do
-      expect(request.intent).to eq payload_hash['intent']
+      allow(bot_class.router).to receive(:handle) do |request|
+        expect(request.action).to eq payload_hash['action']
+      end
+
       subject.perform(*valid_args)
     end
 
     it 'contains the matched parameters' do
-      expect(request.params).to eq payload_hash['params']
+      allow(bot_class.router).to receive(:handle) do |request|
+        expect(request.params).to eq payload_hash['params']
+      end
+
       subject.perform(*valid_args)
     end
-  end
-
-  it 'sends the request to the router' do
-    expect(bot_class.router).to receive(:handle)
-
-    subject.perform(*valid_args)
   end
 end
