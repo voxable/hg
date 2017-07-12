@@ -164,8 +164,70 @@ RSpec.describe Hg::MessageWorker, type: :worker do
     end
 
     context 'when the message has an attachment' do
+      let(:attachments) {
+        {
+          'type' => 'location',
+          'payload' => {
+            'coordinates' => {
+              'lat' => 'somelatitude',
+              'long' => 'somelongitude'
+            }
+          }
+        }
+      }
+      let(:raw_message_w_attach) {
+        {
+          'sender' => {
+            'id' => user_id
+          },
+          'message' => {
+            'text' => text,
+            'attachments' => [attachments]
+          }
+        }
+      }
+      let(:message_w_attach) {
+        instance_double(
+          'Facebook::Messenger::Incoming::Message',
+          sender: { 'id' => user_id },
+          text: text,
+          attachments: attachments
+        )
+      }
+      let(:attach_request) {
+        instance_double(
+          'Hg::Request',
+          user: user,
+          message:    message_w_attach,
+          intent:     Hg::InternalActions::HANDLE_COORDINATES,
+          action:     Hg::InternalActions::HANDLE_COORDINATES,
+          parameters: {
+            lat: 'somelatitude',
+            long: 'somelongitude'
+          }
+        )
+      }
+
+      before(:example) do
+        allow(queue).to receive(:pop).and_return(raw_message_w_attach, {})
+        allow(Facebook::Messenger::Incoming::Message).to receive(:initialize).with(raw_message_w_attach).and_return(message_w_attach)
+      end
+
+      it 'finds the attachment' do
+        #subject.perform(*valid_args)
+
+        expect(message_w_attach.attachments).to_not be_nil
+      end
+
       context 'the attachment is a location' do
-        it 'adds the coordinates to the request'
+        it 'adds the coordinates to the request' do
+          allow(user_class).to receive(:find_or_create_by).and_return(user)
+          allow(Hg::Request).to receive(:initialize) { attach_request }
+
+          expect(router_class).to receive(:handle)
+
+          subject.perform(*valid_args)
+        end
       end
     end
 
