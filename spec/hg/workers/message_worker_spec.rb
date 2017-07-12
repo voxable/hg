@@ -267,7 +267,7 @@ RSpec.describe Hg::MessageWorker, type: :worker do
 
   context "when no messages are present on the user's unprocessed message queue" do
     before(:example) do
-      allow(queue).to receive(:pop).and_return(Hashie::Mash.new({}))
+      allow(queue).to receive(:pop).and_return({})
     end
 
     it 'does nothing' do
