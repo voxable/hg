@@ -115,22 +115,56 @@ RSpec.describe Hg::MessageWorker, type: :worker do
           }
         )
       }
+      let(:dialog_request) {
+        instance_double(
+          'Hg::Request',
+          intent:     'somehandler',
+          action:     'somehandler',
+          parameters: 'someparams',
+          route: {
+            controller: controller,
+            handler:    'somehandler'
+          }
 
-      it 'builds a dialog request' do
+        )
+      }
+
+      before(:example) do
         allow(user_class).to receive(:find_or_create_by).and_return(user_in_dialog)
-        allow(queue).to receive(:pop).and_return(raw_message, {})
-        allow(Facebook::Messenger::Incoming::Message).to receive(:initialize).and_return(message)
         allow(Kernel).to receive(:const_get).and_return(bot_class, controller)
+      end
 
-        #TODO: Why does build_dialog_request receive a Message object instead of the :message double?
-        expect(subject).to receive(:build_dialog_request).and_return(request)
+      before(:each) do
+        allow(subject).to receive(:build_dialog_request).and_return(dialog_request)
+        @result = subject.send(:build_dialog_request, user_in_dialog, message)
+      end
+
+      it 'adds the dialog handler to the request' do
+        expect(@result.intent).to eq user_in_dialog.context[:dialog_handler]
+
+        subject.perform(*valid_args)
+      end
+
+      it 'adds the parameters to the request' do
+        expect(@result.parameters).to eq user_in_dialog.context[:dialog_parameters]
+
+        subject.perform(*valid_args)
+      end
+
+      it 'adds the dialog controller to the request' do
+        expect(@result.route[:controller]).to eq user_in_dialog.context[:dialog_controller]
+
+        subject.perform(*valid_args)
+      end
+      it 'creates the request' do
+        expect(subject).to receive(:build_dialog_request).with(user_in_dialog, an_instance_of(Facebook::Messenger::Incoming::Message)).and_return(dialog_request)
 
         subject.perform(*valid_args)
       end
     end
 
     context 'when the message has an attachment' do
-      context 'the attachment is a loaction' do
+      context 'the attachment is a location' do
         it 'adds the coordinates to the request'
       end
     end
