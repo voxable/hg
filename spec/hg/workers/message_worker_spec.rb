@@ -113,18 +113,15 @@ RSpec.describe Hg::MessageWorker, type: :worker do
           }
         )
       }
-      let(:dialog_request) {
-        instance_double(
-          'Hg::Request',
-          intent:     'somehandler',
-          action:     'somehandler',
-          parameters: 'someparams',
-          route: {
-            controller: controller,
-            handler:    'somehandler'
-          }
-
-        )
+      let(:dialog_request) { instance_double(
+        'Hg::Request',
+        intent:     'somehandler',
+        action:     'somehandler',
+        parameters: 'someparams',
+        route: {
+          controller: controller,
+          handler:    'somehandler'
+        })
       }
 
       before(:example) do
@@ -196,18 +193,16 @@ RSpec.describe Hg::MessageWorker, type: :worker do
           attachments: attachments
         )
       }
-      let(:attach_request) {
-        instance_double(
-          'Hg::Request',
-          user: user,
-          message:    message_w_attach,
-          intent:     Hg::InternalActions::HANDLE_COORDINATES,
-          action:     Hg::InternalActions::HANDLE_COORDINATES,
-          parameters: {
-            lat: 'somelatitude',
-            long: 'somelongitude'
-          }
-        )
+      let(:attach_request) { instance_double(
+        'Hg::Request',
+        user: user,
+        message:    message_w_attach,
+        intent:     Hg::InternalActions::HANDLE_COORDINATES,
+        action:     Hg::InternalActions::HANDLE_COORDINATES,
+        parameters: {
+          lat: 'somelatitude',
+          long: 'somelongitude'
+        })
       }
 
       before(:example) do
