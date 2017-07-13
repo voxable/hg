@@ -258,23 +258,21 @@ RSpec.describe Hg::MessageWorker, type: :worker do
     end
 
     context "when the message isn't understood by the API.ai agent", priority: :high do
-      let(:UNKNOWN_SYSTEM_ACTION) { 'input.unknown' }
       let(:nlu_response) {
         {
           intent: 'someintent',
-          action: :UNKNOWN_SYSTEM_ACTION
+          action: 'input.unknown'
         }
       }
       let(:params) { {foo: 'bar'} }
 
       it 'delivers default chunk to user' do
         allow(subject).to receive(:parse_message).and_return(nlu_response, params)
-
-        subject.perform(*valid_args)
-
         allow(bot_class.router).to receive(:handle) do |request|
           expect(request.action).to eq Hg::InternalActions::DEFAULT
         end
+
+        subject.perform(*valid_args)
       end
     end
   end
