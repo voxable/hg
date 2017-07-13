@@ -258,14 +258,23 @@ RSpec.describe Hg::MessageWorker, type: :worker do
     end
 
     context "when the message isn't understood by the API.ai agent", priority: :high do
-      context 'when the bot has a chunk with a fuzzily-matching keyword' do
-        it 'delivers that chunk to the user' do
+      let(:UNKNOWN_SYSTEM_ACTION) { 'input.unknown' }
+      let(:nlu_response) {
+        {
+          intent: 'someintent',
+          action: :UNKNOWN_SYSTEM_ACTION
+        }
+      }
+      let(:params) { {foo: 'bar'} }
 
+      it 'delivers default chunk to user' do
+        allow(subject).to receive(:parse_message).and_return(nlu_response, params)
+
+        subject.perform(*valid_args)
+
+        allow(bot_class.router).to receive(:handle) do |request|
+          expect(request.action).to eq Hg::InternalActions::DEFAULT
         end
-      end
-
-      context 'when the bot does not have a chunk with a fuzzily-matching keyword' do
-        it 'delivers the default chunk to the user'
       end
     end
   end
