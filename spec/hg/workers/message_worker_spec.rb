@@ -261,7 +261,7 @@ RSpec.describe Hg::MessageWorker, type: :worker do
       let(:nlu_response) {
         {
           intent: 'someintent',
-          action: 'input.unknown'
+          action: 'default'
         }
       }
       let(:params) { {foo: 'bar'} }
