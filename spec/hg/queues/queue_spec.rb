@@ -33,15 +33,12 @@ describe Hg::Queues::Queue do
     end
 
     context 'when there is no message on the queue' do
-      let(:empty_queue_key) { 'empty_queue_key' }
-      let(:empty_queue) { Hg::Queues::Queue.new(empty_queue_key) }
-
       it 'returns an empty hash' do
         allow(conn).to receive(:lpop).and_return(nil)
 
-        result = empty_queue.pop
+        result = queue.pop
 
-        expect(result).to be_empty
+        expect(result).to eq({})
       end
     end
   end
