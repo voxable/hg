@@ -143,6 +143,22 @@ describe Hg::Controller do
     end
   end
 
+  describe '#performed' do
+    it 'returns @performed' do
+      result = @controller_instance.performed?
+
+      expect(result).to eq @controller_instance.instance_variable_get(:@performed)
+    end
+  end
+
+  describe '#halt' do
+    it 'sets @performed to true' do
+      @controller_instance.halt
+
+      expect(@controller_instance.instance_variable_get(:@performed)).to eq true
+    end
+  end
+
   context 'filtering' do
     it 'works with filters'
   end
