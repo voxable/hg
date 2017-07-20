@@ -1,7 +1,10 @@
 require 'rails_helper'
 
 describe Hg::Controller do
-  class OrdersController < Hg::Controller; end
+  class OrdersController < Hg::Controller
+    def place
+    end
+  end
 
   class BotUser; end
 
