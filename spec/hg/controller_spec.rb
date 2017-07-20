@@ -166,4 +166,48 @@ describe Hg::Controller do
   describe '#merged_context' do
     it 'generates a merged context'
   end
+
+  describe '#show_typing' do
+    it 'sends typing_on to Facebook'
+  end
+
+  describe '#flash' do
+    it 'sends message for delivery'
+
+    it 'shows typing'
+  end
+
+  describe '#prompt' do
+    it 'creates new messenger prompt with options'
+  end
+
+  describe '#answer' do
+    it 'creates new messenger answer'
+  end
+
+  describe '#redirect_to' do
+    it 'sends request to router with provided params'
+
+    context 'when no intent is provided' do
+      it 'substiutes action for intent'
+    end
+  end
+
+  describe '#logger' do
+    it 'exposes Sidekiq logger' do
+      expect(Sidekiq::Logging).to receive(:logger)
+
+      @controller_instance.logger
+    end
+  end
+
+  describe '#t' do
+    let(:message_text) { 'sometext' }
+
+    it 'uses I18n' do
+      expect(I18n).to receive(:t)
+
+      @controller_instance.t(message_text)
+    end
+  end
 end
