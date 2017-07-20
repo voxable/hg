@@ -223,7 +223,7 @@ RSpec.describe Hg::MessageWorker, type: :worker do
           allow(Hg::Request).to receive(:initialize) { attach_request }
 
           allow(bot_class.router).to receive(:handle) do |request|
-            expect(request.intent).to eq Hg::InternalActions::HANDLE_COORDINATES
+            expect(request.action).to eq Hg::InternalActions::HANDLE_COORDINATES
           end
 
           subject.perform(*valid_args)
