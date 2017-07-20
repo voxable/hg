@@ -41,7 +41,6 @@ module Hg
     # @option handler_name [String] The name of the handler to be executed.
     def initialize(request: {}, router: nil, handler_name: nil)
       @request = request
-      # TODO: Test that params or parameters works, here.
       @params = ActiveSupport::HashWithIndifferentAccess.new(request.parameters || request.params)
       @user = request.user
       @performed = false
