@@ -5,9 +5,7 @@ require 'types'
 class QuickReply < Dry::Struct
 
   attribute :content_type, Types::ContentType
-  attribute :quick_replies, Types::Strict::Array
-                        .member(
-                          QuickReply::TextQuickReply || QuickReply::LocationQuickReply
-                        )
-                        .constrained(size: 1..11)
+  attribute :quick_replies, Types::Strict::Array.member(
+      QuickReply::TextQuickReply || QuickReply::LocationQuickReply
+    ).constrained(size: 1..11)
 end
