@@ -2,8 +2,19 @@ require 'rails_helper'
 
 describe Hg::Controller do
   class OrdersController < Hg::Controller
-    def place
+    before_handler :filter, only: :filtered
+
+    def place; end
+
+    def filtered
+      puts 'Not Filtered'
     end
+
+    private
+
+      def filter
+        puts 'Filtered' and halt
+      end
   end
 
   class BotUser; end
@@ -160,11 +171,21 @@ describe Hg::Controller do
   end
 
   context 'filtering' do
+    # TODO: Test controller not receiving before_handler??
     it 'works with filters'
+      # expect(@controller_instance).to receive(:filter)
+      #
+      # @controller_instance.filtered
   end
 
   describe '#merged_context' do
-    it 'generates a merged context'
+    it 'generates a merged context' do
+      # allow(@controller_instance.instance_variable_get(:@user)).to receive(:context_hash).and_return nil
+      #
+      # result = @controller_instance.merged_context
+      #
+      # puts result
+    end
   end
 
   describe '#show_typing' do
