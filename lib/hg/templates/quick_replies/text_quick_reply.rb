@@ -1,5 +1,3 @@
-require 'types'
-
 # facebook messenger text quick reply template
 # see https://developers.facebook.com/docs/messenger-platform/send-api-reference/quick-replies
 class TextQuickReply < QuickReply
