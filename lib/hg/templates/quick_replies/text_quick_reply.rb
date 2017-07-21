@@ -4,7 +4,7 @@ require 'types'
 # see https://developers.facebook.com/docs/messenger-platform/send-api-reference/quick-replies
 class TextQuickReply < QuickReply
 
-  attribute :content_type, Types::ContentType('text')
+  attribute :content_type, Types::Strict::String('text')
   # Max FBM title length of 20
   attribute :title, Types::Strict::String.constrained(max_size:20)
   # Max FBM payload length of 1000
