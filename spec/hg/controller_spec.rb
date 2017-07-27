@@ -19,11 +19,13 @@ describe Hg::Controller do
 
   class BotUser; end
 
+  let(:recipient_id) { '1234' }
+  let(:user) { double('BotUser', facebook_psid: recipient_id) }
   let(:request) {
     instance_double(
       'Hg::Request',
       parameters: { 'toppings' => ['cheese', 'pepperoni'] },
-      user: BotUser.new
+      user: user
     )
   }
 
@@ -84,9 +86,6 @@ describe Hg::Controller do
     # to create an expectation on deliver (Missing required keyword arguments: access_token)
     # TODO: file a bug on rspeck-mocks about the above
     let(:messenger_api_client) { double('Facebook::Messenger::Bot') }
-
-    let(:recipient_id) { '1234' }
-    let(:user) { double('User', facebook_psid: recipient_id) }
 
     before(:example) do
       @old_messenger_bot_class = Facebook::Messenger::Bot
@@ -179,12 +178,24 @@ describe Hg::Controller do
   end
 
   describe '#merged_context' do
+    let(:recipient_id) { '1234' }
+    let(:user) { double(
+      'User',
+      facebook_psid: recipient_id
+    )}
+    let(:params) {
+      { 'foo' => 'bar' }
+    }
+    let(:user_context) {
+      {}
+    }
+
     it 'generates a merged context' do
-      # allow(@controller_instance.instance_variable_get(:@user)).to receive(:context_hash).and_return nil
-      #
-      # result = @controller_instance.merged_context
-      #
-      # puts result
+      allow(user).to receive(:context_hash).and_return(params)
+
+      result = @controller_instance.merged_context
+
+      expect(result).to eq params.merge(request.parameters)
     end
   end
 
