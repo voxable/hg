@@ -200,28 +200,78 @@ describe Hg::Controller do
   end
 
   describe '#show_typing' do
-    it 'sends typing_on to Facebook'
+    let(:messenger_api_client) { double('Facebook::Messenger::Bot') }
+    before(:example) do
+      @old_messenger_bot_class = Facebook::Messenger::Bot
+      Facebook::Messenger::Bot = messenger_api_client
+      allow(@controller_instance).to receive(:user).and_return(user)
+    end
+
+    after(:example) do
+      Facebook::Messenger::Bot = @old_messenger_bot_class
+    end
+
+    it 'sends typing_on to Facebook' do
+      expect(messenger_api_client).to receive(:deliver).with hash_including(sender_action: 'typing_on'), anything
+
+      @controller_instance.show_typing
+    end
   end
 
   describe '#flash' do
-    it 'sends message for delivery'
+    let(:messenger_api_client) { double('Facebook::Messenger::Bot') }
+    before(:example) do
+      @old_messenger_bot_class = Facebook::Messenger::Bot
+      Facebook::Messenger::Bot = messenger_api_client
+      allow(@controller_instance).to receive(:user).and_return(user)
+    end
 
-    it 'shows typing'
+    after(:example) do
+      Facebook::Messenger::Bot = @old_messenger_bot_class
+    end
+
+    it 'sends message for delivery' do
+      allow(messenger_api_client).to receive(:deliver).and_return true
+
+      expect(@controller_instance).to receive(:respond).with('sometext')
+
+      @controller_instance.flash('sometext')
+    end
+
+    it 'shows typing' do
+      allow(messenger_api_client).to receive(:deliver).and_return true
+
+      expect(@controller_instance).to receive(:show_typing)
+
+      @controller_instance.flash('sometext')
+    end
   end
 
   describe '#prompt' do
-    it 'creates new messenger prompt with options'
+    it 'creates new messenger prompt with options' do
+      expect(Hg::Messenger::Prompt).to receive(:new).with hash_including(somekey: 'someval')
+
+      @controller_instance.prompt({somekey: 'someval'})
+    end
   end
 
   describe '#answer' do
-    it 'creates new messenger answer'
+    let(:some_msg) {'somemsg'}
+    it 'creates new messenger answer' do
+      allow(request).to receive(:message).and_return some_msg
+      expect(Hg::Messenger::Answer).to receive(:new).with(some_msg, user: user)
+
+      @controller_instance.answer({somekey: 'someval'})
+    end
   end
 
   describe '#redirect_to' do
     it 'sends request to router with provided params'
 
+    it 'works with payload[parameters] or [params]'
+
     context 'when no intent is provided' do
-      it 'substiutes action for intent'
+      it 'substitutes action for intent'
     end
   end
 
