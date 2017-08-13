@@ -281,9 +281,7 @@ RSpec.describe Hg::Messenger::Bot do
         FAQBot.queue_postback(postback_obj)
       end
 
-      it 'queues with the correct Redis namespace' do
-        expect(FAQBot.redis_namespace).to eq 'faq_bots'
-      end
+      it 'queues with the correct Redis namespace'
 
       it 'queues with the correct bot class' do
         expect(Hg::PostbackWorker).to receive(:perform_async).with(anything, anything, FAQBot.to_s)
