@@ -265,13 +265,57 @@ describe Hg::Controller do
     end
   end
 
+  describe '#ask' do
+    let(:prompt) {double('prompt')}
+    it 'creates new messenger prompt and asks a question' do
+      allow(@controller_instance).to receive(:prompt).and_return(prompt)
+
+      expect(prompt).to receive(:ask).with('What question?', {})
+
+      @controller_instance.ask('What question?')
+    end
+  end
+
   describe '#redirect_to' do
-    it 'sends request to router with provided params'
+    let(:payload) {
+      {
+        action: 'someaction',
+        intent: 'someintent',
+        route:  'someroute',
+        parameters: 'someparams'
+      }
+    }
+    let(:params_payload) {
+      {
+        action: 'someaction',
+        intent: 'someintent',
+        route:  'someroute',
+        params: 'someparams'
+      }
+    }
+    let(:router) { class_double(Hg::Router) }
 
-    it 'works with payload[parameters] or [params]'
+    before(:example) do
+      request_stubs
+      allow(@controller_instance).to receive(:request).and_return(@request)
+      allow(router).to receive(:handle)
+    end
 
-    context 'when no intent is provided' do
-      it 'substitutes action for intent'
+    it 'sends request to router' do
+      expect(router).to receive(:handle).with(@request)
+
+      @controller_instance.redirect_to(payload)
+    end
+
+    it 'works with payload[parameters] or [params]' do
+      expect(router).to receive(:handle).with(@request)
+
+      @controller_instance.redirect_to(params_payload)
+    end
+
+    context 'when no action is provided' do
+
+      it 'substitutes intent for action'
     end
   end
 
@@ -292,4 +336,18 @@ describe Hg::Controller do
       @controller_instance.t(message_text)
     end
   end
+end
+
+def request_stubs
+  @request = double('request')
+  allow(@request).to receive(:action=)
+  allow(@request).to receive(:intent=)
+  allow(@request).to receive(:route=)
+  allow(@request).to receive(:parameters=)
+  allow(@request).to receive(:params=)
+  allow(@request).to receive(:action)
+  allow(@request).to receive(:intent)
+  allow(@request).to receive(:route)
+  allow(@request).to receive(:parameters)
+  allow(@request).to receive(:params)
 end
