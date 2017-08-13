@@ -329,4 +329,30 @@ RSpec.describe Hg::Messenger::Bot do
       end
     end
   end
+
+  describe '.persistent_menu'
+
+  describe '.enable_input'
+
+  describe '.nested_menu'
+
+  describe '.menu_item'
+
+  describe '.nested_menu_item'
+
+  describe '.subscribe_to_messages'
+
+  describe '.initialize_persistent_menu'
+
+  describe '.call_to_action'
+
+  describe '.get_started'
+
+  describe '.initialize_get_started_button'
+
+  describe '.greeting_text'
+
+  describe '.image_url_base'
+
+  describe '.initialize_greeting_text'
 end
