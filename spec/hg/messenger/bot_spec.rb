@@ -92,6 +92,40 @@ RSpec.describe Hg::Messenger::Bot do
     end
   end
 
+  describe '.init' do
+    context 'running associated initializers' do
+      before(:example) {
+        allow(FAQBot).to receive(:subscribe_to_messages)
+        allow(FAQBot).to receive(:initialize_message_handlers)
+        allow(FAQBot).to receive(:initialize_get_started_button)
+        allow(FAQBot).to receive(:initialize_persistent_menu)
+        allow(FAQBot).to receive(:initialize_greeting_text)
+
+        FAQBot.init
+      }
+
+      it 'subscribes to messages' do
+        expect(FAQBot).to have_received(:subscribe_to_messages)
+      end
+
+      it 'initializes message handlers' do
+        expect(FAQBot).to have_received(:initialize_message_handlers)
+      end
+
+      it 'initializes get started button' do
+        expect(FAQBot).to have_received(:initialize_get_started_button)
+      end
+
+      it 'initializes persisitent menu' do
+        expect(FAQBot).to have_received(:initialize_persistent_menu)
+      end
+
+      it 'initializes greeting text' do
+        expect(FAQBot).to have_received(:initialize_greeting_text)
+      end
+    end
+  end
+
   describe '.access_token' do
     it 'defaults to the ENV variable FB_ACCESS_TOKEN'
   end
