@@ -127,7 +127,11 @@ RSpec.describe Hg::Messenger::Bot do
   end
 
   describe '.access_token' do
-    it 'defaults to the ENV variable FB_ACCESS_TOKEN'
+    it 'defaults to the ENV variable FB_ACCESS_TOKEN' do
+      result = FAQBot.access_token
+
+      expect(result).to eq ENV['FB_ACCESS_TOKEN']
+    end
   end
 
   describe '.router' do
