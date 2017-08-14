@@ -330,9 +330,36 @@ RSpec.describe Hg::Messenger::Bot do
 
   describe '.persistent_menu'
 
-  describe '.enable_input'
+  describe '.enable_input' do
+    it 'sets input_disabled to false' do
+      FAQBot.enable_input
 
-  describe '.nested_menu'
+      expect(FAQBot.instance_variable_get(:@input_disabled)).to eq false
+    end
+  end
+
+  describe '.nested_menu' do
+    let(:title) { 'sometitle' }
+    let(:menu_block) {
+      {
+        foo: 'bar'
+      }
+    }
+    let(:call_to_actions) {
+      {
+        title: title,
+        type: 'nested',
+        call_to_actions: [menu_block]
+      }
+    }
+    it 'adds title and block to call_to_actions' do
+      FAQBot.nested_menu(title) do
+        menu_block
+      end
+
+      expect(FAQBot.instance_variable_get(:@call_to_actions)).to eq [call_to_actions]
+    end
+  end
 
   describe '.menu_item'
 
