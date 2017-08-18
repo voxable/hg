@@ -2,19 +2,9 @@ require 'rails_helper'
 
 describe Hg::Controller do
   class OrdersController < Hg::Controller
-    before_handler :filter, only: :filtered
 
     def place; end
 
-    def filtered
-      puts 'Not Filtered'
-    end
-
-    private
-
-      def filter
-        puts 'Filtered' and halt
-      end
   end
 
   class BotUser; end
@@ -169,14 +159,6 @@ describe Hg::Controller do
     end
   end
 
-  context 'filtering' do
-    # TODO: Test controller not receiving before_handler??
-    it 'works with filters'
-      # expect(@controller_instance).to receive(:filter)
-      #
-      # @controller_instance.filtered
-  end
-
   describe '#merged_context' do
     let(:recipient_id) { '1234' }
     let(:user) { double(
@@ -186,9 +168,7 @@ describe Hg::Controller do
     let(:params) {
       { 'foo' => 'bar' }
     }
-    let(:user_context) {
-      {}
-    }
+    let(:user_context) { {} }
 
     it 'generates a merged context' do
       allow(user).to receive(:context_hash).and_return(params)
