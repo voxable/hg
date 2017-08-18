@@ -64,6 +64,14 @@ RSpec.describe Hg::Messenger::Bot do
 
         send_postback(postback)
       end
+
+      it 'rescues StandardError' do
+        allow(FAQBot).to receive(:queue_postback).and_raise StandardError
+
+        expect(Rails.logger).to receive(:error).twice
+
+        send_postback(postback)
+      end
     end
 
     context 'when messages received' do
@@ -86,6 +94,14 @@ RSpec.describe Hg::Messenger::Bot do
 
       it 'queues the message for processing' do
         expect(FAQBot).to receive(:queue_message).with(message)
+
+        send_message(message)
+      end
+
+      it 'rescues StandardError' do
+        allow(FAQBot).to receive(:queue_message).and_raise StandardError
+
+        expect(Rails.logger).to receive(:error).twice
 
         send_message(message)
       end
