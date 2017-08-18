@@ -344,7 +344,11 @@ RSpec.describe Hg::Messenger::Bot do
     end
   end
 
-  describe '.persistent_menu'
+  describe '.persistent_menu' do
+    it 'yields' do
+      expect { |b| FAQBot.persistent_menu(&b) }.to yield_with_no_args
+    end
+  end
 
   describe '.enable_input' do
     it 'sets input_disabled to false' do
