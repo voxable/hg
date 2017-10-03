@@ -155,12 +155,24 @@ module Hg
         #
         # @return [void]
         def get_started(payload)
-          # TODO: Support to: option
-          @get_started_content = {
-            get_started: {
-              payload: JSON.generate(payload)
+          if payload[:to]
+            @get_started_content = {
+              get_started: {
+                payload: {
+                  action: Hg::InternalActions::DISPLAY_CHUNK,
+                  parameters: {
+                    chunk: payload[:to].to_s
+                  }
+                }
+              }
             }
-          }
+          else
+            @get_started_content = {
+              get_started: {
+                payload: JSON.generate(payload)
+              }
+            }
+          end
         end
 
         # Initialize the Get Started button payload setting.
