@@ -108,12 +108,6 @@ module Hg
         }, access_token: ENV['FB_ACCESS_TOKEN'])
       end
 
-      def keywords(*chunk_keywords)
-        #chunk_keywords.each do |keyword|
-        #  bot_class.routes[keyword] = self
-        #end
-      end
-
       def text(message)
         @deliverables <<
           {

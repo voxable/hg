@@ -1,7 +1,7 @@
 # Represents an inbound request to a bot. Contains all relevant request information:
 #
 # * `user` - The user making the request.
-# * `message` - The original message object from the bot's platform, converted to a `Hashie::Mash`.
+# * `message` - The original message object from the bot's platform.
 # * `action` - The name of the action requested.
 # * `intent` - The name of the intent requested.
 # * `parameters` - Any parsed parameters (entities) for this request.

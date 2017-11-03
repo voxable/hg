@@ -35,8 +35,8 @@ module Hg
         def init
           subscribe_to_messages
           initialize_message_handlers
-          initialize_persistent_menu
           initialize_get_started_button
+          initialize_persistent_menu
           initialize_greeting_text
         end
 
@@ -147,20 +147,35 @@ module Hg
           call_to_action_content
         end
 
+        # Set the postback payload for the Get Started button.
+        #
+        # @param payload [Hash] The postback payload.
+        #
+        # @see https://developers.facebook.com/docs/messenger-platform/messenger-profile/get-started-button
+        #
+        # @return [void]
         def get_started(payload)
-          # TODO: Support to: option
-          @get_started_content = {
-            setting_type: 'call_to_actions',
-            thread_state: 'new_thread',
-            call_to_actions: [
-              {
-                # TODO: High - generation of the display chunk options should be a method
+          if payload[:to]
+            @get_started_content = {
+              get_started: {
+                payload: {
+                  action: Hg::InternalActions::DISPLAY_CHUNK,
+                  parameters: {
+                    chunk: payload[:to].to_s
+                  }
+                }
+              }
+            }
+          else
+            @get_started_content = {
+              get_started: {
                 payload: JSON.generate(payload)
               }
-            ]
-          }
+            }
+          end
         end
 
+        # Initialize the Get Started button payload setting.
         def initialize_get_started_button
           Facebook::Messenger::Profile.set @get_started_content, access_token: access_token
         end

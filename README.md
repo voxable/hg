@@ -1,4 +1,27 @@
+
 # Hg
+
+<p align=center>
+  <a title="Gem Version" href="https://rubygems.org/gems/hg">
+    <img src="https://img.shields.io/gem/v/hg.svg" />
+  </a>
+  <a title="Linux Build Status" href="https://travis-ci.org/voxable-labs/expando">
+    <img src="https://img.shields.io/travis/voxable-labs/expando/master.svg?label=Linux%20build" />
+  </a>
+   <a title="Code Climate" href="https://codeclimate.com/github/voxable-labs/hg">
+    <img src="https://img.shields.io/codeclimate/github/voxable-labs/hg.svg" />
+  </a>
+  <a title="Test Coverage" href="https://codeclimate.com/github/voxable-labs/hg/coverage">
+    <img src="https://img.shields.io/codeclimate/coverage/github/voxable-labs/hg.svg" />
+  </a>
+  <a title="Dependency Status" href="https://gemnasium.com/voxable-labs/hg">
+    <img src="https://img.shields.io/gemnasium/voxable-labs/hg.svg" />
+  </a>
+  <a title="Security" href="https://hakiri.io/github/voxable-labs/hg/master">
+    <img src="https://hakiri.io/github/voxable-labs/hg/master.svg" />
+  </a>
+</p>
+
 **NB: This gem is still under heavy development, and is likely going to change wildly between releases. You probably shouldn't use it quite yet. [Follow Voxable](https://www.voxable.io/blog) and we'll let you know when it's ready!**
 
 Hg is a conversational interface framework for Ruby on Rails. It dramatically simplifies the process of building voice interfaces and chatbots for a variety of messaging platforms.

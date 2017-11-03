@@ -1,7 +1,11 @@
 RSpec.shared_examples 'a message processing worker' do
-  it "pops the latest unprocessed message from the user's queue" do
-    # TODO: two expectations in one it block is poor form
+  it 'finds the proper queue' do
     expect(queue_class).to receive(:new).with(hash_including(user_id: user_id)).and_return(queue)
+
+    subject.perform(*valid_args)
+  end
+
+  it "pops the latest unprocessed message from the user's queue" do
     expect(queue).to receive(:pop)
 
     subject.perform(*valid_args)
@@ -17,12 +21,28 @@ RSpec.shared_examples 'constructing a request object' do
       subject.perform(*valid_args)
     end
 
-    it 'contains the matched intent'
+    it 'contains the matched intent' do
+      allow(bot_class.router).to receive(:handle) do |request|
+        expect(request.intent).to eq payload_hash['intent']
+      end
 
-    it 'contains the matched action'
+      subject.perform(*valid_args)
+    end
 
-    it 'contains the matched parameters'
+    it 'contains the matched action' do
+      allow(bot_class.router).to receive(:handle) do |request|
+        expect(request.action).to eq payload_hash['action']
+      end
+
+      subject.perform(*valid_args)
+    end
+
+    it 'contains the matched parameters' do
+      allow(bot_class.router).to receive(:handle) do |request|
+        expect(request.params).to eq payload_hash['params']
+      end
+
+      subject.perform(*valid_args)
+    end
   end
-
-  it 'sends the request to the router'
 end

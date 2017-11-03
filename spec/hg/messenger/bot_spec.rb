@@ -1,4 +1,4 @@
-require 'support/rails_helper'
+require 'rails_helper'
 
 RSpec.describe Hg::Messenger::Bot do
   class FAQBot
@@ -64,6 +64,14 @@ RSpec.describe Hg::Messenger::Bot do
 
         send_postback(postback)
       end
+
+      it 'rescues StandardError' do
+        allow(FAQBot).to receive(:queue_postback).and_raise StandardError
+
+        expect(Rails.logger).to receive(:error).twice
+
+        send_postback(postback)
+      end
     end
 
     context 'when messages received' do
@@ -89,11 +97,57 @@ RSpec.describe Hg::Messenger::Bot do
 
         send_message(message)
       end
+
+      it 'rescues StandardError' do
+        allow(FAQBot).to receive(:queue_message).and_raise StandardError
+
+        expect(Rails.logger).to receive(:error).twice
+
+        send_message(message)
+      end
+    end
+  end
+
+  describe '.init' do
+    context 'running associated initializers' do
+      before(:example) {
+        allow(FAQBot).to receive(:subscribe_to_messages)
+        allow(FAQBot).to receive(:initialize_message_handlers)
+        allow(FAQBot).to receive(:initialize_get_started_button)
+        allow(FAQBot).to receive(:initialize_persistent_menu)
+        allow(FAQBot).to receive(:initialize_greeting_text)
+
+        FAQBot.init
+      }
+
+      it 'subscribes to messages' do
+        expect(FAQBot).to have_received(:subscribe_to_messages)
+      end
+
+      it 'initializes message handlers' do
+        expect(FAQBot).to have_received(:initialize_message_handlers)
+      end
+
+      it 'initializes get started button' do
+        expect(FAQBot).to have_received(:initialize_get_started_button)
+      end
+
+      it 'initializes persisitent menu' do
+        expect(FAQBot).to have_received(:initialize_persistent_menu)
+      end
+
+      it 'initializes greeting text' do
+        expect(FAQBot).to have_received(:initialize_greeting_text)
+      end
     end
   end
 
   describe '.access_token' do
-    it 'defaults to the ENV variable FB_ACCESS_TOKEN'
+    it 'defaults to the ENV variable FB_ACCESS_TOKEN' do
+      result = FAQBot.access_token
+
+      expect(result).to eq ENV['FB_ACCESS_TOKEN']
+    end
   end
 
   describe '.router' do
@@ -287,6 +341,223 @@ RSpec.describe Hg::Messenger::Bot do
 
         FAQBot.queue_message(message)
       end
+    end
+  end
+
+  describe '.persistent_menu' do
+    it 'yields' do
+      expect { |b| FAQBot.persistent_menu(&b) }.to yield_with_no_args
+    end
+  end
+
+  describe '.enable_input' do
+    it 'sets input_disabled to false' do
+      FAQBot.enable_input
+
+      expect(FAQBot.instance_variable_get(:@input_disabled)).to eq false
+    end
+  end
+
+  describe '.nested_menu' do
+    let(:title) { 'sometitle' }
+    let(:menu_block) {
+      {
+        foo: 'bar'
+      }
+    }
+    let(:call_to_actions) {
+      {
+        title: title,
+        type: 'nested',
+        call_to_actions: [menu_block]
+      }
+    }
+    it 'adds title and block to call_to_actions' do
+      FAQBot.nested_menu(title) do
+        menu_block
+      end
+
+      expect(FAQBot.instance_variable_get(:@call_to_actions)).to eq [call_to_actions]
+    end
+  end
+
+  describe '.call_to_action' do
+    let(:text) { 'sometext' }
+
+    context 'when no options are specified' do
+      it 'adds only the text to content' do
+        @result = FAQBot.call_to_action(text)
+
+        expect(@result).to eq({ title: text })
+      end
+    end
+
+    context 'when options[:to] is specified' do
+      let(:options) {
+        {
+          to: 'SomeChunkClass'
+        }
+      }
+
+      before(:example) do
+        @result = FAQBot.call_to_action(text, options)
+      end
+
+      it "sets :type to 'postback'" do
+        expect(@result[:type]).to eq 'postback'
+      end
+
+      it 'generates JSON payload with options[:to]' do
+        expect(JSON.parse(@result[:payload])).to include('action', 'parameters' => {'chunk' => options[:to]})
+      end
+    end
+
+    context 'when options[:url] is specified' do
+      let(:options) {
+        {
+          url: 'SomeValidURL'
+        }
+      }
+
+      before(:example) do
+        @result = FAQBot.call_to_action(text, options)
+      end
+
+      it "sets :type to 'web_url'" do
+        expect(@result[:type]).to eq 'web_url'
+      end
+
+      it 'sets :url to url' do
+        expect(@result[:url]).to eq options[:url]
+      end
+    end
+
+    context 'when options[:payload] is specified' do
+      let(:options) {
+        {
+          payload: 'SomeChunKlass'
+        }
+      }
+
+      before(:example) do
+        @result = FAQBot.call_to_action(text, options)
+      end
+
+      it "sets :type to 'postback'" do
+        expect(@result[:type]).to eq 'postback'
+      end
+
+      it 'generates JSON payload with options[:to]' do
+        expect(JSON.parse(@result[:payload])).to eq options[:payload]
+      end
+    end
+  end
+
+  describe '.menu_item' do
+    let(:text) { "It's a Wonderful Title" }
+    let(:menu_item) { JSON.generate( title: text )}
+
+    before(:example) do
+      allow(FAQBot).to receive(:call_to_action).and_return(menu_item)
+      FAQBot.menu_item(text)
+    end
+
+    it 'creates call_to_action content' do
+      expect(FAQBot).to have_received(:call_to_action)
+    end
+
+    it 'adds call_to_action content to @call_to_actions' do
+      expect(FAQBot.instance_variable_get(:@call_to_actions)).to include menu_item
+    end
+  end
+
+  describe '.nested_menu_item' do
+    let(:text) { 'SMS' }
+    let(:options) {
+      { foo: 'bar' }
+    }
+
+    it 'is an alias for .call_to_action' do
+      expect(FAQBot).to receive(:call_to_action).with(text, options)
+
+      FAQBot.nested_menu_item(text, options)
+    end
+  end
+
+  describe '.subscribe_to_messages' do
+    it 'subscribes to webhook notifications' do
+      expect(Facebook::Messenger::Subscriptions).to receive(:subscribe).and_return(true)
+
+      FAQBot.subscribe_to_messages
+    end
+  end
+
+  describe '.initialize_persistent_menu' do
+    it 'sets persistent menu with @input_disabled and @call_to_actions' do
+      expect(Facebook::Messenger::Profile).to receive(:set).and_return true
+
+      FAQBot.initialize_persistent_menu
+    end
+  end
+
+  describe '.get_started' do
+    let(:to_payload) {
+      {
+        to: 'thisChunk'
+      }
+    }
+    let(:payload) {
+      { foo: 'bar' }
+    }
+
+    it 'sets @get_started_content' do
+      FAQBot.get_started(payload)
+
+      expect(FAQBot.instance_variable_get(:@get_started_content)).to_not be_nil
+    end
+
+    context 'when :to is specified' do
+      it 'set display_chunk action with payload' do
+        FAQBot.get_started(to_payload)
+
+        expect(FAQBot.instance_variable_get(:@get_started_content)).to include(:get_started => { :payload => {:action => Hg::InternalActions::DISPLAY_CHUNK, :parameters => { :chunk => to_payload[:to]}}})
+      end
+    end
+  end
+
+  describe '.initialize_get_started_button' do
+    it 'calls FB::MSGR::Profile#set with @get_started_content' do
+      allow(Facebook::Messenger::Profile).to receive(:set)
+
+      FAQBot.initialize_get_started_button
+
+      expect(Facebook::Messenger::Profile).to have_received(:set).with(FAQBot.instance_variable_get(:@get_started_content), access_token: FAQBot.access_token)
+    end
+  end
+
+  describe '.initialize_greeting_text' do
+    it 'sets FB Profile greeting text' do
+      expect(Facebook::Messenger::Profile).to receive(:set).and_return true
+
+      FAQBot.initialize_greeting_text
+    end
+  end
+
+  describe '.greeting_text' do
+    let(:text) { double('text') }
+    it 'sets @greeting_text with arg' do
+      FAQBot.greeting_text(text)
+
+      expect(FAQBot.instance_variable_get(:@greeting_text)).to eq text
+    end
+  end
+
+  describe '.image_url_base' do
+    let(:base) { double('base') }
+    it 'sets @image_url_base_portion with arg' do
+      FAQBot.image_url_base(base)
+
+      expect(FAQBot.instance_variable_get(:@image_url_base_portion)).to eq base
     end
   end
 end

@@ -24,7 +24,7 @@ module Hg
 
       # Pop the oldest message off of the queue.
       #
-      # @return [Hashie::Mash] The oldest message on the queue.
+      # @return [Hash] The oldest message on the queue.
       def pop
         message = Hg::Redis.execute do |conn|
           if message_json = conn.lpop(@key)
