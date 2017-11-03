@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Hg::UserModelGenerator < Rails::Generators::Base
   desc 'Generate a user model and migration'
 

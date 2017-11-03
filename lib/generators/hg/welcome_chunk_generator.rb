@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class WelcomeChunkGenerator < Rails::Generators::NamedBase
   def create_controller_file
     create_file "app/bot/#{class_name}_bot/chunks/welcome.rb",

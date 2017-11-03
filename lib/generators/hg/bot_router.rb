@@ -1,7 +1,9 @@
+# frozen_string_literal: true
+
 module BotRouter
   class Generator < Rails::Generators::NamedBase
     def self.source_root
-      File.expand_path("../templates", __FILE__)
+      File.expand_path('../templates', __FILE__)
     end
 
     def generate

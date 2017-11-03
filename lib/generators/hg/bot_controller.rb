@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module BotController
   class Generator < Rails::Generators::NamedBase
     def self.source_root
