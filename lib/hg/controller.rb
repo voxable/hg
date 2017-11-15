@@ -201,7 +201,7 @@ module Hg
     #
     # @return [void]
     def clear_dialogflow_context
-      user.update_attributes(dialogflow_context: nil)
+      user.update_attributes(dialogflow_context_name: nil)
     end
   end
 end
