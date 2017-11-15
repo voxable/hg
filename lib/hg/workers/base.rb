@@ -45,9 +45,10 @@ module Hg
       def parse_message(text, user)
         begin
           # ...send the message to API.ai for NLU.
-          nlu_response = ApiAiClient.new(user.api_ai_session_id).query(text)
+          nlu_response = ApiAiClient.new(user.api_ai_session_id)
+                           .query(text, context_name: user.dialogflow_context_name)
         rescue Hg::ApiAiClient::QueryError => e
-          # TODO: High - what should be the general method for reporting errors to the user?
+          log_error(e)
         else
           # Drop any params that weren't recognized.
           params = nlu_response[:parameters].reject {|k, v| v.blank?}
@@ -84,6 +85,17 @@ module Hg
       def build_referral_request(referral, user)
         payload = JSON.parse(URI.decode(referral.ref))
         build_payload_request(payload['payload'], user)
+      end
+
+      # Log an error.
+      #
+      # @param [Error] e
+      #   The error to log.
+      #
+      # @return [void]
+      def log_error(e)
+        logger.error e.message
+        logger.error e.backtrace.join()
       end
     end
   end
