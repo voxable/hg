@@ -25,15 +25,21 @@ module Hg
     #
     # @param message [String]
     #   The natural language query to be parsed.
+    # @param context_name [String]
+    #   The context name to set on the Dialogflow session.
     #
     # @return [Hash] The information parsed from the message.
-    def query(message)
+    def query(message, context_name: nil)
       # TODO: which logger?
       retry_counter = 0
 
       begin
         retry_counter += 1
-        api_ai_response = @client.text_request(message)
+
+        # Build a contexts object if one is passed.
+        contexts = context_name ? [context_name] : nil
+
+        api_ai_response = @client.text_request(message, contexts: contexts)
       rescue ApiAiRuby::ClientError, ApiAiRuby::RequestError => e
         Sidekiq::Logging.logger.error 'Error with API.ai query request'
         Sidekiq::Logging.logger.error e

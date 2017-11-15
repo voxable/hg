@@ -107,68 +107,6 @@ RSpec.describe Hg::MessageWorker, type: :worker do
       end
     end
 
-    context 'when the user is in the midst of a dialog' do
-      let(:controller) { class_double("SomeController").as_stubbed_const }
-      let(:user_in_dialog) {
-        double(
-          'user',
-          api_ai_session_id: user_api_ai_session_id,
-          context: {
-            dialog_handler:    'somehandler',
-            dialog_controller: controller,
-            dialog_parameters: 'someparams'
-          }
-        )
-      }
-      let(:dialog_request) { instance_double(
-        'Hg::Request',
-        intent:     'somehandler',
-        action:     'somehandler',
-        parameters: 'someparams',
-        route: {
-          controller: controller,
-          handler:    'somehandler'
-        })
-      }
-
-      before(:example) do
-        allow(user_class).to receive(:find_or_create_by).and_return(user_in_dialog)
-        allow(Kernel).to receive(:const_get).and_return(bot_class, controller)
-      end
-
-      context 'when building a dialog request' do
-        it 'adds the dialog handler to the request' do
-          allow(bot_class.router).to receive(:handle) do |request|
-            expect(request.intent).to eq user_in_dialog.context[:dialog_handler]
-          end
-
-          subject.perform(*valid_args)
-        end
-
-        it 'adds the parameters to the request' do
-          allow(bot_class.router).to receive(:handle) do |request|
-            expect(request.parameters).to eq user_in_dialog.context[:dialog_parameters]
-          end
-
-          subject.perform(*valid_args)
-        end
-
-        it 'adds the dialog controller to the request' do
-          allow(bot_class.router).to receive(:handle) do |request|
-            expect(request.route[:controller]).to eq user_in_dialog.context[:dialog_controller]
-          end
-
-          subject.perform(*valid_args)
-        end
-      end
-
-      it 'creates the request' do
-        expect(subject).to receive(:build_dialog_request).with(user_in_dialog, an_instance_of(Facebook::Messenger::Incoming::Message))
-
-        subject.perform(*valid_args)
-      end
-    end
-
     context 'when the message has an attachment' do
       let(:attachments) {
         {

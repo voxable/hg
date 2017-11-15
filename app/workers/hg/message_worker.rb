@@ -60,9 +60,6 @@ module Hg
           else
             # TODO: What should we do if attachments aren't recognized?
           end
-        # If the user is in the middle of a dialog...
-        elsif user.context[:dialog_handler]
-          request = build_dialog_request(user, message)
         # If the message is text...
         else
           # Parse the message.
@@ -98,25 +95,6 @@ module Hg
         action:     nlu_response[:action] || nlu_response[:intent],
         parameters: params,
         response:   nlu_response[:response]
-      )
-    end
-
-    # TODO: High - document and test
-    def build_dialog_request(user, message)
-      handler_name = user.context[:dialog_handler]
-      parameters   = user.context[:dialog_parameters]
-
-      # Build a request object.
-      request = Hg::Request.new(
-        user:       user,
-        message:    message,
-        intent:     handler_name,
-        action:     handler_name,
-        parameters: parameters,
-        route: {
-          controller: Kernel.const_get(user.context[:dialog_controller]),
-          handler:    handler_name
-        }
       )
     end
 

@@ -172,20 +172,8 @@ module Hg
       end
     end
     alias_method :reply, :respond
+    alias_method :ask, :respond
     alias_method :respond_with, :respond
-
-    def prompt(options = {})
-      Hg::Messenger::Prompt.new(options.merge(user: user, controller: self.class.to_s))
-    end
-
-    def answer(options = {})
-      Hg::Messenger::Answer.new(request.message, user: user)
-    end
-
-    # TODO: passing options to both of these is confusing
-    def ask(message, options = {})
-      prompt(options).ask(message, options)
-    end
 
     # TODO: High - document and test
     def redirect_to(payload = {})
@@ -205,6 +193,15 @@ module Hg
 
     def t(*args)
       I18n.t(*args)
+    end
+
+    after_handler :clear_dialogflow_context
+
+    # Clear out the Dialogflow context for the user.
+    #
+    # @return [void]
+    def clear_dialogflow_context
+      user.update_attributes(dialogflow_context: nil)
     end
   end
 end
