@@ -35,7 +35,8 @@ RSpec.describe Hg::MessageWorker, type: :worker do
         double(
           'user',
           api_ai_session_id: user_api_ai_session_id,
-          context: {}
+          context: {},
+          dialogflow_context_name: nil
         )
       }
       let(:api_ai_response) { { intent: 'someintent', action: 'someaction', parameters: { 'foo' => 'bar' } }}
@@ -183,7 +184,7 @@ RSpec.describe Hg::MessageWorker, type: :worker do
       end
 
       it 'sends the message to API.ai for parsing' do
-        expect(api_ai_client).to receive(:query).with(text)
+        expect(api_ai_client).to receive(:query).with(text, anything)
 
         subject.perform(*valid_args)
       end
