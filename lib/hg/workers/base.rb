@@ -47,6 +47,9 @@ module Hg
           # ...send the message to API.ai for NLU.
           nlu_response = ApiAiClient.new(user.api_ai_session_id)
                            .query(text, context_name: user.dialogflow_context_name)
+
+          # Clear the Dialogflow context.
+          user.update_attributes(dialogflow_context_name: nil) if user.dialogflow_context_name
         rescue Hg::ApiAiClient::QueryError => e
           log_error(e)
         else

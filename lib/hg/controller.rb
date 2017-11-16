@@ -194,14 +194,5 @@ module Hg
     def t(*args)
       I18n.t(*args)
     end
-
-    after_handler :clear_dialogflow_context
-
-    # Clear out the Dialogflow context for the user, if it is set.
-    #
-    # @return [void]
-    def clear_dialogflow_context
-      user.update_attributes(dialogflow_context_name: nil) if user.dialogflow_context_name
-    end
   end
 end
