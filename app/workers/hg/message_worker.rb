@@ -7,11 +7,12 @@ module Hg
 
     # Process an inbound message.
     #
-    # @param user_id [String, Integer] The ID representing the user on this
-    #   platform
-    # @param redis_namespace [String] The redis namespace under which the
-    #   message to process is nested.
-    # @param bot_class_name [String] The string version of the bot's class name
+    # @param user_id [String, Integer]
+    #   The ID representing the user on this platform.
+    # @param redis_namespace [String]
+    #   The redis namespace under which the message to process is nested.
+    # @param bot_class_name [String]
+    #   The string version of the bot's class name
     #
     # @return [void]
     def perform(user_id, redis_namespace, bot_class_name)
@@ -60,7 +61,11 @@ module Hg
           else
             # TODO: What should we do if attachments aren't recognized?
           end
-        # If the message is text...
+        # If the user is in the middle of a dialog...
+        elsif user.context[:dialog_action]
+          request = build_dialog_request(user, message)
+
+          # If the message is text...
         else
           # Parse the message.
           nlu_response, params = parse_message(message.text, user)
@@ -81,12 +86,17 @@ module Hg
 
     # Generate a new request for this message.
     #
-    # @param message [Facebook::Messenger::Incoming::Message] The incoming message.
-    # @param nlu_response [Hash] The API.ai query response.
-    # @param params [Hash] The parsed entities for the request.
-    # @param user [Object] The user that sent the message.
+    # @param message [Facebook::Messenger::Incoming::Message]
+    #   The incoming message.
+    # @param nlu_response [Hash]
+    #   The API.ai query response.
+    # @param params [Hash]
+    #   The parsed entities for the request.
+    # @param user [Object]
+    #   The user that sent the message.
     #
-    # @return [Hg::Request] The generated request.
+    # @return [Hg::Request]
+    #   The generated request.
     def build_request(message, nlu_response, params, user)
       Hg::Request.new(
         user:       user,
@@ -100,12 +110,13 @@ module Hg
 
     # Pop the latest raw message from this user's queue.
     #
-    # @param user_id [String, Integer] The ID representing the user on this
-    #   platform
-    # @param redis_namespace [String] The redis namespace under which the
-    #   message to process is nested.
+    # @param user_id [String, Integer]
+    #   The ID representing the user on this platform.
+    # @param redis_namespace [String]
+    #   The redis namespace under which the message to process is nested.
     #
-    # @return [Hash] The latest raw message from this user's queue.
+    # @return [Hash]
+    #   The latest raw message from this user's queue.
     def pop_raw_message(user_id, redis_namespace)
       pop_from_queue(
         Hg::Queues::Messenger::MessageQueue,
@@ -113,5 +124,36 @@ module Hg
         namespace: redis_namespace
       )
     end
+
+    # Build a request when the user is in the midst of a dialog prompt.
+    #
+    # @param [Object] user
+    #   The user for this request.
+    # @param [Hash] message
+    #   The message for this request.
+    #
+    # @return [Hg::Request]
+    #   The generated dialog request.
+    def build_dialog_request(user, message)
+      # Fetch the information from the user's context.
+      action       = user.context[:dialog_action]
+      parameters   = user.context[:dialog_parameters]
+
+      # Build a request object.
+      request = Hg::Request.new(
+        user:       user,
+        message:    message,
+        intent:     action,
+        action:     action,
+        parameters: parameters
+      )
+
+      # Clear the user's dialog context.
+      user.update_context!(dialog_action: nil)
+      user.update_context!(dialog_parameters: nil)
+
+      request
+    end
+
   end
 end

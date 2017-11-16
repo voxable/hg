@@ -108,6 +108,79 @@ RSpec.describe Hg::MessageWorker, type: :worker do
       end
     end
 
+    context 'when the user is in the midst of a dialog' do
+      let!(:controller) { double('controller') }
+      let!(:params) {
+        {
+          foo: 'bar'
+        }
+      }
+
+      let(:user_in_dialog) {
+        double(
+          'user',
+          api_ai_session_id: user_api_ai_session_id,
+          context: {
+            dialog_action:     'someaction',
+            dialog_parameters: params
+          }
+        )
+      }
+
+      before(:example) do
+        allow(user_class).to receive(:find_or_create_by).and_return(user_in_dialog)
+        allow(user_in_dialog).to receive(:update_context!)
+        allow(Kernel).to receive(:const_get).and_return(bot_class, controller)
+        allow(bot_class.router).to receive(:handle)
+      end
+
+      context 'when building a dialog request' do
+        it 'adds the dialog action to the request' do
+          $break = true
+
+          allow(bot_class.router).to receive(:handle) do |request|
+            expect(request.intent).to eq user_in_dialog.context[:dialog_action]
+          end
+
+          subject.perform(*valid_args)
+
+          $break = nil
+        end
+
+        it 'adds the parameters to the request' do
+          allow(bot_class.router).to receive(:handle) do |request|
+            expect(request.parameters).to eq user_in_dialog.context[:dialog_parameters]
+          end
+
+          subject.perform(*valid_args)
+        end
+
+        it 'sends the request to the router' do
+          expect(bot_class.router).to receive(:handle)
+
+          subject.perform(*valid_args)
+        end
+      end
+
+      it 'creates the request' do
+        expect(subject).to receive(:build_dialog_request).with(user_in_dialog, an_instance_of(Facebook::Messenger::Incoming::Message))
+
+        subject.perform(*valid_args)
+      end
+
+      it "clears the dialog action from the user's context" do
+        expect(user_in_dialog).to receive(:update_context!).with(dialog_action: nil)
+
+        subject.perform(*valid_args)
+      end
+
+      it "clears the dialog params from the user's context" do
+        expect(user_in_dialog).to receive(:update_context!).with(dialog_parameters: nil)
+
+        subject.perform(*valid_args)
+      end
+    end
+
     context 'when the message has an attachment' do
       let(:attachments) {
         {

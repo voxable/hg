@@ -133,6 +133,7 @@ module Hg
       #
       # @param request [Hash] The inbound request.
       def handle(request)
+        # Don't use the router if a route has already been specified.
         unless route = request.route
           begin
             route = routes.fetch(request.action)
