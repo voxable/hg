@@ -27,6 +27,11 @@ module Hg
         # Instantiate a message object with the raw message from the queue.
         message = Facebook::Messenger::Incoming::Message.new(raw_message)
 
+        # Send to Chatbase if env var present
+        if ENV['CHATBASE_API_KEY']
+          chatbase_api_client.send_user_message(message)
+        end
+        
         # Locate the class representing the bot.
         bot = Kernel.const_get(bot_class_name)
 
@@ -154,6 +159,5 @@ module Hg
 
       request
     end
-
   end
 end
