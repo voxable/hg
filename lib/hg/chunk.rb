@@ -33,7 +33,12 @@ module Hg
         # If another chunk...
         if deliverable.is_a? Class
           # ...deliver the chunk.
-          deliverable.new(recipient: @recipient, context: context).deliver
+          response = deliverable.new(recipient: @recipient, context: context).deliver
+
+          # Send to Chatbase if env var present
+          if ENV['CHATBASE_API_KEY']
+            chatbase_api_client.send_bot_message(postback)
+          end
 
         # If dynamic, then it needs to be evaluated at delivery time.
         elsif deliverable.is_a? Proc
@@ -45,14 +50,29 @@ module Hg
           template.class_exec(context, &deliverable)
 
           # Deliver the chunk.
-          template.new(recipient: @recipient, context: context).deliver
+          response = template.new(recipient: @recipient, context: context).deliver
 
+          # Send to Chatbase if env var present
+          if ENV['CHATBASE_API_KEY']
+            chatbase_api_client.send_bot_message(postback)
+          end
+          
         # Otherwise, it's just a raw message.
         else
           # Deliver the message
-          Facebook::Messenger::Bot.deliver(deliverable.merge(recipient: @recipient), access_token: ENV['FB_ACCESS_TOKEN'])
+          response = Facebook::Messenger::Bot.deliver(deliverable.merge(recipient: @recipient), access_token: ENV['FB_ACCESS_TOKEN'])
+
+          # Send to Chatbase if env var present
+          if ENV['CHATBASE_API_KEY']
+            chatbase_api_client.send_bot_message(deliverable[:message][:text], JSON.parse(response))
+          end
         end
       end
+    end
+
+    # Helper for Chatbase API Client
+    def chatbase_api_client
+      ChatbaseAPIClient.new
     end
 
     module Initializer
