@@ -99,16 +99,25 @@ class ChatbaseAPIClient
       }
     }
   end
+
+  # Rescue errors from HTTParty
+  #
+  # @return [void]
   def catch_errors
     begin
       @response = yield
     rescue HTTParty::Error => e
       connection_errors(e)
     end
-    error_codes(@response)
   end
 
-  # Logs connections errors during communication
+  # Logs connections errors rescued, does not raise error
+  # Errors to be captured by preferred error tracker
+  #
+  # @param [error] e
+  #   Error captured
+  #
+  # @return [void]
   def connection_errors(e)
     logger.error 'error with Chatbase API request:'
     logger.error e
@@ -117,11 +126,11 @@ class ChatbaseAPIClient
 
   # Generate the proper request options for a JSON request body.
   #
-  # @param body [Hash]
+  # @param [Hash] body
   #   The request body.
   #
   # @return [Hash]
-  #   The newly generated options.
+  #   The newly generated JSON body with headers.
   def json_body(body)
     {
       body: body.to_json,
