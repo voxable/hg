@@ -302,6 +302,11 @@ module Hg
           title: title
         }
 
+        # If image_url is specified, include the asset path
+        if options[:image_url]
+          quick_reply_content[:image_url] = ApplicationController.helpers.image_url(options[:image_url])
+        end
+
         # If a `to` option is present, assume this is a postback link to another chunk.
         if options[:to]
           quick_reply_content[:payload] = JSON.generate({
