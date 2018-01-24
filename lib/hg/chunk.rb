@@ -302,9 +302,13 @@ module Hg
           title: title
         }
 
-        # If image_url is specified, include the asset path
+        # If image_url is specified include the url or asset path
         if options[:image_url]
-          quick_reply_content[:image_url] = ApplicationController.helpers.image_url(options[:image_url])
+          if options.has_key?(:host)
+            quick_reply_content[:image_url] = ApplicationController.helpers.image_url(options[:image_url], host: options[:host])
+          else
+            quick_reply_content[:image_url] = options[:image_url]
+          end
         end
 
         # If a `to` option is present, assume this is a postback link to another chunk.
