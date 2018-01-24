@@ -27,9 +27,11 @@ module Hg
     #   The natural language query to be parsed.
     # @param context_name [String]
     #   The context name to set on the Dialogflow session.
+    # @param log_context [Hash]
+    #   Context to include in logging
     #
     # @return [Hash] The information parsed from the message.
-    def query(message, context_name: nil)
+    def query(message, context_name: nil, log_context: nil)
       # TODO: which logger?
       retry_counter = 0
 
@@ -41,9 +43,11 @@ module Hg
 
         api_ai_response = @client.text_request(message, contexts: contexts)
       rescue ApiAiRuby::ClientError, ApiAiRuby::RequestError => e
-        Sidekiq::Logging.logger.error 'Error with API.ai query request'
-        Sidekiq::Logging.logger.error e
-        Sidekiq::Logging.logger.error e.backtrace.join("\n")
+        Timber.with_context log_context do
+          Rails.logger.error 'Error with API.ai query request'
+          Rails.logger.error e
+          Rails.logger.error e.backtrace.join("\n")
+        end
 
         # Retry the call 3 times.
         retry if retry_counter < 3
@@ -53,7 +57,9 @@ module Hg
         # If the API.ai call fails...
         if api_ai_response[:status][:code] != 200
           # ...log an error.
-          Sidekiq::Logging.logger.error "Error with API.ai request: #{api_ai_response.inspect}"
+          Timber.with_context log_context do
+            Rails.logger.error "Error with API.ai request: #{api_ai_response.inspect}"
+          end
 
           # Return the default action.
           return {

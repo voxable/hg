@@ -44,14 +44,24 @@ module Hg
       #   second element is the parsed parameters.
       def parse_message(text, user)
         begin
+          # Gather user context
+          user_log_context = Timber::Contexts::User.new(
+            facebook_psid:            user.facebook_psid,
+            conversation_state:       user.conversation_state,
+            dialogflow_context_name:  user.dialogflow_context_name
+          )
           # ...send the message to API.ai for NLU.
           nlu_response = ApiAiClient.new(user.api_ai_session_id)
-                           .query(text, context_name: user.dialogflow_context_name)
+                           .query(text,
+                                  context_name: user.dialogflow_context_name,
+                                  log_context: user_log_context)
 
           # Clear the Dialogflow context.
           user.update_attributes(dialogflow_context_name: nil) if user.dialogflow_context_name
         rescue Hg::ApiAiClient::QueryError => e
-          log_error(e)
+          Timber.with_context user_log_context do
+            log_error(e)
+          end
         else
           # Drop any params that weren't recognized.
           params = nlu_response[:parameters].reject {|k, v| v.blank?}
@@ -97,8 +107,8 @@ module Hg
       #
       # @return [void]
       def log_error(e)
-        logger.error e.message
-        logger.error e.backtrace.join()
+        Rails.logger.error e.message
+        Rails.logger.error e.backtrace.join()
       end
     end
   end
