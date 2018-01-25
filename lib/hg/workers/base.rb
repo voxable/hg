@@ -101,9 +101,20 @@ module Hg
         logger.error e.backtrace.join()
       end
 
-      # Helper for Chatbase API Client
-      def chatbase_api_client
-        ChatbaseAPIClient.new
+      # Method to set chatbase client fields
+      #
+      # @param [String] intent
+      #   Determined intent of user message
+      # @param [String] text
+      #   Text of user message
+      # @param [Boolean] not_handled
+      #   Flag for user message not understood
+      #
+      # @return [void]
+      def set_chatbase_fields(intent, text, not_handled)
+        @client.intent = intent
+        @client.text = text
+        @client.not_handled = not_handled
       end
     end
   end

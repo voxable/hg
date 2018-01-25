@@ -154,14 +154,21 @@ module Hg
         message_text = args.first
 
         # TODO: Add this as a method to Bot.
-        Facebook::Messenger::Bot.deliver({
-          recipient: {
-            id: user.facebook_psid
-          },
-          message: {
-            text: message_text
-          }
-        }, access_token: ENV['FB_ACCESS_TOKEN'])
+        response = Facebook::Messenger::Bot.deliver(
+          {
+            recipient: {
+              id: user.facebook_psid
+            },
+            message: {
+              text: message_text
+            }
+          }, access_token: ENV['FB_ACCESS_TOKEN']
+        )
+
+        # Send to Chatbase
+        if ENV['CHATBASE_API_KEY']
+          ChatbaseAPIClient.new.send_bot_message(message_text, response)
+        end
       # If we're attempting to deliver a chunk...
       elsif args.first.is_a?(Class)
         # ....deliver the chunk

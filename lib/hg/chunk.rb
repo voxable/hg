@@ -33,13 +33,7 @@ module Hg
         # If another chunk...
         if deliverable.is_a? Class
           # ...deliver the chunk.
-          response = deliverable.new(recipient: @recipient, context: context).deliver
-
-          # Send to Chatbase if env var present
-          if ENV['CHATBASE_API_KEY']
-            chatbase_api_client.send_bot_message(postback)
-          end
-
+          deliverable.new(recipient: @recipient, context: context).deliver
         # If dynamic, then it needs to be evaluated at delivery time.
         elsif deliverable.is_a? Proc
           # Create a `template` anonymous subclass of the chunk class.
@@ -50,12 +44,7 @@ module Hg
           template.class_exec(context, &deliverable)
 
           # Deliver the chunk.
-          response = template.new(recipient: @recipient, context: context).deliver
-
-          # Send to Chatbase if env var present
-          if ENV['CHATBASE_API_KEY']
-            chatbase_api_client.send_bot_message(postback)
-          end
+          template.new(recipient: @recipient, context: context).deliver
           
         # Otherwise, it's just a raw message.
         else
@@ -64,15 +53,10 @@ module Hg
 
           # Send to Chatbase if env var present
           if ENV['CHATBASE_API_KEY']
-            chatbase_api_client.send_bot_message(deliverable[:message][:text], JSON.parse(response))
+            ChatbaseAPIClient.new.send_bot_message(deliverable, response)
           end
         end
       end
-    end
-
-    # Helper for Chatbase API Client
-    def chatbase_api_client
-      ChatbaseAPIClient.new
     end
 
     module Initializer
