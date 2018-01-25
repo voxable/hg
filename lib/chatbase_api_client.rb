@@ -43,7 +43,7 @@ class ChatbaseAPIClient
 
   # Formats received message data for Chatbase Facebook API
   #
-  # @param [Hash] message
+  # @param [Facebook::Incoming::Message / ::Postback] message
   #   Hash of message data
   #
   # @return [Hash]
@@ -67,7 +67,7 @@ class ChatbaseAPIClient
 
   # Formats sent message data for Chatbase Facebook API
   #
-  # @param [String] text
+  # @param [Hash, String] message
   #   Message text
   # @param [Hash] response
   #   Response from Facebook
