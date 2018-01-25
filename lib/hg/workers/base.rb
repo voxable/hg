@@ -59,9 +59,7 @@ module Hg
           # Clear the Dialogflow context.
           user.update_attributes(dialogflow_context_name: nil) if user.dialogflow_context_name
         rescue Hg::ApiAiClient::QueryError => e
-          Timber.with_context user_log_context do
-            log_error(e)
-          end
+          log_error(e, user_log_context)
         else
           # Drop any params that weren't recognized.
           params = nlu_response[:parameters].reject {|k, v| v.blank?}
@@ -104,11 +102,15 @@ module Hg
       #
       # @param [Error] e
       #   The error to log.
+      # @param [Timber::Contexts::User] context
+      #   User context for Timber
       #
       # @return [void]
-      def log_error(e)
-        Rails.logger.error e.message
-        Rails.logger.error e.backtrace.join()
+      def log_error(e, context)
+        Timber.with_context context do
+          logger.error e.message
+          logger.error e.backtrace.join()
+        end
       end
     end
   end

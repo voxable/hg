@@ -282,7 +282,10 @@ module Hg
             begin
               # TODO: Build a custom Rails.logger, make production logging optional
               # Log the message
-              Rails.logger.info "MESSAGE: #{message.text}"
+              user_log_context = Timber::Contexts::User.new(facebook_psid: message.sender['id'])
+              Timber.with_context user_log_context do
+                Rails.logger.info "MESSAGE: #{message.text}"
+              end
 
               # Show a typing indicator to the user
               show_typing(message.sender['id'])
@@ -291,8 +294,10 @@ module Hg
               queue_message(message)
             rescue StandardError => e
               # TODO: high
-              Rails.logger.error e.inspect
-              Rails.logger.error e.backtrace
+              Timber.with_context user_log_context do
+                Rails.logger.error e.inspect
+                Rails.logger.error e.backtrace
+              end
             end
           end
         end

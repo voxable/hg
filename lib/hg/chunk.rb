@@ -18,16 +18,20 @@ module Hg
     end
 
     def deliver
-      Sidekiq::Logging.logger.info 'DELIVERABLES'
-      self.class.deliverables.each do |deliverable|
-        if deliverable.is_a? Hash
-          Sidekiq::Logging.logger.info JSON.pretty_generate(deliverable)
-        else
-          Sidekiq::Logging.logger.info deliverable.inspect
+      user_log_context = Timber::Contexts::User.new(facebook_psid: @recipient[:id])
+      Timber.with_context user_log_context do
+        Sidekiq::Logging.logger.info 'DELIVERABLES'
+
+        self.class.deliverables.each do |deliverable|
+          if deliverable.is_a? Hash
+            Sidekiq::Logging.logger.info JSON.pretty_generate(deliverable)
+          else
+            Sidekiq::Logging.logger.info deliverable.inspect
+          end
         end
+        Sidekiq::Logging.logger.info 'RECIPIENT'
+        Sidekiq::Logging.logger.info @recipient.inspect
       end
-      Sidekiq::Logging.logger.info 'RECIPIENT'
-      Sidekiq::Logging.logger.info @recipient.inspect
 
       self.class.deliverables.each do |deliverable|
         # If another chunk...
