@@ -29,8 +29,6 @@ module Hg
           Sidekiq::Logging.logger.info deliverable.inspect
         end
       end
-      Sidekiq::Logging.logger.info 'RECIPIENT', user_log_context
-      Sidekiq::Logging.logger.info @recipient.inspect, user_log_context
 
       self.class.deliverables.each do |deliverable|
         # If another chunk...
