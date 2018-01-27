@@ -46,6 +46,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'simplecov', '~> 0.13.0'
   spec.add_development_dependency 'codeclimate-test-reporter', '~> 1.0.8'
   spec.add_development_dependency 'httparty', '~> 0.15.6'
+  spec.add_development_dependency 'timber', '~> 2.6'
 end
 
 # rubocop:enable Metrics/BlockLength
