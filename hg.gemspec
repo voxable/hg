@@ -25,7 +25,7 @@ Gem::Specification.new do |spec|
   spec.executables   = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
   spec.require_paths = ['lib']
 
-  spec.add_runtime_dependency 'facebook-messenger', '~> 0.13.0'
+  spec.add_runtime_dependency 'facebook-messenger', '~> 1.0.0'
   spec.add_runtime_dependency 'fuzzy_match', '~> 2.1.0'
   spec.add_runtime_dependency 'rails', '>= 5.0.0'
 
@@ -45,6 +45,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'rubocop', '~> 0.49.1'
   spec.add_development_dependency 'simplecov', '~> 0.13.0'
   spec.add_development_dependency 'codeclimate-test-reporter', '~> 1.0.8'
+  spec.add_development_dependency 'httparty', '~> 0.15.6'
 end
 
 # rubocop:enable Metrics/BlockLength

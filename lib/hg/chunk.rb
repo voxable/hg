@@ -37,7 +37,6 @@ module Hg
         if deliverable.is_a? Class
           # ...deliver the chunk.
           deliverable.new(recipient: @recipient, context: context).deliver
-
         # If dynamic, then it needs to be evaluated at delivery time.
         elsif deliverable.is_a? Proc
           # Create a `template` anonymous subclass of the chunk class.
@@ -49,11 +48,16 @@ module Hg
 
           # Deliver the chunk.
           template.new(recipient: @recipient, context: context).deliver
-
+          
         # Otherwise, it's just a raw message.
         else
           # Deliver the message
-          Facebook::Messenger::Bot.deliver(deliverable.merge(recipient: @recipient), access_token: ENV['FB_ACCESS_TOKEN'])
+          response = Facebook::Messenger::Bot.deliver(deliverable.merge(recipient: @recipient), access_token: ENV['FB_ACCESS_TOKEN'])
+
+          # Send to Chatbase if env var present
+          if ENV['CHATBASE_API_KEY']
+            ChatbaseAPIClient.new.send_bot_message(deliverable, response)
+          end
         end
       end
     end
