@@ -23,6 +23,8 @@ module Hg
 
       self.class.deliverables.each do |deliverable|
         if deliverable.is_a? Hash
+          # TODO: When custom data display is upgraded in Timber,
+          #   pass the full deliver object as custom metadata.
           Sidekiq::Logging.logger.info JSON.pretty_generate(deliverable),
                                        user_log_context
         else
