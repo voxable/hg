@@ -26,7 +26,12 @@ module Hg
       until raw_message.empty?
         # Instantiate a message object with the raw message from the queue.
         message = Facebook::Messenger::Incoming::Message.new(raw_message)
-
+        
+        # Instantiate chatbase client
+        if ENV['CHATBASE_API_KEY']
+          @client = ChatbaseAPIClient.new
+        end
+        
         # Locate the class representing the bot.
         bot = Kernel.const_get(bot_class_name)
 
@@ -41,6 +46,12 @@ module Hg
           payload = JSON.parse(quick_reply_payload)
           # ...build a request object from the payload.
           request = build_payload_request(payload, user)
+          
+          # Set quick reply chatbase fields
+          if ENV['CHATBASE_API_KEY']
+            set_chatbase_fields(request.action, message.text, false)
+          end
+
         # If the message has attachments.
         elsif message.attachments
           attachment = message.attachments.first
@@ -58,6 +69,12 @@ module Hg
                 long:  attachment['payload']['coordinates']['long']
               }
             )
+
+            # Set location attachment chatbase fields
+            if ENV['CHATBASE_API_KEY']
+              set_chatbase_fields(request.intent, message.text, false)
+            end
+
           else
             # TODO: What should we do if attachments aren't recognized?
           end
@@ -65,13 +82,33 @@ module Hg
         elsif user.context[:dialog_action]
           request = build_dialog_request(user, message)
 
-          # If the message is text...
+          # Set chatbase fields for dialog action
+          if ENV['CHATBASE_API_KEY']
+            set_chatbase_fields(request.action, message.text, false)
+          end
+
+        # If the message is text...
         else
           # Parse the message.
           nlu_response, params = parse_message(message.text, user)
 
           # Build a request.
           request = build_request(message, nlu_response, params, user)
+          
+          # Set chatbase fields and determine not_handled
+          if ENV['CHATBASE_API_KEY']
+            @not_handled = false
+            if nlu_response.intent.nil? || request.intent == 'Default'
+              @not_handled = true
+            else
+              set_chatbase_fields(request.intent, message.text, @not_handled)
+            end
+          end
+        end
+
+        # Send to Chatbase if env var present
+        if ENV['CHATBASE_API_KEY']
+          @client.send_user_message(message)
         end
 
         # Send the request to the bot's router.
@@ -154,6 +191,5 @@ module Hg
 
       request
     end
-
   end
 end
