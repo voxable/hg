@@ -51,7 +51,7 @@ module Hg
               conversation_state:       user.conversation_state,
               dialogflow_context_name:  user.dialogflow_context_name
             }
-          )
+          }
 
           # ...send the message to API.ai for NLU.
           nlu_response = ApiAiClient.new(user.api_ai_session_id)
