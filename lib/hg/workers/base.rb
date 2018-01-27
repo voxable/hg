@@ -45,13 +45,16 @@ module Hg
       def parse_message(text, user)
         begin
           # Gather user context
-          user_log_context = Timber::Contexts::User.new(
-            id:                       user.facebook_psid,
-            meta: {
-              conversation_state:       user.conversation_state,
-              dialogflow_context_name:  user.dialogflow_context_name
+          user_log_context = {
+            user: {
+              id:                       user.facebook_psid,
+              meta: {
+                conversation_state:       user.conversation_state,
+                dialogflow_context_name:  user.dialogflow_context_name
+              }
             }
-          )
+          }
+
           # ...send the message to API.ai for NLU.
           nlu_response = ApiAiClient.new(user.api_ai_session_id)
                            .query(text,

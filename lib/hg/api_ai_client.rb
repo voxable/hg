@@ -44,9 +44,9 @@ module Hg
         api_ai_response = @client.text_request(message, contexts: contexts)
       rescue ApiAiRuby::ClientError, ApiAiRuby::RequestError => e
         Timber.with_context log_context do
-          Rails.logger.error 'Error with API.ai query request'
-          Rails.logger.error e
-          Rails.logger.error e.backtrace.join("\n")
+          Sidekiq.logger.error 'Error with API.ai query request', log_context
+          Sidekiq.logger.error e, log_context
+          Sidekiq.logger.error e.backtrace.join("\n"),log_context
         end
 
         # Retry the call 3 times.
@@ -57,9 +57,7 @@ module Hg
         # If the API.ai call fails...
         if api_ai_response[:status][:code] != 200
           # ...log an error.
-          Timber.with_context log_context do
-            Rails.logger.error "Error with API.ai request: #{api_ai_response.inspect}"
-          end
+          Sidekiq.logger.error "Error with API.ai request: #{api_ai_response.inspect}", log_context
 
           # Return the default action.
           return {
