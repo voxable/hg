@@ -3,6 +3,7 @@ require 'fuzzy_match'
 require 'hashie/mash'
 require 'sidekiq'
 require 'api-ai-ruby'
+require 'timber'
 
 # TODO: List subordinate requires in their respective files.
 require 'hg/engine'
