@@ -18,7 +18,7 @@ module Hg
     end
 
     def deliver
-      user_log_context = Timber::Contexts::User.new(facebook_psid: @recipient[:id])
+      user_log_context = Timber::Contexts::User.new(id: @recipient[:id])
       Timber.with_context user_log_context do
         Sidekiq::Logging.logger.info 'DELIVERABLES'
 
@@ -49,7 +49,7 @@ module Hg
 
           # Deliver the chunk.
           template.new(recipient: @recipient, context: context).deliver
-          
+
         # Otherwise, it's just a raw message.
         else
           # Deliver the message
