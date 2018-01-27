@@ -262,12 +262,7 @@ module Hg
 
               # TODO: Build a custom logger, make production logging optional
               # Log the postback
-              user_log_context = {
-                user: {
-                  id: postback.sender['id']
-                }
-              }
-
+              user_log_context = Timber::Contexts::User.new(facebook_psid: postback.sender['id'])
               Timber.with_context user_log_context do
                 Rails.logger.info "POSTBACK: #{postback.payload}"
               end
@@ -287,12 +282,7 @@ module Hg
             begin
               # TODO: Build a custom Rails.logger, make production logging optional
               # Log the message
-              user_log_context = {
-                user: {
-                  id: message.sender['id']
-                }
-              }
-
+              user_log_context = Timber::Contexts::User.new(facebook_psid: message.sender['id'])
               Timber.with_context user_log_context do
                 Rails.logger.info "MESSAGE: #{message.text}"
               end
