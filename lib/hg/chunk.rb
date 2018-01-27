@@ -18,8 +18,7 @@ module Hg
     end
 
     def deliver
-      user_log_context = Timber::Contexts::User.new(facebook_psid: @recipient[:id])
-      Timber.with_context user_log_context do
+      Timber.with_context({user: {id: @recipient[:id]}}) do
         Sidekiq::Logging.logger.info 'DELIVERABLES'
 
         self.class.deliverables.each do |deliverable|
