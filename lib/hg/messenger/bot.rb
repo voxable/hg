@@ -264,7 +264,7 @@ module Hg
               # Log the postback
               user_log_context = Timber::Contexts::User.new(id: postback.sender['id'])
               Timber.with_context user_log_context do
-                Rails.logger.info 'POSTBACK', postback: postback.payload
+                Rails.logger.info "POSTBACK: #{postback.payload}"
               end
 
               # Queue the postback for processing
