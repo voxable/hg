@@ -53,9 +53,7 @@ module Hg
           response = Facebook::Messenger::Bot.deliver(deliverable.merge(recipient: @recipient), access_token: ENV['FB_ACCESS_TOKEN'])
 
           # Send to Chatbase if env var present
-          if ENV['CHATBASE_API_KEY']
-            ChatbaseAPIClient.new.send_bot_message(deliverable, response)
-          end
+          ChatbaseAPIClient.new.send_bot_message(deliverable, response)
         end
       end
     end

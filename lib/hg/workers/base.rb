@@ -129,9 +129,11 @@ module Hg
       #
       # @return [void]
       def set_chatbase_fields(intent, text, not_handled)
-        @client.intent = intent
-        @client.text = text
-        @client.not_handled = not_handled
+        return unless ChatbaseAPIClient.api_key
+
+        @chatbase_api_client.intent = intent
+        @chatbase_api_client.text = text
+        @chatbase_api_client.not_handled = not_handled
       end
     end
   end
