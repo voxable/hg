@@ -4,7 +4,6 @@
 class ChatbaseAPIClient
   include HTTParty
   base_uri 'https://chatbase.com/api/facebook'
-  debug_output STDOUT
 
   attr_accessor :intent, :text, :not_handled
 
