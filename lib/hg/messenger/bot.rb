@@ -21,6 +21,7 @@ module Hg
         base.extend ClassMethods
         base.chunks = []
         base.call_to_actions = []
+        base.nested_call_to_actions = []
         base.nested_menu_items =[]
 
         # TODO: Need to figure this out.
@@ -59,6 +60,7 @@ module Hg
 
         attr_accessor :chunks
         attr_accessor :call_to_actions
+        attr_accessor :nested_call_to_actions
         attr_accessor :input_disabled
         attr_accessor :image_url_base_portion
         attr_accessor :nested_menu_items
@@ -87,12 +89,12 @@ module Hg
         end
 
         def nested_menu(title, &block)
-          @nested_menu_items << yield
+          yield
 
           @nested_menu = {
               title: title,
               type: 'nested',
-              call_to_actions: @nested_menu_items
+              call_to_actions: @nested_call_to_actions
           }
           @call_to_actions << @nested_menu
         end
@@ -102,9 +104,8 @@ module Hg
         end
 
         def nested_menu_item(text, options = {})
-          call_to_action(text, options)
+          @nested_call_to_actions << call_to_action(text, options)
         end
-
 
         # Subscribe to Facebook message webhook notifications.
         def subscribe_to_messages
