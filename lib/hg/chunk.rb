@@ -128,6 +128,28 @@ module Hg
         @card[:subtitle] = text
       end
 
+      # Add a default action (link to navigate to when image is tapped) to the card.
+      #
+      # @param [String] url
+      #   The URL to navigate to.
+      # @param [String|Symbol] webview_height_ratio
+      #   The height of the webview to open (compact, tall, or full).
+      #
+      # @return [void]
+      def default_action(url, webview_height_ratio = 'full')
+        # TODO: This should be a private method check that runs anywhere we
+        #   use this option.
+        unless %w[compact tall full].any? { |r| r == webview_height_ratio }
+          raise ArgumentError, 'webview_height_ratio must be one of "compact", "tall", or "full"'
+        end
+
+        @card[:default_action] = {
+          type: 'web_url',
+          url: url,
+          webview_height_ratio: webview_height_ratio.to_s
+        }
+      end
+
       def image_url(url, options = {})
         if options.has_key?(:host)
           @card[:image_url] = ApplicationController.helpers.image_url(url, options)
