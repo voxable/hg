@@ -111,7 +111,16 @@ module Hg
         }, access_token: ENV['FB_ACCESS_TOKEN'])
       end
 
+      # Add text message to chunk
+      #
+      # @param [String, Array] message
+      #   Message to be delivered.
+      #   If message is an array, will deliver one at random
+      #
+      # @return [void]
       def text(message)
+        # Sample if message is an array
+        message = message.sample if message.respond_to?(:sample)
         @deliverables <<
           {
             message: {
