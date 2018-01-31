@@ -98,7 +98,7 @@ module Hg
           # Set chatbase fields and determine not_handled
           if ENV['CHATBASE_API_KEY']
             @not_handled = false
-            if nlu_response.intent.nil? || request.intent == 'Default'
+            if !nlu_response[:intent] || request.intent == 'Default'
               @not_handled = true
             else
               set_chatbase_fields(request.intent, message.text, @not_handled)
