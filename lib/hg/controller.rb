@@ -166,9 +166,7 @@ module Hg
         )
 
         # Send to Chatbase
-        if ENV['CHATBASE_API_KEY']
-          ChatbaseAPIClient.new.send_bot_message(message_text, response)
-        end
+        ChatbaseAPIClient.new.send_bot_message({text: message_text}, response)
       # If we're attempting to deliver a chunk...
       elsif args.first.is_a?(Class)
         # ....deliver the chunk

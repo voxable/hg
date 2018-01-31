@@ -35,10 +35,10 @@ module Hg
         postback = Facebook::Messenger::Incoming::Postback.new(raw_postback)
 
         # Send to Chatbase if env var present
-        if ENV['CHATBASE_API_KEY']
-          @client = ChatbaseAPIClient.new
+        if ChatbaseAPIClient.api_key
+          @chatbase_api_client = ChatbaseAPIClient.new
           set_chatbase_fields(postback.payload['action'], postback.payload['action'], false)
-          @client.send_user_message(postback)
+          @chatbase_api_client.send_user_message(postback)
         end
 
         # Build the request object

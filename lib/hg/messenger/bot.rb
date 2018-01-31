@@ -244,7 +244,8 @@ module Hg
 
         # Show a typing indicator to the user.
         #
-        # @param recipient_id [String] The Facebook PSID of the user that will see the indicator
+        # @param recipient_id [String]
+        #   The Facebook PSID of the user that will see the indicator
         def show_typing(recipient_psid)
           Facebook::Messenger::Bot.deliver({
              recipient: {id: recipient_psid},
@@ -262,14 +263,19 @@ module Hg
 
               # TODO: Build a custom logger, make production logging optional
               # Log the postback
-              Rails.logger.info "POSTBACK: #{postback.payload}"
+              user_log_context = Timber::Contexts::User.new(id: postback.sender['id'])
+              Timber.with_context user_log_context do
+                Rails.logger.info "POSTBACK: #{postback.payload}"
+              end
 
               # Queue the postback for processing
               queue_postback(postback)
             rescue StandardError => e
               # TODO: high
-              Rails.logger.error e.inspect
-              Rails.logger.error e.backtrace
+              Timber.with_context user_log_context do
+                Rails.logger.error e.inspect
+                Rails.logger.error e.backtrace
+              end
             end
           end
 
@@ -277,7 +283,10 @@ module Hg
             begin
               # TODO: Build a custom Rails.logger, make production logging optional
               # Log the message
-              Rails.logger.info "MESSAGE: #{message.text}"
+              user_log_context = Timber::Contexts::User.new(id: message.sender['id'])
+              Timber.with_context user_log_context do
+                Rails.logger.info "MESSAGE: #{message.text}"
+              end
 
               # Show a typing indicator to the user
               show_typing(message.sender['id'])
@@ -286,8 +295,10 @@ module Hg
               queue_message(message)
             rescue StandardError => e
               # TODO: high
-              Rails.logger.error e.inspect
-              Rails.logger.error e.backtrace
+              Timber.with_context user_log_context do
+                Rails.logger.error e.inspect
+                Rails.logger.error e.backtrace
+              end
             end
           end
         end

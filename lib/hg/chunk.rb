@@ -18,16 +18,17 @@ module Hg
     end
 
     def deliver
-      Sidekiq::Logging.logger.info 'DELIVERABLES'
+      user_log_context = {user: { id: @recipient[:id] }}
+      Sidekiq::Logging.logger.info 'DELIVERABLES', user_log_context
+
       self.class.deliverables.each do |deliverable|
         if deliverable.is_a? Hash
-          Sidekiq::Logging.logger.info JSON.pretty_generate(deliverable)
+          Sidekiq::Logging.logger.info JSON.pretty_generate(deliverable),
+                                       user_log_context
         else
           Sidekiq::Logging.logger.info deliverable.inspect
         end
       end
-      Sidekiq::Logging.logger.info 'RECIPIENT'
-      Sidekiq::Logging.logger.info @recipient.inspect
 
       self.class.deliverables.each do |deliverable|
         # If another chunk...
@@ -52,9 +53,7 @@ module Hg
           response = Facebook::Messenger::Bot.deliver(deliverable.merge(recipient: @recipient), access_token: ENV['FB_ACCESS_TOKEN'])
 
           # Send to Chatbase if env var present
-          if ENV['CHATBASE_API_KEY']
-            ChatbaseAPIClient.new.send_bot_message(deliverable, response)
-          end
+          ChatbaseAPIClient.new.send_bot_message(deliverable, response)
         end
       end
     end

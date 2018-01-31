@@ -3,29 +3,41 @@
 # Client used to send metrics to Chatbase, when ENV var present
 class ChatbaseAPIClient
   include HTTParty
-  BASE_PATH = 'https://chatbase.com/api/facebook'
+  base_uri 'https://chatbase.com/api/facebook'
 
   attr_accessor :intent, :text, :not_handled
 
+  # @return [String] The Chatbase API Key.
+  def self.api_key
+    ENV['CHATBASE_API_KEY']
+  end
+
   # Sends message sent by user to Chatbase
   #
-  # @param [String] message
-  #   Text of user message
+  # @param [Facebook::Messenger::Incoming::Message|::Postback] message
+  #   Hash of message data
   #
   # @return [void]
   def send_user_message(message)
+    return unless self.class.api_key
+
     # Format for Chatbase Facebook API
     message_received = serialize_user_message(message)
     # Post to Chatbase
-    catch_errors{
-      self.class.post("#{BASE_PATH}/message_received?api_key=#{ENV['CHATBASE_API_KEY']}", json_body(message_received))
+    catch_errors {
+      result = self.class.post(
+        "/message_received?api_key=#{self.class.api_key}",
+        json_body(message_received)
+      )
+
+      result
     }
   end
 
   # Sends message sent by bot to Chatbase
   #
-  # @param [String, Hash] message
-  #   Message sent
+  # @param [Hash] message
+  #   Hash of message data
   # @param [Hash] response
   #   Hash of response data from Facebook
   #
@@ -35,7 +47,12 @@ class ChatbaseAPIClient
     message_body = serialize_bot_message(message, response)
     # Post to Chatbase
     catch_errors{
-      self.class.post("#{BASE_PATH}/send_message?api_key=#{ENV['CHATBASE_API_KEY']}", json_body(message_body))
+      result = self.class.post(
+        "/send_message?api_key=#{self.class.api_key}",
+        json_body(message_body)
+      )
+
+      result
     }
   end
 
@@ -43,15 +60,15 @@ class ChatbaseAPIClient
 
   # Formats received message data for Chatbase Facebook API
   #
-  # @param [Facebook::Incoming::Message / ::Postback] message
+  # @param [Facebook::Messenger::Incoming::Message|::Postback] message
   #   Hash of message data
   #
   # @return [Hash]
   #   Message data formatted for Chatbase
   def serialize_user_message(message)
     message_received = {
-      sender: message.sender['id'],
-      recipient: message.recipient['id'],
+      sender: message.sender,
+      recipient: message.recipient,
       timestamp: message.messaging['timestamp'],
       message: {
         mid: message.try(:id),
@@ -59,10 +76,10 @@ class ChatbaseAPIClient
       },
       chatbase_fields: {
         intent: intent,
-        version: ENV['CHATBASE_BOT_VERSION'],
         not_handled: not_handled
       }
     }
+    message_received
   end
 
   # Formats sent message data for Chatbase Facebook API
@@ -75,22 +92,15 @@ class ChatbaseAPIClient
   # @return [Hash]
   #   Message data formatted for Chatbase
   def serialize_bot_message(message, response)
-    message = message.to_json if message.is_a?(Hash)
     parsed_response = JSON.parse(response)
     message_body = {
       request_body: {
-        recipient: parsed_response['recipient_id'],
-        message: {
-          text: text
-        }
+        recipient: {
+          id: parsed_response['recipient_id']
+        },
+        message: message[:message]
       },
-      response_body: {
-        recipient_id: response['recipient_id'],
-        message_id: response['message_id']
-      },
-      chatbase_fields: {
-        version: ENV['CHATBASE_BOT_VERSION']
-      }
+      response_body: parsed_response
     }
   end
 
