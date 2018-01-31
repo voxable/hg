@@ -120,6 +120,17 @@ module Hg
           }
       end
 
+      # Method to handle text variation in chunk
+      #
+      # @param [Array] samples
+      #   Array of various strings to add to chunk
+      #
+      # @return [void]
+      def varying_text(samples)
+        # Sample array
+        text samples.sample
+      end
+
       def title(text)
         @card[:title] = text
       end
