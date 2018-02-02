@@ -21,7 +21,7 @@ RSpec.describe Hg::PostbackWorker, type: :worker do
           }
         }
       }
-      let(:payload) { JSON.generate( payload_hash )}
+      let(:payload) { JSON.generate(payload_hash) }
       let(:postback) {
         instance_double(
           'Facebook::Messenger::Incoming::Postback',
@@ -32,7 +32,7 @@ RSpec.describe Hg::PostbackWorker, type: :worker do
       let(:raw_postback) {
         {
           'sender' => {
-            'id' => user_id,
+            'id' => user_id
           },
           'postback' => {
             'payload' => payload_hash
@@ -60,18 +60,17 @@ RSpec.describe Hg::PostbackWorker, type: :worker do
       let(:referral_payload) {
         {
           'ref' => JSON.generate(
-            {
-              'payload' => {
-                'action' => 'someaction',
-                'params' => {
-                  'invite_code' => 'somerefcode'
-                }
+            'payload' => {
+              'action' => 'someaction',
+              'params' => {
+                'invite_code' => 'somerefcode'
               }
             }
           )
         }
       }
-      let(:ref_payload) { instance_double(
+      let(:ref_payload) {
+        instance_double(
           'Facebook::Messenger::Incoming::Postback',
           referral: referral_payload
         )
@@ -79,12 +78,9 @@ RSpec.describe Hg::PostbackWorker, type: :worker do
       let(:raw_referral) {
         {
           'sender' => {
-            'id' => user_id,
+            'id' => user_id
           },
-          'postback' => {
-            'payload' => payload,
-            'referral' => referral_payload
-          }
+          'referral' => referral_payload
         }
       }
       let(:ref_request) {

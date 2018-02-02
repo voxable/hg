@@ -7,6 +7,13 @@ class ChatbaseAPIClient
 
   attr_accessor :intent, :text, :not_handled
 
+  # @return [ChatbaseAPIClient]
+  def initialize(params = {})
+    @intent = params.fetch(:intent, nil)
+    @text = params.fetch(:text, nil)
+    @not_handled = params.fetch(:not_handled, false)
+  end
+
   # Sends message sent by user to Chatbase
   #
   # @param [String] message
@@ -39,6 +46,22 @@ class ChatbaseAPIClient
     }
   end
 
+  # Method to set chatbase client fields
+  #
+  # @param [String] intent
+  #   Given intent for user message
+  # @param [String] text
+  #   Text of message or representation of postback
+  # @param [Boolean] not_handled
+  #   Whether or not user message was understood
+  #
+  # @return [void]
+  def set_chatbase_fields(intent, text, not_handled)
+    @intent = intent
+    @text = text
+    @not_handled = not_handled
+  end
+
   private
 
   # Formats received message data for Chatbase Facebook API
@@ -55,12 +78,12 @@ class ChatbaseAPIClient
       timestamp: message.messaging['timestamp'],
       message: {
         mid: message.try(:id),
-        text: text
+        text: @text
       },
       chatbase_fields: {
-        intent: intent,
+        intent: @intent,
         version: ENV['CHATBASE_BOT_VERSION'],
-        not_handled: not_handled
+        not_handled: @not_handled
       }
     }
   end
@@ -81,7 +104,7 @@ class ChatbaseAPIClient
       request_body: {
         recipient: parsed_response['recipient_id'],
         message: {
-          text: text
+          text: message
         }
       },
       response_body: {

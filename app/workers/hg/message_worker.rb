@@ -28,10 +28,8 @@ module Hg
         message = Facebook::Messenger::Incoming::Message.new(raw_message)
         
         # Instantiate chatbase client
-        if ENV['CHATBASE_API_KEY']
-          @client = ChatbaseAPIClient.new
-        end
-        
+        @client = ChatbaseAPIClient.new if ENV['CHATBASE_API_KEY']
+
         # Locate the class representing the bot.
         bot = Kernel.const_get(bot_class_name)
 
@@ -48,9 +46,11 @@ module Hg
           request = build_payload_request(payload, user)
           
           # Set quick reply chatbase fields
-          if ENV['CHATBASE_API_KEY']
-            set_chatbase_fields(request.action, message.text, false)
-          end
+          @client.set_chatbase_fields(
+            request.action,
+            message.text,
+            false
+          ) if ENV['CHATBASE_API_KEY']
 
         # If the message has attachments.
         elsif message.attachments
@@ -71,9 +71,11 @@ module Hg
             )
 
             # Set location attachment chatbase fields
-            if ENV['CHATBASE_API_KEY']
-              set_chatbase_fields(request.intent, message.text, false)
-            end
+            @client.set_chatbase_fields(
+              request.intent,
+              message.text,
+              false
+            ) if ENV['CHATBASE_API_KEY']
 
           else
             # TODO: What should we do if attachments aren't recognized?
@@ -84,7 +86,10 @@ module Hg
 
           # Set chatbase fields for dialog action
           if ENV['CHATBASE_API_KEY']
-            set_chatbase_fields(request.action, message.text, false)
+            @client.set_chatbase_fields(
+              request.action,
+              message.text,
+              false)
           end
 
         # If the message is text...
@@ -97,19 +102,16 @@ module Hg
           
           # Set chatbase fields and determine not_handled
           if ENV['CHATBASE_API_KEY']
-            @not_handled = false
             if !nlu_response[:intent] || request.intent == 'Default'
-              @not_handled = true
+              @client.not_handled = true
             else
-              set_chatbase_fields(request.intent, message.text, @not_handled)
+              @client.set_chatbase_fields(request.intent, message.text, false)
             end
           end
         end
 
         # Send to Chatbase if env var present
-        if ENV['CHATBASE_API_KEY']
-          @client.send_user_message(message)
-        end
+        @client.send_user_message(message) if ENV['CHATBASE_API_KEY']
 
         # Send the request to the bot's router.
         bot.router.handle(request) if request
