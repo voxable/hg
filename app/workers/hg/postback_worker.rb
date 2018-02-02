@@ -31,12 +31,6 @@ module Hg
         # make this platform agnostic
         user = find_bot_user(bot, user_id)
 
-        # Send to Chatbase if env var present
-        if ENV['CHATBASE_API_KEY']
-          @client = ChatbaseAPIClient.new
-          set_chatbase_fields(postback.payload['action'], postback.payload['action'], false)
-          @client.send_user_message(postback)
-        end
         request =
           # Handle referral postback
           if raw_postback['referral']
@@ -51,6 +45,15 @@ module Hg
             # Build the request object
             build_payload_request @postback.payload, user
           end
+
+        # Send to Chatbase if env var present
+        # Use the action, because it's a postback.
+        send_user_message(
+          intent: request.action,
+          text: request.action,
+          not_handled: false,
+          message: @postback || @referral
+        ) if ENV['CHATBASE_API_KEY']
 
         # Send the request to the bot's router.
         bot.router.handle(request)
