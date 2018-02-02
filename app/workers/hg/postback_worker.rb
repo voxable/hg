@@ -31,9 +31,6 @@ module Hg
         # make this platform agnostic
         user = find_bot_user(bot, user_id)
 
-        # Extract the payload from the postback.
-        postback = Facebook::Messenger::Incoming::Postback.new(raw_postback)
-
         # Build the request object
         request =
           # Handle referral postback

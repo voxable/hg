@@ -27,9 +27,6 @@ module Hg
         # Instantiate a message object with the raw message from the queue.
         message = Facebook::Messenger::Incoming::Message.new(raw_message)
 
-        # Instantiate chatbase client
-        @chatbase_api_client = ChatbaseAPIClient.new if ChatbaseAPIClient.api_key
-
         # Locate the class representing the bot.
         bot = Kernel.const_get(bot_class_name)
 
