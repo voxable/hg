@@ -360,21 +360,29 @@ RSpec.describe Hg::Messenger::Bot do
 
   describe '.nested_menu' do
     let(:title) { 'sometitle' }
+    let(:nested_title) { 'nestedtitle' }
     let(:menu_block) {
       {
         foo: 'bar'
+      }
+    }
+    let(:nested_menu_item) {
+      {
+        title: nested_title,
+        type: 'postback',
+        payload: JSON.generate(menu_block)
       }
     }
     let(:call_to_actions) {
       {
         title: title,
         type: 'nested',
-        call_to_actions: [menu_block]
+        call_to_actions: [nested_menu_item]
       }
     }
     it 'adds title and block to call_to_actions' do
       FAQBot.nested_menu(title) do
-        menu_block
+        FAQBot.nested_menu_item nested_title, payload: menu_block
       end
 
       expect(FAQBot.instance_variable_get(:@call_to_actions)).to eq [call_to_actions]
