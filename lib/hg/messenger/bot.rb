@@ -290,6 +290,23 @@ module Hg
               Rails.logger.error e.backtrace
             end
           end
+
+          ::Facebook::Messenger::Bot.on :referral do |referral|
+            begin
+              # Log the referral receipt
+              Rails.logger.info "Referral from sender: #{referral.sender['id']}"
+
+              # Show a typing indicator to the user
+              show_typing(referral.sender['id'])
+
+              # Queue the referral for processing
+              queue_postback(referral)
+            rescue StandardError => e
+              # TODO: high
+              Rails.logger.error e.inspect
+              Rails.logger.error e.backtrace
+            end
+          end
         end
       end
     end
