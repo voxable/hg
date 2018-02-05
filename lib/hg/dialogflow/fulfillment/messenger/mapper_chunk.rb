@@ -4,6 +4,7 @@ module Hg
       module Messenger
         class MapperChunk
           include Hg::Chunk
+          include MessengerBot::Chunks::BaseQuickReplies
 
           dynamic do |context|
             if !context['speech'].empty?
@@ -35,6 +36,9 @@ module Hg
 
                 end
               end
+
+              schedule_main_quick_reply
+              main_menu_quick_reply
             end
           end
 
