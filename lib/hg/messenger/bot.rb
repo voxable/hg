@@ -222,9 +222,12 @@ module Hg
             raw_postback['postback'] = payload
           # Else, it may be a referral, but Get Started postback has been received
           elsif raw_postback['postback']['referral']
-            payload = raw_postback['postback']['referral']['ref']
-            # Parse the payload and set to 'postback'
-            raw_postback['postback'] = JSON.parse(payload)
+            # Parse the referral payload
+            payload = JSON.parse(raw_postback['postback']['referral']['ref'])
+            # Include onboarding param
+            payload['payload']['params'].merge!({ 'onboarding' => 'true' })
+            # Give to 'postback'
+            raw_postback['postback'] = payload
           # ...else, it's a standard postback
           else
             # Parse the postback payload as JSON, and store it as the value of
