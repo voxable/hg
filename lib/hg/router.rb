@@ -139,11 +139,12 @@ module Hg
             route = routes.fetch(request.action)
             request.route = route
           rescue KeyError
-            # If there is a response defined, respond with that.
-            process_fulfillment(request) unless
-            # process_response(request)
-
-            raise ActionNotRegisteredError.new(request.action)
+            if request.fulfillment.empty?
+              raise ActionNotRegisteredError.new(request.action)
+            else
+              Hg::Dialogflow::Fulfillment::Messenger::Responder
+                .new(request).respond
+            end
           end
         end
 

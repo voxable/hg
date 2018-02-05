@@ -19,7 +19,6 @@ module Hg
     module Bot
       def self.included(base)
         base.extend ClassMethods
-        base.chunks = []
         base.call_to_actions = []
         base.nested_call_to_actions = []
         base.nested_menu_items =[]
@@ -58,7 +57,6 @@ module Hg
           raise NoUserClassExistsError.new
         end
 
-        attr_accessor :chunks
         attr_accessor :call_to_actions
         attr_accessor :nested_call_to_actions
         attr_accessor :input_disabled
