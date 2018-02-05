@@ -26,7 +26,7 @@ module Hg
       until raw_message.empty?
         # Instantiate a message object with the raw message from the queue.
         message = Facebook::Messenger::Incoming::Message.new(raw_message)
-        
+
         # Instantiate chatbase client
         @client = ChatbaseAPIClient.new if ENV['CHATBASE_API_KEY']
 
@@ -44,7 +44,7 @@ module Hg
           payload = JSON.parse(quick_reply_payload)
           # ...build a request object from the payload.
           request = build_payload_request(payload, user)
-          
+
           # Set quick reply chatbase fields
           @client.set_chatbase_fields(
             request.action,
@@ -99,7 +99,7 @@ module Hg
 
           # Build a request.
           request = build_request(message, nlu_response, params, user)
-          
+
           # Set chatbase fields and determine not_handled
           if ENV['CHATBASE_API_KEY']
             if !nlu_response[:intent] || request.intent == 'Default'
@@ -128,7 +128,7 @@ module Hg
     # @param message [Facebook::Messenger::Incoming::Message]
     #   The incoming message.
     # @param nlu_response [Hash]
-    #   The API.ai query response.
+    #   The Dialogflow query response.
     # @param params [Hash]
     #   The parsed entities for the request.
     # @param user [Object]

@@ -32,7 +32,7 @@ module Hg
         bot.user_class.find_or_create_by(facebook_psid: user_id)
       end
 
-      # Parse a message via an NLU service (at the moment, API.ai).
+      # Parse a message via an NLU service (at the moment, Dialogflow).
       #
       # @param text [String]
       #   The raw text of the message.
@@ -44,13 +44,13 @@ module Hg
       #   second element is the parsed parameters.
       def parse_message(text, user)
         begin
-          # ...send the message to API.ai for NLU.
-          nlu_response = ApiAiClient.new(user.api_ai_session_id)
+          # ...send the message to Dialogflow for NLU.
+          nlu_response = DialogflowClient.new(user.api_ai_session_id)
                            .query(text, context_name: user.dialogflow_context_name)
 
           # Clear the Dialogflow context.
           user.update_attributes(dialogflow_context_name: nil) if user.dialogflow_context_name
-        rescue Hg::ApiAiClient::QueryError => e
+        rescue Hg::DialogflowClient::QueryError => e
           log_error(e)
         else
           # Drop any params that weren't recognized.
