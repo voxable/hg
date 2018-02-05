@@ -45,12 +45,12 @@ module Hg
       def parse_message(text, user)
         begin
           # ...send the message to Dialogflow for NLU.
-          nlu_response = DialogflowClient.new(user.api_ai_session_id)
+          nlu_response = Dialogflow::Client.new(user.api_ai_session_id)
                            .query(text, context_name: user.dialogflow_context_name)
 
           # Clear the Dialogflow context.
           user.update_attributes(dialogflow_context_name: nil) if user.dialogflow_context_name
-        rescue Hg::DialogflowClient::QueryError => e
+        rescue Hg::Dialogflow::Client::QueryError => e
           log_error(e)
         else
           # Drop any params that weren't recognized.

@@ -113,8 +113,16 @@ module Hg
         # Send to Chatbase if env var present
         @client.send_user_message(message) if ENV['CHATBASE_API_KEY']
 
-        # Send the request to the bot's router.
-        bot.router.handle(request) if request
+        begin
+          # Send the request to the bot's router.
+          bot.router.handle(request) if request
+        rescue Hg::Router::ActionNotRegisteredError => e
+          # If no response is defined, throw an error.
+          raise e if request.fulfillment.empty?
+
+          # Otherwise, respond with the prescribed response.
+          Hg::Dialogflow::Fulfillment::Messenger.new(bot, request).respond
+        end
 
         # Attempt to pop another message from the queue for processing.
         raw_message = pop_raw_message(user_id, redis_namespace)
@@ -138,12 +146,12 @@ module Hg
     #   The generated request.
     def build_request(message, nlu_response, params, user)
       Hg::Request.new(
-        user:       user,
-        message:    message,
-        intent:     nlu_response[:intent],
-        action:     nlu_response[:action] || nlu_response[:intent],
-        parameters: params,
-        response:   nlu_response[:response]
+        user:          user,
+        message:       message,
+        intent:        nlu_response[:intent],
+        action:        nlu_response[:action] || nlu_response[:intent],
+        parameters:    params,
+        fulfillment:   nlu_response[:fulfillment]
       )
     end
 

@@ -41,7 +41,7 @@ RSpec.describe Hg::MessageWorker, type: :worker do
       }
       let(:api_ai_response) { { intent: 'someintent', action: 'someaction', parameters: { 'foo' => 'bar' } }}
       let(:api_ai_client) {
-        instance_double('Hg::DialogflowClientClient', query: api_ai_response)
+        instance_double('Hg::Dialogflow::Client', query: api_ai_response)
       }
       let(:valid_args) { [1, 'foo', 'NewsBot'] }
       let(:payload_hash) {
@@ -246,12 +246,12 @@ RSpec.describe Hg::MessageWorker, type: :worker do
     before(:example) do
       allow(queue).to receive(:pop).and_return(raw_message, {})
       allow(Facebook::Messenger::Incoming::Message).to receive(:initialize).and_return(message)
-      allow(Hg::DialogflowClient).to receive(:new).and_return(api_ai_client)
+      allow(Hg::Dialogflow::Client).to receive(:new).and_return(api_ai_client)
     end
 
     context 'sending the message to Dialogflow for parsing' do
       it 'sets the session ID the Dialogflow session key for the user' do
-        expect(Hg::DialogflowClient).to receive(:new).with(user_api_ai_session_id)
+        expect(Hg::Dialogflow::Client).to receive(:new).with(user_api_ai_session_id)
 
         subject.perform(*valid_args)
       end
