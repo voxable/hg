@@ -40,8 +40,8 @@ RSpec.describe Hg::MessageWorker, type: :worker do
         )
       }
       let(:api_ai_response) { { intent: 'someintent', action: 'someaction', parameters: { 'foo' => 'bar' } }}
-      let(:api_ai_client) {
-        instance_double('Hg::ApiAiClient', query: api_ai_response)
+      let(:dialogflow_client) {
+        instance_double('Hg::Dialogflow::Client', query: api_ai_response)
       }
       let(:valid_args) { [1, 'foo', 'NewsBot'] }
       let(:payload_hash) {
@@ -246,24 +246,24 @@ RSpec.describe Hg::MessageWorker, type: :worker do
     before(:example) do
       allow(queue).to receive(:pop).and_return(raw_message, {})
       allow(Facebook::Messenger::Incoming::Message).to receive(:initialize).and_return(message)
-      allow(Hg::ApiAiClient).to receive(:new).and_return(api_ai_client)
+      allow(Hg::Dialogflow::Client).to receive(:new).and_return(dialogflow_client)
     end
 
-    context 'sending the message to API.ai for parsing' do
-      it 'sets the session ID the API.ai session key for the user' do
-        expect(Hg::ApiAiClient).to receive(:new).with(user_api_ai_session_id)
+    context 'sending the message to Dialogflow for parsing' do
+      it 'sets the session ID the Dialogflow session key for the user' do
+        expect(Hg::Dialogflow::Client).to receive(:new).with(user_api_ai_session_id)
 
         subject.perform(*valid_args)
       end
 
-      it 'sends the message to API.ai for parsing' do
-        expect(api_ai_client).to receive(:query).with(text, anything)
+      it 'sends the message to Dialogflow for parsing' do
+        expect(dialogflow_client).to receive(:query).with(text, anything)
 
         subject.perform(*valid_args)
       end
     end
 
-    context 'when the message is understood by the API.ai agent' do
+    context 'when the message is understood by the Dialogflow agent' do
       it "sends a request to the bot router's handle method" do
         expect(router_class).to receive(:handle)
 
@@ -271,7 +271,7 @@ RSpec.describe Hg::MessageWorker, type: :worker do
       end
     end
 
-    context "when the message isn't understood by the API.ai agent", priority: :high do
+    context "when the message isn't understood by the Dialogflow agent", priority: :high do
       let(:nlu_response) {
         {
           intent: 'someintent',

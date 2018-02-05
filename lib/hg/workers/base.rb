@@ -32,7 +32,7 @@ module Hg
         bot.user_class.find_or_create_by(facebook_psid: user_id)
       end
 
-      # Parse a message via an NLU service (at the moment, API.ai).
+      # Parse a message via an NLU service (at the moment, Dialogflow).
       #
       # @param text [String]
       #   The raw text of the message.
@@ -56,14 +56,14 @@ module Hg
           }
 
           # ...send the message to API.ai for NLU.
-          nlu_response = ApiAiClient.new(user.api_ai_session_id)
+          nlu_response = Dialogflow::Client.new(user.api_ai_session_id)
                            .query(text,
                                   context_name: user.dialogflow_context_name,
                                   log_context: user_log_context)
 
           # Clear the Dialogflow context.
           user.update_attributes(dialogflow_context_name: nil) if user.dialogflow_context_name
-        rescue Hg::ApiAiClient::QueryError => e
+        rescue Hg::Dialogflow::Client::QueryError => e
           log_error(e, user_log_context)
         else
           # Drop any params that weren't recognized.
@@ -118,7 +118,7 @@ module Hg
         end
       end
 
-      # Method to set chatbase client fields
+      # Method to send user message to Chatbase
       #
       # @param [String] intent
       #   Determined intent of user message
@@ -126,6 +126,8 @@ module Hg
       #   Text of user message
       # @param [Boolean] not_handled
       #   Flag for user message not understood
+      # @param [Hash] message
+      #   Message or postback received
       #
       # @return [void]
       def set_chatbase_fields(intent, text, not_handled)

@@ -43,11 +43,28 @@ module Hg
 
         # Build the request object
         request =
-          if postback.referral
-            build_referral_request(postback.referral, user)
+          # Handle referral postback
+          if raw_postback['referral']
+            # Extract payload from referral
+            @referral = Facebook::Messenger::Incoming::Referral.new(raw_postback)
+            # Build request object
+            build_referral_request @referral, user
+          # Handle postback
           else
-            build_payload_request(postback.payload, user)
+            # Extract the payload from the postback.
+            @postback = Facebook::Messenger::Incoming::Postback.new(raw_postback)
+            # Build the request object
+            build_payload_request @postback.payload, user
           end
+
+        # Send to Chatbase if env var present
+        # Use the action, because it's a postback.
+        send_user_message(
+          intent: request.action,
+          text: request.action,
+          not_handled: false,
+          message: @postback || @referral
+        ) if ENV['CHATBASE_API_KEY']
 
         # Send the request to the bot's router.
         bot.router.handle(request)

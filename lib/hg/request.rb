@@ -18,18 +18,18 @@ class Hg::Request
   attr_accessor :parameters
   alias_method :params, :parameters
   # The response suggested by the NLU
-  attr_accessor :response
+  attr_accessor :fulfillment
   # An (optional) specified route for the request. Used for prompts.
   attr_accessor :route
 
   # TODO: Use dry-initializer
   def initialize(options = {})
-    @action     = options.fetch(:action)
-    @user       = options.fetch(:user)
-    @intent     = options.fetch(:intent) { nil }
-    @message    = options.fetch(:message) { nil }
-    @parameters = options.fetch(:parameters) { {} }
-    @response   = options.fetch(:response) { nil }
-    @route      = options.fetch(:route) { nil }
+    @action      = options.fetch(:action)
+    @user        = options.fetch(:user)
+    @intent      = options.fetch(:intent) { nil }
+    @message     = options.fetch(:message) { nil }
+    @parameters  = options.fetch(:parameters) { {} }
+    @fulfillment = options.fetch(:fulfillment) { {} }
+    @route       = options.fetch(:route) { nil }
   end
 end

@@ -77,7 +77,6 @@ module Hg
 
           # Set chatbase fields for dialog action
           set_chatbase_fields(request.action, message.text, false)
-
         # If the message is text...
         else
           # Parse the message.
@@ -115,7 +114,7 @@ module Hg
     # @param message [Facebook::Messenger::Incoming::Message]
     #   The incoming message.
     # @param nlu_response [Hash]
-    #   The API.ai query response.
+    #   The Dialogflow query response.
     # @param params [Hash]
     #   The parsed entities for the request.
     # @param user [Object]
@@ -125,12 +124,12 @@ module Hg
     #   The generated request.
     def build_request(message, nlu_response, params, user)
       Hg::Request.new(
-        user:       user,
-        message:    message,
-        intent:     nlu_response[:intent],
-        action:     nlu_response[:action] || nlu_response[:intent],
-        parameters: params,
-        response:   nlu_response[:response]
+        user:          user,
+        message:       message,
+        intent:        nlu_response[:intent],
+        action:        nlu_response[:action] || nlu_response[:intent],
+        parameters:    params,
+        fulfillment:   nlu_response[:fulfillment]
       )
     end
 

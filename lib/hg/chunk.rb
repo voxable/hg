@@ -8,8 +8,6 @@ module Hg
       base.id = base.to_s
       base.deliverables = []
       base.dynamic = false
-      base.add_to_chunks
-      base.include_chunks
     end
 
     # @return [OpenStruct] The execution context for this chunk instance.
@@ -82,20 +80,8 @@ module Hg
       attr_accessor :context
       attr_accessor :dynamic
 
-      def bot_class
-        Kernel.const_get(self.to_s.split('::').first)
-      end
-
       def label(text)
         @label = text
-      end
-
-      def add_to_chunks
-        bot_class.chunks << self
-      end
-
-      def include_chunks
-        bot_class.class_eval "include #{bot_class.to_s}::Chunks"
       end
 
       def dynamic(&block)

@@ -19,7 +19,6 @@ module Hg
     module Bot
       def self.included(base)
         base.extend ClassMethods
-        base.chunks = []
         base.call_to_actions = []
         base.nested_call_to_actions = []
         base.nested_menu_items =[]
@@ -58,7 +57,6 @@ module Hg
           raise NoUserClassExistsError.new
         end
 
-        attr_accessor :chunks
         attr_accessor :call_to_actions
         attr_accessor :nested_call_to_actions
         attr_accessor :input_disabled
@@ -207,17 +205,31 @@ module Hg
 
         # Queue a postback for processing.
         #
-        # @param message [Facebook::Messenger::Incoming::Postback] The postback to be queued.
+        # @param postback [Facebook::Messenger::Incoming::Postback / ::Referral]
+        #   The postback/referral to be queued.
         def queue_postback(postback)
           # Grab the user's PSID.
           user_id = postback.sender['id']
           # Pull out the raw JSON postback from the `Postback` object.
           raw_postback = postback.messaging
 
-          # Parse the postback payload as JSON, and store it as the value of
-          # the `payload` key
-          raw_payload = raw_postback['postback']['payload']
-          raw_postback['postback']['payload'] = JSON.parse(raw_payload)
+          # Handle referral
+          if raw_postback['referral']
+            # 'ref' value is parsed json, set to 'postback' key
+            payload = raw_postback['referral']['ref']
+            raw_postback['postback'] = payload
+          # Else, it may be a referral, but Get Started postback has been received
+          elsif raw_postback['postback']['referral']
+            payload = raw_postback['postback']['referral']['ref']
+            # Parse the payload and set to 'postback'
+            raw_postback['postback'] = JSON.parse(payload)
+          # ...else, it's a standard postback
+          else
+            # Parse the postback payload as JSON, and store it as the value of
+            # the `payload` key
+            raw_payload = raw_postback['postback']['payload']
+            raw_postback['postback']['payload'] = JSON.parse(raw_payload)
+          end
 
           # Store the transformed postback on the queue
           Hg::Queues::Messenger::PostbackQueue
@@ -299,6 +311,23 @@ module Hg
                 Rails.logger.error e.inspect
                 Rails.logger.error e.backtrace
               end
+            end
+          end
+
+          ::Facebook::Messenger::Bot.on :referral do |referral|
+            begin
+              # Log the referral receipt
+              Rails.logger.info "Referral from sender: #{referral.sender['id']}"
+
+              # Show a typing indicator to the user
+              show_typing(referral.sender['id'])
+
+              # Queue the referral for processing
+              queue_postback(referral)
+            rescue StandardError => e
+              # TODO: high
+              Rails.logger.error e.inspect
+              Rails.logger.error e.backtrace
             end
           end
         end
