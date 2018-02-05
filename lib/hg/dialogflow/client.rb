@@ -83,13 +83,13 @@ module Hg
               action_from_response
             end
 
-          response = api_ai_response[:result][:fulfillment][:speech]
+          fulfillment = api_ai_response[:result][:fulfillment]
 
           return {
             intent: intent_name,
             action: action_name,
             parameters: parsed_params(api_ai_response[:result][:parameters]),
-            response: response
+            fulfillment: fulfillment
           }
         end
       end
