@@ -97,7 +97,7 @@ module Hg
         bot.router.handle(request) if request
 
         # Send to Chatbase if env var present
-        @chatbase_api_client.send_user_message(message)
+        send_user_message(message)
 
         # Attempt to pop another message from the queue for processing.
         raw_message = pop_raw_message(user_id, redis_namespace)

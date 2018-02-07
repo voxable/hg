@@ -121,7 +121,7 @@ class ChatbaseAPIClient
         recipient: {
           id: parsed_response['recipient_id']
         },
-        message: message[:message]
+        message: message[:text]
       },
       response_body: parsed_response
     }
