@@ -35,6 +35,11 @@ module Hg
 
                 end
               end
+
+              render_gallery(cards) if cards.any?
+
+              schedule_main_quick_reply
+              main_menu_quick_reply
             end
           end
 

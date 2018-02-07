@@ -138,6 +138,15 @@ module Hg
           begin
             route = routes.fetch(request.action)
             request.route = route
+
+            handler_name = route[:handler]
+
+            controller_for_request = route[:controller].new(
+              request:      request,
+              router:       self,
+              handler_name: handler_name
+            )
+            controller_for_request.process_action(handler_name)
           rescue KeyError
             if request.fulfillment.empty?
               raise ActionNotRegisteredError.new(request.action)
@@ -147,15 +156,6 @@ module Hg
             end
           end
         end
-
-        handler_name = route[:handler]
-
-        controller_for_request = route[:controller].new(
-          request:      request,
-          router:       self,
-          handler_name: handler_name
-        )
-        controller_for_request.process_action(handler_name)
       end
 
       # Set up a handler for the default action.
