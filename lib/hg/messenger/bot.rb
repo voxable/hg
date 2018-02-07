@@ -17,6 +17,11 @@ module Hg
 
   module Messenger
     module Bot
+      # @const
+      #   Parameter passed when user is accessing a ref link via the Get
+      #   Started button (and thus, should be shown "onboarding" content).
+      ONBOARDING_PARAM = 'onboarding'.freeze
+
       def self.included(base)
         base.extend ClassMethods
         base.call_to_actions = []
@@ -220,9 +225,12 @@ module Hg
             raw_postback['postback'] = payload
           # Else, it may be a referral, but Get Started postback has been received
           elsif raw_postback['postback']['referral']
-            payload = raw_postback['postback']['referral']['ref']
-            # Parse the payload and set to 'postback'
-            raw_postback['postback'] = JSON.parse(payload)
+            # Parse the referral payload
+            payload = JSON.parse(raw_postback['postback']['referral']['ref'])
+            # Include onboarding param
+            payload['payload']['params'][Hg::Messenger::Bot::ONBOARDING_PARAM] = true
+            # Give to 'postback'
+            raw_postback['postback'] = payload
           # ...else, it's a standard postback
           else
             # Parse the postback payload as JSON, and store it as the value of
