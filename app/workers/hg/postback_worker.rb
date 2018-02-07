@@ -34,13 +34,6 @@ module Hg
         # Extract the payload from the postback.
         postback = Facebook::Messenger::Incoming::Postback.new(raw_postback)
 
-        # Send to Chatbase if env var present
-        if ChatbaseAPIClient.api_key
-          @chatbase_api_client = ChatbaseAPIClient.new
-          set_chatbase_fields(postback.payload['action'], postback.payload['action'], false)
-          @chatbase_api_client.send_user_message(postback)
-        end
-
         # Build the request object
         request =
           # Handle referral postback
@@ -68,6 +61,13 @@ module Hg
 
         # Send the request to the bot's router.
         bot.router.handle(request)
+
+        # Send to Chatbase if env var present
+        if ChatbaseAPIClient.api_key
+          @chatbase_api_client = ChatbaseAPIClient.new
+          set_chatbase_fields(postback.payload['action'], postback.payload['action'], false)
+          @chatbase_api_client.send_user_message(postback)
+        end
 
         # Attempt to pop another postback from the queue for processing.
         raw_postback = pop_raw_postback(user_id, redis_namespace)
