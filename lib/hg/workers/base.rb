@@ -118,6 +118,25 @@ module Hg
         end
       end
 
+      # Initialize a new Chatbase API client for this worker.
+      #
+      # @param [String] intent
+      #   Determined intent of user message
+      # @param [String] text
+      #   Text of user message
+      # @param [Boolean] not_handled
+      #   Flag for user message not understood
+      #
+      # @return [Hg::ChatbaseAPIClient]
+      #   The Chatbase API client.
+      def initialize_chatbase_api_client(intent, text, not_handled)
+        @chatbase_api_client ||= ChatbaseAPIClient.new(
+          intent: intent,
+          text: text,
+          not_handled: not_handled
+        )
+      end
+
       # Method to set Chatbase client fields
       #
       # @param [String] intent
@@ -129,9 +148,9 @@ module Hg
       #
       # @return [void]
       def set_chatbase_fields(intent, text, not_handled)
-        @client.intent = intent
-        @client.text = text
-        @client.not_handled = not_handled
+        return unless ChatbaseAPIClient.api_key
+
+        initialize_chatbase_api_client(intent, text, not_handled)
       end
 
       # Method to send user message to Chatbase
@@ -146,14 +165,12 @@ module Hg
       #   Message or postback received
       #
       # @return [void]
-      def send_user_message(intent:, text:, not_handled:, message:)
+      def send_user_message(intent: nil, text: nil, not_handled: nil, message:)
         return unless ChatbaseAPIClient.api_key
 
-        ChatbaseAPIClient.new(
-          intent: intent,
-          text: text,
-          not_handled: not_handled
-        ).send_user_message message
+        initialize_chatbase_api_client(intent, text, not_handled)
+
+        @chatbase_api_client.send_user_message message
       end
     end
   end

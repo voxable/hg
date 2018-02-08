@@ -121,10 +121,11 @@ class ChatbaseAPIClient
         recipient: {
           id: parsed_response['recipient_id']
         },
-        message: message[:text]
+        message: message[:message]
       },
       response_body: parsed_response
     }
+    message_body
   end
 
   # Rescue errors from HTTParty
