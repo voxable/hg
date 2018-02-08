@@ -99,6 +99,7 @@ class ChatbaseAPIClient
       },
       chatbase_fields: {
         intent: intent,
+        version: '2018',
         not_handled: not_handled
       }
     }
@@ -166,3 +167,4 @@ class ChatbaseAPIClient
     }
   end
 end
+
