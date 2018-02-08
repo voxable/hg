@@ -83,13 +83,13 @@ module Hg
           request = build_request(message, nlu_response, params, user)
 
           # Set chatbase fields and determine not_handled
-          return unless ChatbaseAPIClient.api_key
-
-          @not_handled = false
-          if !nlu_response[:intent] || request.intent == 'Default'
-            @not_handled = true
-          else
-            set_chatbase_fields(request.intent, message.text, @not_handled)
+          if ChatbaseAPIClient.api_key
+            @not_handled = false
+            if !nlu_response[:intent] || request.intent == 'Default'
+              @not_handled = true
+            else
+              set_chatbase_fields(request.intent, message.text, @not_handled)
+            end
           end
         end
 

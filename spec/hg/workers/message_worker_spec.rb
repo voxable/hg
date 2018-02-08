@@ -35,6 +35,9 @@ RSpec.describe Hg::MessageWorker, type: :worker do
         double(
           'user',
           api_ai_session_id: user_api_ai_session_id,
+          facebook_psid: '1234',
+          conversation_state: {},
+          dialogflow_context_name: nil,
           context: {},
           dialogflow_context_name: nil
         )
@@ -120,6 +123,7 @@ RSpec.describe Hg::MessageWorker, type: :worker do
         double(
           'user',
           api_ai_session_id: user_api_ai_session_id,
+          facebook_psid: '1234',
           context: {
             dialog_action:     'someaction',
             dialog_parameters: params
@@ -132,6 +136,7 @@ RSpec.describe Hg::MessageWorker, type: :worker do
         allow(user_in_dialog).to receive(:update_context!)
         allow(Kernel).to receive(:const_get).and_return(bot_class, controller)
         allow(bot_class.router).to receive(:handle)
+
       end
 
       context 'when building a dialog request' do
@@ -163,7 +168,7 @@ RSpec.describe Hg::MessageWorker, type: :worker do
       end
 
       it 'creates the request' do
-        expect(subject).to receive(:build_dialog_request).with(user_in_dialog, an_instance_of(Facebook::Messenger::Incoming::Message))
+        expect(subject).to receive(:build_dialog_request).with(user_in_dialog, an_instance_of(Facebook::Messenger::Incoming::Message)).and_return(request)
 
         subject.perform(*valid_args)
       end

@@ -78,6 +78,11 @@ describe Hg::Controller do
       @old_messenger_bot_class = Facebook::Messenger::Bot
       Facebook::Messenger::Bot = messenger_api_client
       allow(@controller_instance).to receive(:user).and_return(user)
+
+      chatbase_api_client = instance_double('Hg::ChatbaseAPIClient')
+      allow(Hg::ChatbaseAPIClient).to receive(:new).and_return(chatbase_api_client)
+      allow(chatbase_api_client).to receive(:send_bot_message)
+      allow(chatbase_api_client).to receive(:send_user_message)
     end
 
     after(:example) do

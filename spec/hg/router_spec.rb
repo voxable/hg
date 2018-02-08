@@ -69,7 +69,11 @@ describe Hg::Router do
           ingredient: 'pepper'
         },
         route: nil,
-        'route=' => nil
+        'route=' => nil,
+        fulfillment: {
+          'speech' => '',
+          'messages' => []
+        }
       )
     }
 

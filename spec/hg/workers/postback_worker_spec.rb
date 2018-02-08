@@ -98,7 +98,7 @@ RSpec.describe Hg::PostbackWorker, type: :worker do
       end
 
       it 'processes as referral' do
-        expect(subject).to receive(:build_referral_request)
+        expect(subject).to receive(:build_referral_request).and_return(request)
 
         subject.perform(*valid_args)
       end

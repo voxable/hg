@@ -166,9 +166,9 @@ module Hg
       #
       # @return [void]
       def send_user_message(intent: nil, text: nil, not_handled: nil, message:)
-        Thread.new do
-          return unless ChatbaseAPIClient.api_key
+        return unless ChatbaseAPIClient.api_key
 
+        Thread.new do
           initialize_chatbase_api_client(intent, text, not_handled)
 
           @chatbase_api_client.send_user_message message
