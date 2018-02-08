@@ -47,9 +47,6 @@ module Hg
             build_payload_request @postback.payload, user
           end
 
-        # Send the request to the bot's router.
-        bot.router.handle(request)
-
         # Send to Chatbase if env var present
         # Use the action, because it's a postback.
         send_user_message(
@@ -58,6 +55,9 @@ module Hg
           not_handled: false,
           message: @postback || @referral
         )
+
+        # Send the request to the bot's router.
+        bot.router.handle(request)
 
         # Attempt to pop another postback from the queue for processing.
         raw_postback = pop_raw_postback(user_id, redis_namespace)
