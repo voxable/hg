@@ -30,7 +30,7 @@ Gem::Specification.new do |spec|
   spec.add_runtime_dependency 'rails', '>= 5.0.0'
 
   # Background Jobs
-  spec.add_runtime_dependency 'sidekiq', '~> 5.0.0'
+  spec.add_runtime_dependency 'sidekiq', '~> 5.1.1'
   # Dialogflow NLU
   # Don't pin to a version for the moment, so we can reference specific commits
   # This library doesn't get released very often
