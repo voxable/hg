@@ -162,7 +162,8 @@ module Hg
 
       def image_url(url, options = {})
         if options.has_key?(:host)
-          @card[:image_url] = ApplicationController.helpers.image_url(url, options)
+          @card[:image_url] =
+            ApplicationController.helpers.image_url(url, options)
         else
           @card[:image_url] = url
         end
@@ -341,7 +342,7 @@ module Hg
         if options[:image_url]
           if options.has_key?(:host)
             quick_reply_content[:image_url] =
-              ActionController::Base
+              ApplicationController
                 .helpers
                 .image_url(options[:image_url], host: options[:host])
           else
