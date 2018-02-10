@@ -145,7 +145,7 @@ module Hg
         }
       end
 
-      def image_url(url, options = {})
+      def image_url(url = nil, options = {})
         if options.has_key?(:host)
           @card[:image_url] = ApplicationController.helpers.image_url(url, options)
         else
