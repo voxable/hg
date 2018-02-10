@@ -329,9 +329,9 @@ module Hg
               .helpers
               .image_url(options[:image_url], host: options[:host])
 
-            Rails.logger.info 'main menu image_url', url: main_menu_image_url
-            Rails.logger.info 'host option', url: options[:host]
-            Rails.logger.info 'host ENV', url: ENV['HOSTNAME']
+            Rails.logger.info "main menu image_url#{main_menu_image_url}"
+            Rails.logger.info "host option#{options[:host]}"
+            Rails.logger.info "host ENV #{ENV['HOSTNAME']}"
 
             quick_reply_content[:image_url] = main_menu_image_url
           else
