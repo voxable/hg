@@ -325,7 +325,10 @@ module Hg
         # If image_url is specified include the url or asset path
         if options[:image_url]
           if options.has_key?(:host)
-            quick_reply_content[:image_url] = ApplicationController.helpers.image_url(options[:image_url], host: options[:host])
+            quick_reply_content[:image_url] =
+              ActionController::Base
+                .helpers
+                .image_url(options[:image_url], host: options[:host])
           else
             quick_reply_content[:image_url] = options[:image_url]
           end
