@@ -147,7 +147,8 @@ module Hg
 
       def image_url(url = nil, options = {})
         if options.has_key?(:host)
-          @card[:image_url] = ApplicationController.helpers.image_url(url, options)
+          @card[:image_url] =
+            ApplicationController.helpers.image_url(url, options)
         else
           @card[:image_url] = url
         end
@@ -325,15 +326,10 @@ module Hg
         # If image_url is specified include the url or asset path
         if options[:image_url]
           if options.has_key?(:host)
-            main_menu_image_url = ActionController::Base
-              .helpers
-              .image_url(options[:image_url], host: options[:host])
-
-            Rails.logger.info "main menu image_url#{main_menu_image_url}"
-            Rails.logger.info "host option#{options[:host]}"
-            Rails.logger.info "host ENV #{ENV['HOSTNAME']}"
-
-            quick_reply_content[:image_url] = main_menu_image_url
+            quick_reply_content[:image_url] =
+              ApplicationController
+                .helpers
+                .image_url(options[:image_url], host: options[:host])
           else
             quick_reply_content[:image_url] = options[:image_url]
           end
