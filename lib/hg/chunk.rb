@@ -325,10 +325,15 @@ module Hg
         # If image_url is specified include the url or asset path
         if options[:image_url]
           if options.has_key?(:host)
-            quick_reply_content[:image_url] =
-              ActionController::Base
-                .helpers
-                .image_url(options[:image_url], host: options[:host])
+            main_menu_image_url = ActionController::Base
+              .helpers
+              .image_url(options[:image_url], host: options[:host])
+
+            Rails.logger.info 'main menu image_url', url: main_menu_image_url
+            Rails.logger.info 'host option', url: options[:host]
+            Rails.logger.info 'host ENV', url: ENV['HOSTNAME']
+
+            quick_reply_content[:image_url] = main_menu_image_url
           else
             quick_reply_content[:image_url] = options[:image_url]
           end
