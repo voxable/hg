@@ -194,11 +194,14 @@ module Hg
           @image_url_base_portion = base
         end
 
+        # TODO: Should support various locales.
         def initialize_greeting_text
           Facebook::Messenger::Profile.set({
             greeting: [
+              {
                 locale: 'default',
-              text: @greeting_text
+                text: @greeting_text
+              }
             ]
           }, access_token: access_token)
         end
