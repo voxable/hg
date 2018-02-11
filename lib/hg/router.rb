@@ -148,12 +148,10 @@ module Hg
             )
             controller_for_request.process_action(handler_name)
           rescue KeyError
-            if request.fulfillment&.empty?
-              raise ActionNotRegisteredError.new(request.action)
-            else
-              Hg::Dialogflow::Fulfillment::Messenger::Responder
-                .new(request).respond
-            end
+            raise ActionNotRegisteredError.new(request.action) if request.fulfillment&.empty?
+            
+            Dialogflow::Fulfillment::Messenger::Responder
+              .new(request).respond
           end
         end
       end
@@ -165,7 +163,7 @@ module Hg
       # @param handler_method_name [Symbol] The name of the handler method on the
       #   controller class for the default action.
       def default(controller, handler_method_name)
-        action Hg::InternalActions::DEFAULT,
+        action InternalActions::DEFAULT,
                controller: controller,
                with: handler_method_name
       end

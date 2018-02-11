@@ -2,4 +2,4 @@ inherit_from:
   - https://raw.githubusercontent.com/voxable-labs/ruby-style-guide/master/.rubocop.yml
 
 AllCops:
-  TargetRubyVersion: 5.1.0
+  TargetRubyVersion: 2.5.0
