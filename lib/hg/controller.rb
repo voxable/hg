@@ -135,6 +135,7 @@ module Hg
     end
 
     def flash(message)
+      message = message.sample if message.respond_to?(:sample)
       respond(message)
       show_typing
     end
