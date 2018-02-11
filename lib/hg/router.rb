@@ -148,7 +148,7 @@ module Hg
             )
             controller_for_request.process_action(handler_name)
           rescue KeyError
-            if request.fulfillment.empty?
+            if request.fulfillment&.empty?
               raise ActionNotRegisteredError.new(request.action)
             else
               Hg::Dialogflow::Fulfillment::Messenger::Responder
