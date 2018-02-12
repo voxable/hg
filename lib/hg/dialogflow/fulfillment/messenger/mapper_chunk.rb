@@ -11,6 +11,7 @@ module Hg
               text context['speech']
             else
               cards = []
+              images = []
 
               context['messages'].each do |message|
                 next unless message['platform'] == 'facebook'
@@ -29,7 +30,7 @@ module Hg
                 when 2
                   # render_quick_replies
                 when 3
-                  # render_image
+                  images << message['imageUrl']
                 when 4
                   # custom payload
                 else
@@ -38,6 +39,8 @@ module Hg
               end
 
               render_gallery(cards) if cards.any?
+              # Render a random image if several specified.
+              image(images.sample) if images.any?
 
               # TODO: Pull these out.
               schedule_main_quick_reply
