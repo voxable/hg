@@ -4,6 +4,7 @@ module Hg
       module Messenger
         class MapperChunk
           include Hg::Chunk
+          include MessengerBot::Chunks::BaseQuickReplies
 
           dynamic do |context|
             if !context['speech'].empty?
@@ -15,14 +16,14 @@ module Hg
                 next unless message['platform'] == 'facebook'
 
                 # If this isn't a card, render a gallery out of the sequential cards.
-                if message['type'] != 1
+                if message['type'] != 1 && cards.any?
                   render_gallery(cards)
                   cards = []
                 end
 
                 case message['type']
                 when 0
-                  text message['speech']
+                  render_text_response(message['speech'])
                 when 1
                   cards << message
                 when 2
@@ -38,6 +39,7 @@ module Hg
 
               render_gallery(cards) if cards.any?
 
+              # TODO: Pull these out.
               schedule_main_quick_reply
               main_menu_quick_reply
             end
@@ -59,6 +61,41 @@ module Hg
                 end
               end
             end
+          end
+
+          BUTTON_REGEX = /(.*):(https?:\/\/[\S]+)/
+          #
+          def self.render_text_response(text_response)
+            # Create regex to search for text buttons.
+            previous_line = nil
+
+            # For each line in the message.
+            text_response.split("\n").reject(&:blank?).each do |line|
+              if line.match(BUTTON_REGEX)
+                label = $1
+                url = $2
+
+                buttons do
+                  text previous_line
+
+                  button label, url: url
+                end
+              else
+                # ...otherwise, render the line as a text message.
+                render_previous_line(previous_line)
+              end
+
+              previous_line = line
+            end
+
+            render_previous_line(previous_line)
+          end
+
+          #
+          def self.render_previous_line(previous_line)
+            return unless previous_line && !previous_line.match(BUTTON_REGEX)
+
+            text previous_line
           end
         end
       end
