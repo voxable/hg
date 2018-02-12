@@ -148,13 +148,10 @@ module Hg
             )
             controller_for_request.process_action(handler_name)
           rescue KeyError
-            if request.fulfillment['speech'].blank? &&
-               request.fulfillment['messages'].blank?
-              raise ActionNotRegisteredError.new(request.action)
-            else
-              Dialogflow::Fulfillment::Messenger::Responder
-                .new(request).respond
-            end
+            raise ActionNotRegisteredError.new(request.action) if request.fulfillment&.empty?
+
+            Dialogflow::Fulfillment::Messenger::Responder
+              .new(request).respond
           end
         end
       end
