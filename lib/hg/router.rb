@@ -152,7 +152,7 @@ module Hg
                request.fulfillment['messages'].blank?
               raise ActionNotRegisteredError.new(request.action)
             else
-              Hg::Dialogflow::Fulfillment::Messenger::Responder
+              Dialogflow::Fulfillment::Messenger::Responder
                 .new(request).respond
             end
           end
@@ -166,7 +166,7 @@ module Hg
       # @param handler_method_name [Symbol] The name of the handler method on the
       #   controller class for the default action.
       def default(controller, handler_method_name)
-        action Hg::InternalActions::DEFAULT,
+        action InternalActions::DEFAULT,
                controller: controller,
                with: handler_method_name
       end
