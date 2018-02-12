@@ -56,7 +56,15 @@ module Hg
                   subtitle message['subtitle']
 
                   message['buttons'].each do |button_data|
-                    button button_data['text'], url: button_data['postback']
+                    button_text = button_data['text']
+                    postback = button_data['postback']
+
+                    # Todo: Need a better regex, here.
+                    if postback.match(/\(\d{3}\)\s\d{3}-\d{4}/)
+                      call_button button_text, number: postback
+                    else
+                      button button_text, url: postback
+                    end
                   end
                 end
               end
