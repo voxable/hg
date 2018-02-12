@@ -41,11 +41,11 @@ module Hg
               render_gallery(cards) if cards.any?
               # Render a random image if several specified.
               image(images.sample) if images.any?
-
-              # TODO: Pull these out.
-              schedule_main_quick_reply
-              main_menu_quick_reply
             end
+
+            # TODO: Pull these out.
+            schedule_main_quick_reply
+            main_menu_quick_reply
           end
 
           #
