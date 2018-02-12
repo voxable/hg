@@ -95,6 +95,19 @@ describe Hg::Router do
     end
 
     context "when the action isn't registered in the routes" do
+      let(:request) {
+        double(
+          'request',
+          action: ACTION_NAME,
+          parameters: {
+            ingredient: 'pepper'
+          },
+          route: nil,
+          'route=' => nil,
+          fulfillment: {}
+        )
+      }
+
       it 'throws an error' do
         allow(request).to receive(:action).and_return('foo')
 
