@@ -142,7 +142,8 @@ module Hg
 
         @card[:default_action] = {
           type: 'web_url',
-          # ABBY - add utm params, when required
+          # ABBY
+          # Append utm params, when required
           url: with_sxsw_utm(url),
           webview_height_ratio: webview_height_ratio.to_s
         }
