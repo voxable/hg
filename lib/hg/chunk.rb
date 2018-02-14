@@ -262,6 +262,7 @@ module Hg
           klass = text
           text = text.instance_variable_get(:@label)
 
+          # TODO: This should use the display chunk internal action below.
           button_content = {
             title: text,
             type: 'postback',
@@ -291,6 +292,10 @@ module Hg
         # If a `url` option is present, assume this is a webview link button.
         elsif options[:url]
           button_content[:type] = 'web_url'
+
+          # ABBY
+          # Append link emoji to outbound link buttons.
+          button_content[:title] = '🔗 ' + button_content[:title]
 
           button_content[:url] = evaluate_option(options[:url])
         elsif options[:payload]
