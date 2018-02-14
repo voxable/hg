@@ -37,6 +37,8 @@ module Hg
       module Controllers; end
 
       module ClassMethods
+        include Hg::Helpers
+
         def init
           subscribe_to_messages
           initialize_message_handlers
@@ -141,7 +143,8 @@ module Hg
             })
           elsif options[:url]
             call_to_action_content[:type] = 'web_url'
-            call_to_action_content[:url] = options[:url]
+            # ABBY - include utm params, when required
+            call_to_action_content[:url] = with_sxsw_utm(options[:url])
           elsif options[:payload]
             call_to_action_content[:type] = 'postback'
             # Encode the payload hash as JSON.

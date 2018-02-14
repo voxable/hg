@@ -73,6 +73,8 @@ module Hg
     end
 
     module ClassMethods
+      include Hg::Helpers
+
       attr_accessor :id
       attr_accessor :deliverables
       attr_accessor :label
@@ -140,7 +142,8 @@ module Hg
 
         @card[:default_action] = {
           type: 'web_url',
-          url: url,
+          # ABBY - add utm params, when required
+          url: with_sxsw_utm(url),
           webview_height_ratio: webview_height_ratio.to_s
         }
       end
@@ -296,8 +299,8 @@ module Hg
           # ABBY
           # Append link emoji to outbound link buttons.
           button_content[:title] = '🔗 ' + button_content[:title]
-
-          button_content[:url] = evaluate_option(options[:url])
+          # Append Abby utm params
+          button_content[:url] = with_sxsw_utm(evaluate_option(options[:url]))
         elsif options[:payload]
           button_content[:type] = 'postback'
           # Encode the payload hash as JSON.
@@ -452,24 +455,6 @@ module Hg
       # @return [void]
       def set_square_image_ratio
         @gallery[:message][:attachment][:payload][:image_aspect_ratio] = 'square'
-      end
-
-      # ABBY
-      # Add SXSW utm params to url
-      #
-      # @param [String] url
-      #
-      # @return [String] new_url with utm params
-      UTM_PARAMS = 'utm_source=facebook&utm_campaign=abby&utm_medium=bot'.freeze
-      def with_sxsw_utm(url)
-        if /sxsw.com/ =~ url
-          if url.split('?').count == 1
-            @new_url = url + "?#{UTM_PARAMS}"
-          else
-            @new_url = url + "&#{UTM_PARAMS}"
-          end
-        end
-        @new_url ||= url
       end
     end
   end
