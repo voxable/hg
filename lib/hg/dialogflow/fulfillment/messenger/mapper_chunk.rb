@@ -66,7 +66,7 @@ module Hg
                     if postback.match(/\(\d{3}\)\s\d{3}-\d{4}/)
                       call_button button_text, number: postback
                     else
-                      button button_text, url: postback
+                      button "🔗 #{button_text}", url: postback
                     end
                   end
                 end
@@ -89,7 +89,7 @@ module Hg
                 buttons do
                   text previous_line
 
-                  button label, url: url
+                  button "🔗 #{label}", url: url
                 end
               else
                 # ...otherwise, render the line as a text message.
